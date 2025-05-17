@@ -1,0 +1,509 @@
+/* Standart style sheet. Note: uses CSS2 features like position */
+
+:root {
+    --common_border_radius: 0px;
+    --color_lv_1: hsl(15 50% 100%); /* white */
+
+    /* next four are for button borders */
+    --color_lv_2: hsl(15 40% 92%);
+    --color_lv_3: hsl(15 30% 78%);
+    --color_lv_4: hsl(15 30% 65%);
+    --color_lv_5: hsl(15 20% 50%); 
+
+    /* background */
+    --color_lv_7: hsl(15 20% 40%);
+    --color_lv_8: hsl(5 10% 30%);
+    --color_lv_9: hsl(5 10% 20%);
+    --color_lv_10: hsl(5 5% 10%); /* darkest color */
+}
+
+body {
+    font-family: verdana,arial,helvetica,sans-serif;
+    background-color: var(--color_lv_10);
+    color: var(--color_lv_1);
+    min-height: 95vh;
+}
+
+div.header {
+    margin: 0;
+    padding: .5em 1em;
+}
+div.header h1 {
+    margin: 0;
+}
+
+/** For the header title font */
+span.header {
+    font-size: 200%;
+    font-weight: 800;
+}
+
+div.content {
+    margin: 0;
+    padding: .5em 1em;
+    background-color: var(--color_lv_10);
+}
+
+/* My own button. Browser independent */
+span.button {
+    display: inline-block;
+    margin: 0.2em 0.2em;
+    padding: 0.1em 0.3em;
+
+    border: 2px solid var(--color_lv_1);
+    background-color: var(--color_lv_10);
+
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+
+    user-select: none;
+    cursor: default;
+}
+
+span.button:hover {
+    background-color: var(--color_lv_9);
+    box-shadow: 0px 0px 5px 5px var(--color_lv_1);
+}
+span.button[active],
+span.button:active {
+    background-color: var(--color_lv_5);
+}
+
+span.button[disabled],
+span.button[disabled]:hover,
+span.button.disabled,
+span.button.disabled:hover {
+    box-shadow: none;
+    border: 2px solid gray;
+    background-color: var(--color_lv_10);
+    color: darkgray;
+}
+
+/* The buttons in the config table need to be a little smaller */
+td span.button {
+    font-size: 80%;
+}
+
+/* --- control tab --- */
+
+/* Switch for the controller panel */
+div.switch {
+    position: relative;
+    flex-grow: 1;
+
+    margin: 0.4em 0.4em;
+
+    border: 2px solid var(--color_lv_1);
+    background-color: var(--color_lv_10);
+
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+
+    color: var(--color_lv_1);
+
+    container: switch / size;
+    cursor: default;
+    user-select: none;
+}
+div.switch:hover {
+    background-color: var(--color_lv_9);
+    box-shadow: 0px 0px 5px 5px var(--color_lv_1);
+}
+div.switch[active] {
+    background-color: var(--color_lv_5);
+}
+div.switch[disabled],
+div.switch[disabled]:hover {
+    box-shadow: none;
+
+    border: 2px solid var(--color_lv_8);
+    background-color: var(--color_lv_10);
+    color: var(--color_lv_8);
+}
+div.switch[status="on"] {
+    background: radial-gradient(green 0%, var(--color_lv_10) 70%)
+}
+div.switch[status="off"] {
+    background: radial-gradient(red 0%, var(--color_lv_10) 80%)
+}
+
+div.switch > img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    height: 60%;
+    margin: 0;
+
+    transform: translateY(-50%) translateX(-50%);
+    filter: invert(30%);
+}
+div.switch[disabled][status="on"]  > img {
+    filter: blur(2px) invert(60%);
+}
+div.switch[status="off"] > img {
+    filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(-46deg) brightness(88%);
+}
+
+div.switch[status="on"] > img {
+    filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(158%);
+}
+
+div.switch > span:not(.overrideButton) {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: 0;
+
+    transform: translateY(-50%) translateX(-50%);
+
+    font-size: min(50cqh, 12cqw);
+}
+
+/** this is the small override symbol on the control pane
+ *  indicating that the button was pressed and is overriding
+ *  the default signal. */
+.overrideButton {
+    display: block;
+    position: absolute;
+    margin: 0;
+    right: 0.1em;
+    bottom: 0.1em;
+    width: 1.0em;
+    height: 1.0em;
+
+    line-height: 1em;
+
+    border: 2px solid white;
+    color: white;
+
+    background-color: var(--color_lv_9);
+
+    text-align: center;
+    font-size: min(50cqh, 12cqw);
+}
+
+div.switch[auto]  > .overrideButton {
+    border: 2px solid black;
+    color: black;
+}
+
+
+/* signals table */
+table {
+    /* width: 100%; */
+    border-collapse: collapse;
+}
+th, td {
+    text-align: left;
+    padding-left: .4em;
+    border-radius: var(--common_border_radius);
+}
+tr:nth-child(even) {
+    background-color: var(--color_lv_9);
+}
+tr:nth-child(odd) {
+    background-color: var(--color_lv_10);
+}
+
+/* -- procConfig -- */
+ul {
+    list-style-type: none;
+    padding: 0px;
+    margin: 0px;
+}
+li.proc {
+    margin-top: 1em;
+    margin-bottom: .5em;
+    margin-left: .5em;
+    padding: .5em;
+    border: 2px solid #a0a;
+    border-radius: var(--common_border_radius);
+
+    background-color: var(--color_lv_9);
+    border: 2px solid #a0a;
+
+    animation-duration: 1s;
+    animation-name: appear;
+}
+li.proc > h1 {
+    font-size: 100%;
+    font-weight: 600;
+    margin: 0;
+    margin-top: -1.1em;
+    padding: 0;
+    padding-left: .4em;
+    padding-right: .4em;
+
+    width: fit-content;
+    background-color: rgba(0, 0, 0, .2);
+    border-radius: var(--common_border_radius);
+}
+li.proc th {
+    font-weight: 600;
+    border-radius: var(--common_border_radius);
+    width: 1%; /* minimum width */
+    white-space: nowrap;
+}
+
+li.proc td {
+    width: auto;
+}
+
+li.procGroup {
+    margin-top: .5em;
+    margin-left: -.3em;
+    padding: 0.5em;
+
+    border-top: 2px solid var(--color_lv_4);
+    border-left: 2px solid var(--color_lv_3);
+    border-bottom: 2px solid var(--color_lv_2);
+    border-top-left-radius: var(--common_border_radius);
+    border-bottom-left-radius: var(--common_border_radius);
+    background-color: var(--color_lv_9);
+}
+li.procGroup > details > summary {
+    font-size: 100%;
+    font-weight: 600;
+
+    cursor: default;
+}
+
+.options_menu {
+    float: right;
+
+    border: 2px solid var(--color_lv_2);
+    background-color: var(--color_lv_8);
+    /* box-shadow: 4px 4px 3px 0px rgba(0,0,0,0.4); */
+
+    padding-bottom: 0;
+    padding-top: .1em;
+    padding-left: .2em;
+    padding-right: .2em;
+    margin-top: -1.3em;
+}
+.options_menu > img {
+    width: 1.5em;
+    height: 1.5em;
+}
+.options_menu:hover {
+    background-color: var(--color_lv_9);
+}
+.options_window {
+    display: none;
+    position: absolute;
+    right: 10px;
+
+    padding: .5em;
+
+    border: 2px solid #888;
+    border-radius: var(--common_border_radius);
+
+    background-color: rgba(50, 50, 50, 0.7);
+    box-shadow: 4px 4px 3px 0px rgba(0,0,0,0.4);
+
+    text-align: left;
+    font-weight: 400;
+    font-size: 100%;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    z-index: 1;
+}
+
+/* Change color of dropdown links on hover */
+.options_window li:hover {
+    background-color: #aaa;
+    cursor: default;
+}
+
+/* -- slider stuff -- */
+.sliderRed {
+    accent-color:red;
+}
+
+.sliderGreen {
+    accent-color: green;
+}
+
+.sliderBlue {
+    accent-color:blue;
+}
+
+.sliderBlack {
+    accent-color: black;
+}
+
+
+.sliderBubble {
+    display: inline-block;
+    position: relative;
+    background-color: var(--color_lv_7);
+    color: var(--color_lv_1);
+    padding: .1em;
+    text-align: center;
+    border-radius: 5px;
+    width: 3em;
+}
+.sliderBubble:after {
+    content: "";
+    position: absolute;
+    right: 100%;
+    top: .2em;
+    width: 0;
+    height: 0;
+    border-top: 6px solid transparent;
+    border-right: 12px solid var(--color_lv_7);
+    border-bottom: 6px solid transparent;
+}
+
+/* -- tabs -- */
+.tabButton {
+    display: inline-block;
+    margin: 0;
+    padding: .5em 1em .5em 1em;
+
+    background-color: var(--color_lv_10);
+    color: var(--color_lv_5);
+
+    text-align: center;
+
+    cursor: default;
+}
+
+.tabButton:hover {
+    color: var(--color_lv_1);
+}
+
+.tabButton.active {
+    border-bottom: 2px solid var(--color_lv_1);
+
+    color: var(--color_lv_1);
+}
+
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+
+    flex-grow: 1;
+}
+
+canvas.expo {
+    width: 5em;
+    height: 5em;
+    /* padding: 0.2em; */
+
+    background-color: var(--color_lv_8);
+    border-radius: var(--common_border_radius);
+    border: 2px solid var(--color_lv_3);
+}
+
+select,
+input {
+    background-color: var(--color_lv_10);
+    color: var(--color_lv_1);
+}
+
+input[type=number] {
+  text-align:right;
+}
+
+/* styles for the circular speed/rpm meter*/
+.meterPointer {
+    fill: red;
+    stroke: darkred;
+    stroke-width: 1px;
+}
+.meterOutline {
+    fill: #222;
+    stroke: gray;
+    stroke-width: 2px;
+}
+.meterCenter {
+    fill: black;
+}
+.meterMark {
+    stroke: white;
+    stroke-width: 1.5px;
+}
+.meterNumbers {
+    font-family: verdana,arial,helvetica,sans-serif;
+    font-size: 6px;
+    fill: #fff;
+}
+.meterBigText {
+    font-family: verdana,arial,helvetica,sans-serif;
+    font-size: 12px;
+    fill: #fff;
+}
+.meterSmallText {
+    font-family: verdana,arial,helvetica,sans-serif;
+    font-size: 6px;
+    fill: #fff;
+}
+
+
+/* styles for the signals bar */
+.progressBar {
+    fill: white;
+}
+.checkMark {
+    stroke: white;
+    stroke-width: 2px;
+}
+.signalBar {
+    fill: #06f;
+    stroke: gray;
+    stroke-width: 1px;
+}
+.signalMark {
+    fill: #06f;
+    stroke: gray;
+    stroke-width: 1px;
+}
+.signalText {
+    font-family: verdana,arial,helvetica,sans-serif;
+    fill: #fff;
+}
+
+.overrideBar {
+    fill: #d60;
+    stroke: #f40;
+    stroke-width: 1px;
+}
+.overrideMark {
+    fill: #a20;
+    stroke: #f40;
+    stroke-width: 1px;
+}
+.overrideText {
+    font-family: verdana,arial,helvetica,sans-serif;
+    fill: #fff;
+}
+
+/* Animation to highlight a button. */
+@keyframes highlight {
+  50% {
+    box-shadow: 0px 0px 5px 5px var(--color_lv_1);
+  }
+  0%, 100% {
+    box-shadow: none;
+  }
+}
+
+/* Animation for procs and groups to appear.
+ *
+ * Without the animation it might not be that easy to notice.
+ */
+@keyframes appear {
+  from {
+    opacity: 50%;
+    /* scale: 1 50%; */
+  }
+
+  to {
+    opacity: 1;
+    /* scale: 1 100%; */
+  }
+}

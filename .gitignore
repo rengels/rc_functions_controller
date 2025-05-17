@@ -1,0 +1,9 @@
+build
+
+sdkconfig
+upload.cmd
+
+*~
+/wav
+/wav-orig
+/torques

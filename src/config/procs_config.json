@@ -1,0 +1,1557 @@
+[
+    {
+        "description": "Input"
+    },
+    {
+        "id": "DE",
+        "name": "INPUT_DEMO",
+        "filename": "input_demo",
+        "description": "Creates signals without outside input.",
+        "types": [],
+        "values": [
+            {
+                "name" : "scriptType",
+                "num" : 1,
+                "cast": "uint8_t",
+                "type": "InputDemo::DemoType",
+                "description": "The type of the demo.",
+
+                "enum": [
+                    {"name": "Truck", "id": 0,
+                        "description": "Demo for a truck with Engine automatically managing throttle, gear, braking and ignition."},
+                    {"name": "Train", "id": 1,
+                        "description": "Simple demo with no steering or lights."},
+                    {"name": "Car", "id": 2,
+                        "description": "Demo with manual gear, throttle an braking."},
+                    {"name": "Simple", "id": 3,
+                        "description": "Simple demo with just accelerating and deccelerating"}
+                ]
+            }
+        ],
+        "defaultValues": {
+            "scriptType": [
+                "0"
+            ]
+        }
+    },
+
+    {
+        "id": "AD",
+        "name": "INPUT_ADC",
+        "filename": "input_adc",
+        "description": "Returns the analogue signal from an analogue input pin.",
+        "ifdef": "ARDUINO",
+        "types": [
+            {
+                "name" : "type",
+                "num" : 1,
+                "description": "Output type"
+            }
+        ],
+        "defaultTypes": {
+            "type": [
+                "ST_VCC"
+            ]
+        },
+        "values": [
+            {
+                "name": "pin",
+                "type": "gpio_num_t",
+                "cast": "int8_t",
+                "description": "The input pin number. Default is 39. Only pin 32 through 39 are available."
+            }
+        ],
+        "defaultValues": {
+            "pin": [
+                "39"
+            ]
+        }
+    },
+
+    {
+        "id": "PI",
+        "name": "INPUT_PIN",
+        "filename": "input_pin",
+        "description": "Reads signals from a digital pin input at GPIOs 12, 13, 14, 27, 34 and 35",
+        "ifdef": "ARDUINO",
+        "types": [
+            {
+                "name" : "types",
+                "num" : 6,
+                "description": "Input types"
+            }
+        ],
+        "values": []
+    },
+
+    {
+        "id": "PW",
+        "name": "INPUT_PWM",
+        "filename": "input_pwm",
+        "description": "Reads signals from a PWM input at GPIOs 12, 13, 14, 27, 34 and 35",
+        "ifdef": "ARDUINO",
+        "types": [
+            {
+                "name" : "types",
+                "num" : 6,
+                "description": "Input types"
+            }
+        ],
+        "values": []
+    },
+
+    {
+        "id": "PP",
+        "name": "INPUT_PPM",
+        "filename": "input_ppm",
+        "description": "Reads signals from a PPM input.",
+        "ifdef": "ARDUINO",
+        "types": [
+            {
+                "name" : "types",
+                "num" : 8,
+                "description": "Input types"
+            }
+        ],
+        "values": [
+            {
+                "name" : "numInputs",
+                "type": "uint8_t",
+                "description": "The number of expected input signals. Important, since non-matching inputs are disegarded."
+            },
+            {
+                "name": "pin",
+                "type": "gpio_num_t",
+                "cast": "int8_t",
+                "description": "The input pin number. Default is 36"
+            }
+        ]
+    },
+
+    {
+        "id": "SB",
+        "name": "INPUT_SBUS",
+        "filename": "input_sbus",
+        "description": "Reads input signals from digital sbus pin.",
+        "ifdef": "ARDUINO",
+        "types": [
+            {
+                "name" : "types",
+                "num" : 18,
+                "description": "Input types"
+            }
+        ],
+        "values": [
+            {
+                "name": "fast",
+                "type": "bool",
+                "description": "Normal speed (100000 Baud) or fast (twice)."
+            },
+            {
+                "name": "inverted",
+                "type": "bool",
+                "description": "The input is inverted (FUTABA)."
+            },
+            {
+                "name": "pin",
+                "type": "gpio_num_t",
+                "cast": "int8_t",
+                "description": "The input pin number. Default is 36"
+            }
+        ]
+    },
+
+    {
+        "id": "SR",
+        "name": "INPUT_SRXL",
+        "filename": "input_srxl",
+        "description": "Reads input signals from digital SRXL pin.",
+        "ifdef": "ARDUINO",
+        "types": [
+            {
+                "name" : "types",
+                "num" : 16,
+                "description": "Input types"
+            }
+        ],
+        "defaultTypes": {
+            "types": [
+                "ST_ROLL",
+                "ST_PITCH",
+                "ST_YAW",
+                "ST_AUX1",
+                "ST_THROTTLE",
+                "ST_AUX2",
+                "ST_NONE",
+                "ST_NONE",
+                "ST_NONE",
+                "ST_NONE",
+                "ST_NONE",
+                "ST_NONE",
+                "ST_NONE",
+                "ST_NONE",
+                "ST_NONE",
+                "ST_NONE"
+            ]
+        },
+        "values": [
+            {
+                "name": "pin",
+                "type": "gpio_num_t",
+                "cast": "int8_t",
+                "description": "The input pin number. Default is 36"
+            }
+        ]
+    },
+
+    {
+        "description": "Output"
+    },
+
+    {
+        "id": "OA",
+        "name": "OUTPUT_AUDIO",
+        "filename": "output_audio",
+        "description": "Outputs audio via GPIO 25 and 26",
+        "ifdef": "ARDUINO",
+        "types": [],
+        "values": []
+    },
+
+    {
+        "id": "OL",
+        "name": "OUTPUT_LED",
+        "filename": "output_led",
+        "description": "Outputs signals via GPIO ports. Can dim output.",
+        "ifdef": "ARDUINO",
+        "types": [
+            {
+                "name" : "types",
+                "num" : 13,
+                "description": "Output signals for GPIO: 2, 3, 4, 5, 15, 16, 17, 18, 19, 21, 22, 23, 32"
+            }
+        ],
+        "defaultTypes": {
+            "types": [
+                "ST_INDICATOR_LEFT",
+                "ST_LOWBEAM",
+                "ST_INDICATOR_RIGHT",
+                "ST_ROOF",
+                "ST_TAIL",
+                "ST_FOG",
+                "ST_REVERSING",
+                "ST_SIDE",
+                "ST_BEACON1",
+                "ST_BEACON2",
+                "ST_NONE",
+                "ST_NONE"
+            ]
+        },
+        "values": []
+    },
+
+    {
+        "id": "OE",
+        "name": "OUTPUT_ESC",
+        "filename": "output_esc",
+        "description": "Outputs signals in a PWM format suitable for controlling a motor.",
+        "ifdef": "ARDUINO",
+        "types": [
+            {
+                "name" : "types",
+                "num" : 3,
+                "description": "Output signals for GPIO: 12/13, 22/23 and 32/33"
+            }
+        ],
+        "values": [
+            {
+                "name": "deadZone",
+                "type": "uint16_t",
+                "unit": "sig",
+                "description": "Minimal signal that produces an output."
+            },
+            {
+                "name": "freqTypes",
+                "num" : 5,
+                "type": "OutputEsc::FreqType",
+                "description": "Frequencies for different signal value slots. 0-199, 200-399, ...",
+                "enum": [
+                    {"name": "10kHz", "id": 0,
+                        "description": ""},
+                    {"name": "5kHz", "id": 1,
+                        "description": ""},
+                    {"name": "1kHz", "id": 2,
+                        "description": ""},
+                    {"name": "100Hz", "id": 3,
+                        "description": "Using a slow logic for motor start"},
+                    {"name": "10Hz", "id": 4,
+                        "description": "Using a slow logic for motor start"},
+                    {"name": "5Hz", "id": 5,
+                        "description": "Using a slow logic for motor start"}
+                ]
+            },
+            {
+                "name": "pins",
+                "type": "gpio_num_t",
+                "num": 3,
+                "description": "Output pin numbers."
+            },
+            {
+                "name": "pins2",
+                "type": "gpio_num_t",
+                "num": 3,
+                "description": "Output pin numbers."
+            }
+        ],
+        "defaultValues": {
+            "pins": [ 12, 22, 32 ],
+            "pins2": [ 13, 23, 33 ]
+        }
+    },
+
+    {
+        "id": "OP",
+        "name": "OUTPUT_PWM",
+        "filename": "output_pwm",
+        "description": "Outputs signals via PWM signals via GPIO ports.",
+        "ifdef": "ARDUINO",
+        "types": [
+            {
+                "name" : "types",
+                "num" : 3,
+                "description": "Output signals for GPIO: 12, 13, 14"
+            }
+        ],
+        "values": [
+            {
+                "name": "pins",
+                "type": "gpio_num_t",
+                "num": 3,
+                "description": "Output pin numbers."
+            }
+        ],
+        "defaultValues": {
+            "pins": [ 12, 13, 14 ]
+        }
+    },
+
+
+    {
+        "description": "General"
+    },
+
+    {
+        "id": "GR",
+        "name": "PROC_GROUP",
+        "filename": "proc_group",
+        "description": "Groups other elements.",
+        "types": [],
+        "values": [
+            {
+                "name": "type",
+                "type": "uint8_t",
+                "description": "Type of the group."
+            },
+            {
+                "name": "numChilds",
+                "type": "uint8_t",
+                "description": "Number of procs in this group."
+            }
+        ],
+        "type names": [
+            "Input",
+            "Vehicle",
+            "Output",
+            "Audio",
+            "Logic",
+            "Lights",
+            "Motor",
+            "Block 1",
+            "Block 2",
+            "Block 3"
+        ]
+    },
+
+    {
+        "id": "AU",
+        "name": "PROC_AUTO",
+        "filename": "proc_auto",
+        "description": "Creates many signals, using sensible rules, e.g. direction indicators from steering.",
+        "types": [],
+        "values": []
+    },
+
+    {
+        "id": "CO",
+        "name": "PROC_COMBINE",
+        "filename": "proc_combine",
+        "description": "Combines the two input signals in different ways",
+        "types": [
+            {
+                "name" : "inTypes",
+                "num" : 2,
+                "description": "Input types"
+            },
+            {
+                "name" : "outTypes",
+                "num" : 2,
+                "description": "Output types"
+            }
+        ],
+        "values": [
+            {
+                "name": "func",
+                "cast": "uint8_t",
+                "type": "ProcCombine::Function",
+                "description": "Combinations function",
+                "enum": [
+                    {"name": "and", "id": 0,
+                        "description": "Out1 is (in1 and in2). Out2 is !(in1 and in2)."},
+                    {"name": "or", "id": 1,
+                        "description": "Out1 is (in1 or in2). Out2 is !(in1 or in2)."},
+                    {"name": "sub", "id": 2,
+                        "description": "Subs/Adds the two inputs together."},
+                    {"name": "mul", "id": 3,
+                        "description": "Multiplies the two inputs together."},
+                    {"name": "switch", "id": 4,
+                        "description": "Outputs in1 if in2 is true."},
+                    {"name": "either", "id": 5,
+                        "description": "Outputs in1 (if valid) else in2."}
+                ]
+            }
+        ]
+    },
+
+    {
+        "id": "CR",
+        "name": "PROC_CRANKING",
+        "filename": "proc_cranking",
+        "description": "Dims signals while the cranking signal is active",
+        "types": [
+            {
+                "name" : "types",
+                "num" : 4,
+                "description": "Input/output types"
+            }
+        ],
+        "values": []
+    },
+
+    {
+        "id": "de",
+        "name": "PROC_DELAY",
+        "filename": "proc_delay",
+        "description": "The input signal is delayed by the given time value.",
+        "types": [
+            {
+                "name" : "inType",
+                "num" : 1,
+                "description": "Input signal type."
+            },
+            {
+                "name" : "outType",
+                "num" : 1,
+                "description": "Output signal type. Can be the same as the input signal."
+            }
+        ],
+        "values": [
+            {
+                "name": "delayMs",
+                "type": "TimeMs",
+                "unit": "ms",
+                "description": "The delay between the input and the output signal."
+            }
+        ]
+    },
+
+    {
+        "id": "DI",
+        "name": "PROC_DIRECTION",
+        "filename": "proc_direction",
+        "description": "The output signal is 'moved' by the input signals.",
+        "types": [
+            {
+                "name" : "inType",
+                "num" : 1,
+                "description": "Input signal type."
+            },
+            {
+                "name" : "outType",
+                "num" : 1,
+                "description": "Output signal type. Can be the same as the input signal."
+            }
+        ],
+        "values": [
+            {
+                "name": "speed",
+                "type": "uint16_t",
+                "description": "The amount the signal moves every 10ms with full input signal (1000)."
+            }
+        ]
+    },
+
+    {
+        "id": "EX",
+        "name": "PROC_EXCAVATOR",
+        "filename": "proc_excavator",
+        "description": "Creates many excavator related signals e.g. hydraulic flow.",
+        "types": [],
+        "values": []
+    },
+
+    {
+        "id": "Ex",
+        "name": "PROC_EXPO",
+        "filename": "proc_expo",
+        "description": "Exponential (actual just a 2nd degree function)",
+        "types": [
+            {
+                "name" : "inType",
+                "num" : 1,
+                "description": "Input type"
+            },
+            {
+                "name" : "outType",
+                "num" : 1,
+                "description": "Output type"
+            }
+        ],
+        "values": [
+            {
+                "name": "b",
+                "type": "float",
+                "description": "Curvyness factor. Start with 0.5"
+            }
+        ],
+        "defaultValues": {
+            "b": [ "0.5" ]
+        }
+    },
+
+    {
+        "id": "FA",
+        "name": "PROC_FADE",
+        "filename": "proc_fade",
+        "description": "Fades signals in and out. Can be used to slow down signals or for effects, e.g. indacent light bulb effect.",
+        "types": [
+            {
+                "name" : "types",
+                "num" : 4,
+                "description": "Input/output types"
+            }
+        ],
+        "values": [
+            {
+                "name": "fadeIn",
+                "type": "uint16_t",
+                "unit": "sig / 10ms",
+                "description": "The amount the signal fades in every 10ms"
+            },
+            {
+                "name": "fadeOut",
+                "type": "uint16_t",
+                "unit": "sig / 10ms",
+                "description": "The amount the signal fades out every 10ms"
+            }
+        ],
+        "defaultValues": {
+            "fadeIn": [ "10" ],
+            "fadeOut": [ "10" ]
+        }
+    },
+    {
+        "id": "IN",
+        "name": "PROC_INDICATOR",
+        "filename": "proc_indicator",
+        "description": "Creates a synchronized blinking effect.",
+        "types": [
+            {
+                "name" : "types",
+                "num" : 4
+            }
+        ],
+        "values": []
+    },
+    {
+        "id": "Ma",
+        "name": "PROC_MAP",
+        "filename": "proc_map",
+        "description": "Maps the input to an output range. Can be used for constant signals, absolute or negative signals.",
+        "types": [
+            {
+                "name" : "inType",
+                "num" : 1,
+                "description": "Input type"
+            },
+            {
+                "name" : "outType",
+                "num" : 1,
+                "description": "Output type"
+            }
+        ],
+        "values": [
+            {
+                "name": "negative",
+                "type": "RcSignal",
+                "description": "The output for an -1000 input signal."
+            },
+            {
+                "name": "zero",
+                "type": "RcSignal",
+                "description": "The output for an 0 input signal."
+            },
+            {
+                "name": "positive",
+                "type": "RcSignal",
+                "description": "The output for an 1000 input signal."
+            }
+        ]
+    },
+
+    {
+        "id": "Mi",
+        "name": "PROC_MISFIRE",
+        "filename": "proc_misfire",
+        "description": "Randomly modifies the throttle to simulate engine misfire.",
+        "types": [
+            {
+                "name" : "outMisfireType",
+                "num" : 1,
+                "description": "Optional output signal that can be used for a misfire sound effect."
+            }
+        ],
+        "values": [
+            {
+                "name": "misfireChance",
+                "type": "uint8_t",
+                "description": "Misfire chance value"
+            }
+        ]
+    },
+
+    {
+        "id": "PE",
+        "name": "PROC_PERIODIC",
+        "filename": "proc_periodic",
+        "description": "Triggers the output periodically depending on the given frequency.",
+        "types": [
+            {
+                "name" : "freqType",
+                "num" : 1,
+                "description": "Input signal with the frequency."
+            },
+            {
+                "name" : "outType",
+                "num" : 1,
+                "description": "Output type"
+            }
+        ],
+        "values": [
+            {
+                "name": "freqMultiplier",
+                "type": "float",
+                "description": "A multiplier for the frequency signal."
+            },
+            {
+                "name": "offset",
+                "type": "float",
+                "description": "Offset during the cycle, e.g. 0.5"
+            }
+        ]
+    },
+
+    {
+        "id": "PO",
+        "name": "PROC_POWER",
+        "filename": "proc_power",
+        "description": "Implements a logic for monitoring the VCC signal.",
+        "types": [
+            {
+                "name" : "outTypeLow",
+                "num" : 1,
+                "description": "The output signal for the low power state."
+            },
+            {
+                "name" : "outTypeEmpty",
+                "num" : 1,
+                "description": "The output signal for the empty power state."
+            }
+        ],
+        "values": [
+            {
+                "name": "lowLevel",
+                "type": "RcSignal",
+                "description": "Signal level for the low power state"
+            },
+            {
+                "name": "emptyLevel",
+                "type": "RcSignal",
+                "description": "Signal level for the empty power state"
+            },
+            {
+                "name": "lowPercent",
+                "type": "uint8_t",
+                "unit": "%",
+                "description": "Percentage for throttle and speed once the low power state is active."
+            },
+            {
+                "name": "emptyPercent",
+                "type": "uint8_t",
+                "unit": "%",
+                "description": "Percentage for throttle and speed once the empty power state is active."
+            }
+        ]
+    },
+
+    {
+        "id": "RA",
+        "name": "PROC_RANDOM",
+        "filename": "proc_random",
+        "description": "Produces a new random value periodically.",
+        "types": [
+            {
+                "name" : "type",
+                "num" : 1,
+                "description": "Output type"
+            }
+        ],
+        "values": [
+            {
+                "name": "intervalMs",
+                "type": "uint16_t",
+                "unit": "ms",
+                "description": "The time between new random values in milliseconds."
+            }
+        ]
+    },
+
+    {
+        "id": "SE",
+        "name": "PROC_SEQUENCE",
+        "filename": "proc_sequence",
+        "description": "Creates a sequence of on/off changes when triggered.",
+        "types": [
+            {
+                "name" : "inputType",
+                "num" : 1,
+                "description": "Input (trigger) type"
+            },
+            {
+                "name" : "outputType",
+                "num" : 1,
+                "description": "Ouput type"
+            }
+        ],
+        "values": [
+            {
+                "name": "onOffTimes",
+                "type": "uint16_t",
+                "unit": "ms",
+                "num" : 6,
+                "description": "The time between signal change. The starting state is always 'off'."
+            },
+            {
+                "name": "sequenceDurationMs",
+                "type": "TimeMs",
+                "unit": "ms",
+                "description": "The overall sequence duration im milliseconds."
+            }
+        ]
+    },
+
+    {
+        "id": "SC",
+        "name": "PROC_SCENARIO",
+        "filename": "proc_scenario",
+        "description": "Allows cycling through different output signal scenarios.",
+        "types": [
+            {
+                "name" : "inType",
+                "num" : 1,
+                "description": "Input signal type."
+            },
+            {
+                "name" : "outTypes1",
+                "num" : 5,
+                "description": "Output signals for the different states."
+            },
+            {
+                "name" : "outTypes2",
+                "num" : 5,
+                "description": "Output signals for the different states."
+            },
+
+            {
+                "name" : "outTypes3",
+                "num" : 5,
+                "description": "Output signals for the different states."
+            }
+        ],
+        "values": [
+            {
+                "name": "numScenarios",
+                "type": "uint8_t",
+                "description": "The number of scenarios (2-5)."
+            }
+        ]
+    },
+
+    {
+        "id": "SW",
+        "name": "PROC_SWITCH",
+        "filename": "proc_switch",
+        "description": "Switch functionality. Toggeling signals.",
+        "types": [
+            {
+                "name" : "inType",
+                "num" : 1,
+                "description": "Input signal type."
+            },
+            {
+                "name" : "outTypesLong",
+                "num" : 5,
+                "description": "Signals that are toggeled by a long press. (>1.5 sec)"
+            },
+            {
+                "name" : "outTypesShort",
+                "num" : 5,
+                "description": "Signals that are toggeled by a short press. (<1.5sec)"
+            },
+            {
+                "name" : "outTypesMomentary",
+                "num" : 5,
+                "description": "Signals that are activated during a press."
+            }
+        ],
+        "values": []
+    },
+
+    {
+        "id": "TR",
+        "name": "PROC_THRESHOLD",
+        "filename": "proc_threshold",
+        "description": "Configurable trigger with hysteresis",
+        "types": [
+            {
+                "name" : "inType",
+                "num" : 1,
+                "description": "Input (trigger) signal type"
+            },
+            {
+                "name" : "outType",
+                "num" : 1,
+                "description": "Ouput type"
+            }
+        ],
+        "values": [
+            {
+                "name": "highThreshold",
+                "type": "RcSignal",
+                "num" : 1,
+                "description": "The threshold of the input signal that activates the output."
+            },
+            {
+                "name": "lowThreshold",
+                "type": "RcSignal",
+                "num" : 1,
+                "description": "The threshold of the input signal that deactivates the output."
+            }
+        ]
+    },
+
+    {
+        "id": "XE",
+        "name": "PROC_XENON",
+        "filename": "proc_xenon",
+        "description": "Xenon light flash effect.",
+        "types": [
+            {
+                "name" : "types",
+                "num" : 4,
+                "description": "Input/output types"
+            }
+        ],
+        "values": []
+    },
+
+    {
+        "description": "Engine"
+    },
+
+    {
+        "id": "ER",
+        "name": "ENGINE_REVERSE",
+        "filename": "engine_reverse",
+        "description": "Adds reversing and reverse gear on top of EngineBrake.",
+        "types": [],
+        "values": [
+            {
+                "name": "engineType",
+                "type": "EngineSimple::EngineType",
+                "cast": "uint8_t",
+                "description": "The type of engine. Determines the torque curve.",
+                "enum": [
+                    {"name": "Electric", "id": 0,
+                        "description": "Electric engine, e.g. Tesla"},
+                    {"name": "Diesel", "id": 1,
+                        "description": "Diesel engine"},
+                    {"name": "Petrol", "id": 2,
+                        "description": "Internal combustion engine for petrol"},
+                    {"name": "Petrol Turbo", "id": 3,
+                        "description": "Petrol engine with turbo"},
+                    {"name": "Steam", "id": 4,
+                        "description": "Steam engine"},
+                    {"name": "Turbine", "id": 5,
+                        "description": "A jet turbine"}
+                ]
+            },
+            {
+                "name": "reverseDelayMs",
+                "type": "TimeMs",
+                "unit": "ms",
+                "description": "The time that the vehicle needs to be stopped with throttle != 0 until the direction is reversed."
+            },
+            {
+                "name": "crankingTimeMs",
+                "type": "TimeMs",
+                "unit": "ms",
+                "description": "The cranking delay after motor start in milliseconds."
+            },
+            {
+                "name": "offTimeMs",
+                "type": "TimeMs",
+                "unit": "ms",
+                "description": "The amount of time that the engines stays idle until it's switched off. Ignored in case of manual ignition."
+            },
+            {
+                "name": "massEngine",
+                "type": "float",
+                "unit": "kg",
+                "description": "The mass of the engine. A synthetic value. Used in RPM calculation without gear."
+            },
+            {
+                "name": "massVehicle",
+                "type": "float",
+                "unit": "kg",
+                "description": "The mass of the vehicle in kg."
+            },
+            {
+                "name": "maxPower",
+                "type": "float",
+                "unit": "Watt",
+                "description": "The maximum engine power in Watts."
+            },
+            {
+                "name": "rpmMax",
+                "type": "uint16_t",
+                "description": "The maximum RPM in revolutions per minute."
+            },
+            {
+                "name": "idleManager",
+                "type": "rcEngine::Idle",
+                "description": "Idle management settings."
+            },
+            {
+                "name": "wheelDiameter",
+                "type": "float",
+                "unit": "m",
+                "description": "Diameter of the wheel in m."
+            },
+            {
+                "name": "rpmShift",
+                "type": "uint16_t",
+                "description": "This is the RPM that we want to keep when switching gears."
+            },
+            {
+                "name": "gearDecouplingTime",
+                "type": "TimeMs",
+                "unit": "ms",
+                "description": "The time in milliseconds it takes to press the clutch. Set to 0 for double-clutch."
+            },
+            {
+                "name": "gearCouplingTime",
+                "type": "TimeMs",
+                "unit": "ms",
+                "description": "The time in milliseconds it takes to engage the gear. Set to 0 for double-clutch."
+            },
+            {
+                "name": "gearDoubleDeclutchTime",
+                "type": "TimeMs",
+                "unit": "ms",
+                "description": "The time between disengaging and engaging used to bring the gear up to speed. Set to 0 for a synchronized gear."
+            },
+            {
+                "name": "fullGears",
+                "type": "rcEngine::GearCollection",
+                "num": 1,
+                "description": "The gear ratios. e.g. 5.0 means five revolutions of the engine vs. one revolution of the wheels."
+            },
+            {
+                "name": "brakePower",
+                "type": "float",
+                "unit": "Watt",
+                "description": "Max brake power in Watts."
+            },
+            {
+                "name": "resistance",
+                "type": "float",
+                "description": "Flat out resistance for the vehicle in Watts."
+            },
+            {
+                "name": "airResistance",
+                "type": "float",
+                "description": "The air resistance as (A * Cd)."
+            }
+        ],
+        "defaultValues": {
+            "engineType": [ "1" ],
+            "crankingTimeMs": [ 800 ],
+            "offTimeMs": [ 5000 ],
+            "massEngine": [ "400" ],
+            "massVehicle": [ "800" ],
+            "maxPower": [ "80000" ],
+            "rpmMax": [ "1100" ],
+            "wheelDiameter": [ "0.5" ],
+            "downshiftRPM": [ "520" ],
+            "fullGears": [ "-3", "3" ],
+            "brakePower": [ "100000" ],
+            "airResistance": [ "12" ]
+        }
+    },
+
+    {
+        "id": "EB",
+        "name": "ENGINE_BRAKE",
+        "filename": "engine_brake",
+        "description": "Simulates vehicle with gear and braking.",
+        "types": [],
+        "values": [
+            {
+                "name": "engineType",
+                "type": "EngineSimple::EngineType",
+                "cast": "uint8_t",
+                "description": "The type of engine. Determines the torque curve.",
+                "enum": [
+                    {"name": "Electric", "id": 0,
+                        "description": "Electric engine, e.g. Tesla"},
+                    {"name": "Diesel", "id": 1,
+                        "description": "Diesel engine"},
+                    {"name": "Petrol", "id": 2,
+                        "description": "Internal combustion engine for petrol"},
+                    {"name": "Petrol Turbo", "id": 3,
+                        "description": "Petrol engine with turbo"},
+                    {"name": "Steam", "id": 4,
+                        "description": "Steam engine"},
+                    {"name": "Turbine", "id": 5,
+                        "description": "A jet turbine"}
+                ]
+            },
+            {
+                "name": "crankingTimeMs",
+                "type": "TimeMs",
+                "unit": "ms",
+                "description": "The cranking delay after motor start in milliseconds."
+            },
+            {
+                "name": "offTimeMs",
+                "type": "TimeMs",
+                "unit": "ms",
+                "description": "The amount of time that the engines stays idle until it's switched off. Ignored in case of manual ignition."
+            },
+            {
+                "name": "massEngine",
+                "type": "float",
+                "unit": "kg",
+                "description": "The mass of the engine. A synthetic value. Used in RPM calculation without gear."
+            },
+            {
+                "name": "massVehicle",
+                "type": "float",
+                "unit": "kg",
+                "description": "The mass of the vehicle in kg."
+            },
+            {
+                "name": "maxPower",
+                "type": "float",
+                "unit": "Watt",
+                "description": "The maximum engine power in Watts."
+            },
+            {
+                "name": "rpmMax",
+                "type": "uint16_t",
+                "description": "The maximum RPM in revolutions per minute."
+            },
+            {
+                "name": "idleManager",
+                "type": "rcEngine::Idle",
+                "description": "Idle management settings."
+            },
+            {
+                "name": "gears",
+                "type": "rcEngine::GearCollection",
+                "num": 1,
+                "description": "The gear ratios. e.g. 5.0 means five revolutions of the engine vs. one revolution of the wheels."
+            },
+            {
+                "name": "wheelDiameter",
+                "type": "float",
+                "unit": "m",
+                "description": "Diameter of the wheel in m."
+            },
+            {
+                "name": "rpmShift",
+                "type": "uint16_t",
+                "description": "This is the RPM that we want to keep when switching gears."
+            },
+            {
+                "name": "gearDecouplingTime",
+                "type": "TimeMs",
+                "unit": "ms",
+                "description": "The time in milliseconds it takes to press the clutch. Set to 0 for double-clutch."
+            },
+            {
+                "name": "gearCouplingTime",
+                "type": "TimeMs",
+                "unit": "ms",
+                "description": "The time in milliseconds it takes to engage the gear. Set to 0 for double-clutch."
+            },
+            {
+                "name": "gearDoubleDeclutchTime",
+                "type": "TimeMs",
+                "unit": "ms",
+                "description": "The time between disengaging and engaging used to bring the gear up to speed. Set to 0 for a synchronized gear."
+            },
+            {
+                "name": "brakePower",
+                "type": "float",
+                "unit": "Watt",
+                "description": "Max brake power in Watts."
+            },
+            {
+                "name": "resistance",
+                "type": "float",
+                "description": "Flat out resistance for the vehicle in Watts."
+            },
+            {
+                "name": "airResistance",
+                "type": "float",
+                "description": "The air resistance as (A * Cd)."
+            }
+        ],
+        "defaultValues": {
+            "engineType": [ "1" ],
+            "crankingTimeMs": [ 800 ],
+            "offTimeMs": [ 5000 ],
+            "massEngine": [ "400" ],
+            "massVehicle": [ "800" ],
+            "maxPower": [ "80000" ],
+            "rpmMax": [ "1100" ],
+            "wheelDiameter": [ "0.5" ],
+            "gears": [ "-3", "3", "0", "0", "0", "0", "0", "0", "0", "0", "0",
+                "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "brakePower": [ "100000" ],
+            "airResistance": [ "12" ]
+        }
+    },
+
+    {
+        "id": "EG",
+        "name": "ENGINE_GEAR",
+        "filename": "engine_gear",
+        "description": "Simulate a vehicle with engine and gear.",
+        "types": [],
+        "values": [
+            {
+                "name": "engineType",
+                "type": "EngineSimple::EngineType",
+                "cast": "uint8_t",
+                "description": "The type of engine. Determines the torque curve.",
+                "enum": [
+                    {"name": "Electric", "id": 0,
+                        "description": "Electric engine, e.g. Tesla"},
+                    {"name": "Diesel", "id": 1,
+                        "description": "Diesel engine"},
+                    {"name": "Petrol", "id": 2,
+                        "description": "Internal combustion engine for petrol"},
+                    {"name": "Petrol Turbo", "id": 3,
+                        "description": "Petrol engine with turbo"},
+                    {"name": "Steam", "id": 4,
+                        "description": "Steam engine"},
+                    {"name": "Turbine", "id": 5,
+                        "description": "A jet turbine"}
+                ]
+            },
+            {
+                "name": "crankingTimeMs",
+                "type": "TimeMs",
+                "unit": "ms",
+                "description": "The cranking delay after motor start in milliseconds."
+            },
+            {
+                "name": "offTimeMs",
+                "type": "TimeMs",
+                "unit": "ms",
+                "description": "The amount of time that the engines stays idle until it's switched off. Ignored in case of manual ignition."
+            },
+            {
+                "name": "massEngine",
+                "type": "float",
+                "unit": "kg",
+                "description": "The mass of the engine. A synthetic value. Used in RPM calculation without gear."
+            },
+            {
+                "name": "massVehicle",
+                "type": "float",
+                "unit": "kg",
+                "description": "The mass of the vehicle in kg."
+            },
+            {
+                "name": "maxPower",
+                "type": "float",
+                "unit": "Watt",
+                "description": "The maximum engine power in Watts."
+            },
+            {
+                "name": "rpmMax",
+                "type": "uint16_t",
+                "description": "The maximum RPM in revolutions per minute."
+            },
+            {
+                "name": "idleManager",
+                "type": "rcEngine::Idle",
+                "description": "Idle management settings."
+            },
+            {
+                "name": "gears",
+                "type": "rcEngine::GearCollection",
+                "num": 1,
+                "description": "The gear ratios. e.g. 5.0 means five revolutions of the engine vs. one revolution of the wheels."
+            },
+            {
+                "name": "wheelDiameter",
+                "type": "float",
+                "unit": "m",
+                "description": "Diameter of the wheel in m."
+            },
+            {
+                "name": "rpmShift",
+                "type": "uint16_t",
+                "description": "This is the RPM that we want to keep when switching gears."
+            },
+            {
+                "name": "gearDecouplingTime",
+                "type": "TimeMs",
+                "unit": "ms",
+                "description": "The time in milliseconds it takes to press the clutch. Set to 0 for double-clutch."
+            },
+            {
+                "name": "gearCouplingTime",
+                "type": "TimeMs",
+                "unit": "ms",
+                "description": "The time in milliseconds it takes to engage the gear. Set to 0 for double-clutch."
+            },
+            {
+                "name": "gearDoubleDeclutchTime",
+                "type": "TimeMs",
+                "unit": "ms",
+                "description": "The time between disengaging and engaging used to bring the gear up to speed. Set to 0 for a synchronized gear."
+            }
+        ]
+    },
+
+    {
+        "id": "ES",
+        "name": "ENGINE_SIMPLE",
+        "filename": "engine_simple",
+        "description": "Simulates an engine without gear.",
+        "types": [],
+        "values": [
+            {
+                "name": "engineType",
+                "type": "EngineSimple::EngineType",
+                "cast": "uint8_t",
+                "description": "The type of engine. Determines the torque curve.",
+                "enum": [
+                    {"name": "Electric", "id": 0,
+                        "description": "Electric engine, e.g. Tesla"},
+                    {"name": "Diesel", "id": 1,
+                        "description": "Diesel engine"},
+                    {"name": "Petrol", "id": 2,
+                        "description": "Internal combustion engine for petrol"},
+                    {"name": "Petrol Turbo", "id": 3,
+                        "description": "Petrol engine with turbo"},
+                    {"name": "Steam", "id": 4,
+                        "description": "Steam engine"},
+                    {"name": "Turbine", "id": 5,
+                        "description": "A jet turbine"}
+                ]
+            },
+            {
+                "name": "crankingTimeMs",
+                "type": "TimeMs",
+                "unit": "ms",
+                "description": "The cranking delay after motor start in milliseconds."
+            },
+            {
+                "name": "massEngine",
+                "type": "float",
+                "unit": "kg",
+                "description": "The mass of the engine. A synthetic value. Used in RPM calculation without gear."
+            },
+            {
+                "name": "maxPower",
+                "type": "float",
+                "unit": "Watt",
+                "description": "The maximum engine power in Watts."
+            },
+            {
+                "name": "rpmMax",
+                "type": "uint16_t",
+                "description": "The maximum RPM in revolutions per minute."
+            },
+            {
+                "name": "idleManager",
+                "type": "rcEngine::Idle",
+                "description": "Idle management settings."
+            }
+        ]
+    },
+
+    {
+        "description": "Audio"
+    },
+    {
+        "id": "Ad",
+        "name": "AUDIO_DYNAMIC",
+        "filename": "audio_dynamic",
+        "description": "Continously plays a sample but with variable speed and volume.",
+        "types": [
+            {
+                "name" : "speedType",
+                "num" : 1,
+                "description": "Input type controlling the speed. 1000 is 100% speed."
+            },
+            {
+                "name" : "volumeType",
+                "num" : 1,
+                "description": "Input type controlling the volume. 1000 is 100% volume."
+            }
+        ],
+        "values": [
+            {
+                "name": "volume",
+                "type": "Volume",
+                "num" : 2,
+                "description": "Sound volume. 0.0 to 1.0 (or more)"
+            },
+            {
+                "name": "sample",
+                "type": "SampleData",
+                "description": "Audio sample"
+            }
+        ]
+    },
+    {
+        "id": "AL",
+        "name": "AUDIO_LOOP",
+        "filename": "audio_loop",
+        "description": "Plays the sample while triggered.",
+        "types": [
+            {
+                "name" : "triggerType",
+                "num" : 1,
+                "description": "Input trigger type with hysteresis."
+            }
+        ],
+        "values": [
+            {
+                "name": "volume",
+                "type": "Volume",
+                "num" : 2,
+                "description": "Sound volume. 0.0 to 1.0 (or more)"
+            },
+            {
+                "name": "loopBegin",
+                "type": "uint32_t",
+                "description": "Repeated section begin sample count."
+            },
+            {
+                "name": "loopEnd",
+                "type": "uint32_t",
+                "description": "Repeated section end sample count (exclusive)."
+            },
+            {
+                "name": "sample",
+                "type": "SampleData",
+                "description": "Audio sample"
+            }
+        ]
+    },
+    {
+        "id": "AE",
+        "name": "AUDIO_ENGINE",
+        "filename": "audio_engine",
+        "description": "Plays engine revolution sound modified by RPM.",
+        "types": [
+            {
+                "name" : "throttleType",
+                "num" : 1,
+                "description": "Throttle signal. Can be something else e.g. for the Jack-brake."
+            }
+        ],
+        "defaultTypes": { "triggerType": [ "ST_THROTTLE" ] },
+        "values": [
+            {
+                "name": "volume",
+                "type": "Volume",
+                "num" : 2,
+                "description": "Sound volume. 0.0 to 1.0 (or more)"
+            },
+            {
+                "name": "samples",
+                "type": "SampleData",
+                "num": 5,
+                "description": "Audio samples for a revolution. Use multiple samples with different RPMs"
+            },
+            {
+                "name": "throttles",
+                "type": "RcSignal",
+                "num": 5,
+                "description": "The throttle setting associated with the samples."
+            }
+        ],
+        "defaultValues": {
+            "volume": [ 50, 50 ],
+            "samples": [ "TDI", "TDR", "Osi", "Osi", "Osi" ],
+            "throttles": [ "0", "1000", "0", "0", "0" ]
+        }
+    },
+
+    {
+        "id": "AN",
+        "name": "AUDIO_NOISE",
+        "filename": "audio_noise",
+        "description": "Plays generated noise with variable volume.",
+        "types": [
+            {
+                "name" : "volumeType",
+                "num" : 1,
+                "description": "Input / volume trigger type."
+            }
+        ],
+        "defaultTypes": {
+            "volumeType": [ "ST_SPEED" ]
+        },
+        "values": [
+            {
+                "name": "volume",
+                "type": "Volume",
+                "num" : 2,
+                "description": "Sound volume. 0.0 to 1.0 (or more)"
+            },
+            {
+                "name" : "noiseType",
+                "num" : 1,
+                "cast": "uint8_t",
+                "type": "AudioNoise::NoiseType",
+                "description": "The type of noise.",
+
+                "enum": [
+                    {"name": "White", "id": 0,
+                        "description": "White noise (hissing)"},
+                    {"name": "Pink", "id": 1,
+                        "description": "High frequency hissing"},
+                    {"name": "Color", "id": 2,
+                        "description": "Colored noise influenced by freq"},
+                    {"name": "Sine", "id": 3,
+                        "description": "Sine function"},
+                    {"name": "Sawtooth", "id": 4,
+                        "description": "Sawtooth"},
+                    {"name": "Triangle", "id": 5,
+                        "description": "Triangle function"},
+                    {"name": "Rect", "id": 6,
+                        "description": "Rectangle function"}
+                ]
+            },
+            {
+                "name" : "freq",
+                "num" : 1,
+                "type": "uint16_t",
+                "description": "Determines the frequency (in Hz) for some types of noise."
+            }
+        ],
+        "defaultValues": {
+            "volume": [ 5, 5 ],
+            "noiseType": [ "0" ]
+        }
+    },
+    {
+        "id": "AS",
+        "name": "AUDIO_SIMPLE",
+        "filename": "audio_simple",
+        "description": "Plays the sample when triggered.",
+        "types": [
+            {
+                "name" : "triggerType",
+                "num" : 1,
+                "description": "Input trigger type with hysteresis."
+            }
+        ],
+        "defaultTypes": {
+            "triggerType": [ "ST_SIREN" ]
+        },
+        "values": [
+            {
+                "name": "volume",
+                "type": "Volume",
+                "num" : 2,
+                "description": "Sound volume. 0.0 to 1.0 (or more)"
+            },
+            {
+                "name": "sample",
+                "type": "SampleData",
+                "description": "Audio sample"
+            }
+        ],
+        "defaultValues": {
+            "volume": [ 100, 100 ],
+            "sample": [ "SBL" ]
+        }
+    },
+    {
+        "id": "As",
+        "name": "AUDIO_STEAM",
+        "filename": "audio_steam",
+        "description": "Steam engine sound synthesizer.",
+        "types": [],
+        "values": [
+            {
+                "name": "volume",
+                "type": "Volume",
+                "num" : 2,
+                "description": "Sound volume. 0.0 to 1.0 (or more)"
+            },
+            {
+                "name": "tone",
+                "type": "uint8_t",
+                "description": "A number for the noise tone. 1 is white noise."
+            },
+            {
+                "name": "offset",
+                "type": "float",
+                "description": "The offset in the cycle for this cylinder. 0.125 for 90 deg."
+            },
+            {
+                "name": "cylinderResistance",
+                "type": "float",
+                "description": "Synthetic number for the increase of the hissing."
+            },
+            {
+                "name": "exaustResistance",
+                "type": "float",
+                "description": "Synthetic number for the decrease of the hissing."
+            }
+        ]
+    }
+]
+
