@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- This page is part of the rc functions controller project.
+      It will connect to the controller via bluetooth low energy (BLE)
+      and query the signals structure.
+      It also allows to override signals by writing them back
+      via BLE.
+
+      For a primer how to use the BT Web API look at:
+      https://developer.chrome.com/docs/capabilities/bluetooth?hl=en
+    -->
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Content-Language" content="en-GB">
+    <title>RC functions controller configuration</title>
+    <meta name="description" content="Allows viewing and modifying signals and configuration of the rc functions controller via bluetooth.">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes" />
+    <link rel="stylesheet" href="style.css" type="text/css" title="Normal" media="screen, projection">
+
+  </head>
+
+<body id="body" style="display: flex; flex-direction: column;">
+  <div class="header">
+    <span class="header">RcFuncCntrl</span>
+    <span class="button" id="fullscreenButton" style="float: right">Fullscreen</span>
+  </div>
+
+  <div>
+    <span class="button" id="connectBleButton"
+      style="animation-duration: 0.6s; animation-name: highlight; animation-iteration-count: 3;">Connect</span>
+    <span class="button" id="disconnectBleButton">Disconnect</span>
+    <strong><span id="stateText">Disconnected</span></strong>
+    <progress id="stateProgress" style="display: none;" max="100" value="0"></progress>
+  </div>
+
+  <div class="tab">
+    <span class="tabButton active" id="tabButtonControl">Control</span>
+    <span class="tabButton" id="tabButtonSignals">Signals</span>
+    <span class="tabButton" id="tabButtonConfig">Configuration</span>
+  </div>
+
+  <div id="tabControl" class="tabcontent"
+      style="display: flex; flex-direction: column; width: 100%;">
+    <div style="display: flex; flex-direction: row; flex-wrap: wrap; flex-grow: 1; width: 100%">
+      <div class="switch" id="buttonLowbeam" auto="on">
+        <img alt="low beam" src="./res/light_low.svg"/>
+        <span class="overrideButton" id="buttonLowbeamOverride">!</span>
+      </div>
+
+      <div class="switch" id="buttonHighbeam" auto="on">
+        <img alt="high beam" src="./res/light_high.svg"/>
+        <span class="overrideButton" id="buttonHighbeamOverride">!</span>
+      </div>
+
+      <div class="switch" id="buttonHazard" auto="on">
+        <img src="./res/hazard.svg"/>
+        <span class="overrideButton" id="buttonHazardOverride">!</span>
+      </div>
+
+      <div class="switch" id="buttonSiren" auto="on">
+        <img src="./res/siren.svg"/>
+        <span class="overrideButton" id="buttonSirenOverride">!</span>
+      </div>
+
+      <div class="switch" id="buttonHorn" auto="on">
+        <img src="./res/speaker.svg"/>
+        <span class="overrideButton" id="buttonHornOverride">!</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: row; flex-grow: 5; width: 100%;">
+      <div style="flex-grow: 1; flex-basis: 0; container: co / size;">
+        <svg style="touch-action: none; height: min(90cqh, 90cqw);"
+            viewBox="-50 -50 100 100"
+            xmlns="http://www.w3.org/2000/svg"
+            id="directionCtrlSvg">
+          <circle cx="0" cy="0" r="50" fill="grey"/>
+          <circle cx="0" cy="0" r="40" fill="white"/>
+          <circle cx="0" cy="0" r="10" fill="lightgrey" id="directionCtrlCircle"/>
+        </svg>
+      </div>
+
+      <div style="flex-grow: 1; flex-basis: 0; container: co / size;">
+        <svg style="display: block; margin: auto; height: min(90cqh, 90cqw)"
+            viewBox="-50 -50 100 100"
+            xmlns="http://www.w3.org/2000/svg"
+            id="speedBar">
+        </svg>
+      </div>
+      <div style="flex-grow: 1; flex-basis: 0; container: co / size;">
+        <svg style="display: block; margin: auto; height: min(90cqh, 90cqw)"
+            viewBox="-50 -50 100 100"
+            xmlns="http://www.w3.org/2000/svg"
+            id="rpmBar">
+        </svg>
+      </div>
+
+      <div style="flex-grow: 1; flex-basis: 0; display: flex; flex-direction: column;">
+        <div class="switch" id="switchGearAuto" active="on"><span>auto</span></div>
+        <div class="switch" id="switchGearUp" disabled><span>gear +</span></div>
+        <div class="switch" style="border: none"><span id="textGear">N</span></div>
+        <div class="switch" id="switchGearDown" disabled><span>gear -</span></div>
+      </div>
+    </div>
+  </div>  <!-- tabcontent-->
+
+  <div id="tabSignals" class="tabcontent">
+    <table id="signalsTable">
+    </table>
+  </div>
+
+  <div id="tabConfig" class="tabcontent">
+    <span class="button" id="buttonConfigDownload">Download</span>
+    <span class="button" id="buttonConfigUpload">Upload</span>
+    <span class="button" id="buttonConfigReset">Reset</span>
+    <span style="width: 1em; display: inline-block;"></span>
+    <span class="button" id="buttonConfigLoad">Load</span>
+    <span class="button" id="buttonConfigSave">Save</span>
+    <span style="width: 2em; display: inline-block;"></span>
+    <span class="button" id="buttonNewProc">New proc</span>
+    <ul id="configTable">
+    </ul>
+  </div>
+
+  <div>
+    <small>rc function controller by Ralf Engels </small>
+  </div>
+
+  <!-- data lists used later on in sliders -->
+  <datalist id="listSignal">
+    <option>-1000<option>
+    <option>-500<option>
+    <option>0<option>
+    <option>500<option>
+    <option>1000<option>
+  </datalist>
+
+  <datalist id="listVolume">
+    <option>0<option>
+    <option>50<option>
+    <option>100<option>
+    <option>150<option>
+    <option>200<option>
+  </datalist>
+
+</body>
+
+
+<script type="module">
+
+    import {defConfig} from "./script/def_config.js";
+
+    import * as bluetooth from "./script/bluetooth.js";
+    import * as signals from "./script/signals.js";
+    import * as control from "./script/control.js";
+    import {fillConfigTable,
+      updateConfigFromData,
+      downloadConfig,
+      uploadConfig,
+      resetConfig,
+      saveConfig,
+      loadConfig,
+      newProc,
+      procSetStatusCallback,
+      } from "./script/procs.js";
+
+    document.querySelector("#tabButtonControl").addEventListener("click",
+      (evt) => {
+        showTab(evt, tabControl);
+        bluetooth.startSignalsNotification(control.updateSignals);
+    });
+    document.querySelector("#tabButtonSignals").addEventListener("click",
+      (evt) => {
+        showTab(evt, tabSignals);
+        bluetooth.startSignalsNotification(signals.updateSignals);
+    });
+    document.querySelector("#tabButtonConfig").addEventListener("click",
+      (evt) => {
+        bluetooth.stopSignalsNotification();
+        showTab(evt, tabConfig);
+    });
+
+    // DOM Elements
+    const connectButton = document.getElementById("connectBleButton");
+    const disconnectButton = document.getElementById("disconnectBleButton");
+    const fullscreenButton = document.getElementById("fullscreenButton");
+
+    const buttonConfigDownload = document.getElementById("buttonConfigDownload");
+    const buttonConfigUpload = document.getElementById("buttonConfigUpload");
+    const buttonConfigReset = document.getElementById("buttonConfigReset");
+    const buttonConfigLoad = document.getElementById("buttonConfigLoad");
+    const buttonConfigSave = document.getElementById("buttonConfigSave");
+    const buttonNewProc = document.getElementById("buttonNewProc");
+
+    const tabControl = document.getElementById("tabControl");
+    const tabSignals = document.getElementById("tabSignals");
+    const tabConfig = document.getElementById("tabConfig");
+
+    signals.fillTable();
+    fillConfigTable(defConfig);
+
+    /** A function to display the status.
+     *
+     *  This function is called all over the place to
+     *  display a status.
+     *
+     *  @param options A dict with some status info:
+     *    - color
+     *    - connected
+     *    - progress
+     */
+    function statusCallback(statusText, options) {
+        const elStateText = document.getElementById("stateText");
+        if (statusText) {
+          elStateText.innerHTML = statusText;
+        }
+        const  elProgress = document.getElementById("stateProgress");
+
+        if (options == null) {
+          options = {};
+        }
+
+        if ("color" in options) {
+          if (options["color"] == "green") {
+            elStateText.style.color = "#24af37";
+          } else if (options["color"] == "red") {
+            elStateText.style.color = "#d13a30";
+          } else {
+            elStateText.style.color = options["color"];
+          }
+        } else {
+          elStateText.style.color = "inherit";
+        }
+
+        // enable/sidable buttons
+        if ("connected" in options) {
+          const statusFlag = options["connected"];
+          connectButton.toggleAttribute("disabled", statusFlag);
+          disconnectButton.toggleAttribute("disabled", !statusFlag);
+          buttonConfigDownload.toggleAttribute("disabled", !statusFlag);
+          buttonConfigUpload.toggleAttribute("disabled", !statusFlag);
+          buttonConfigReset.toggleAttribute("disabled", !statusFlag);
+        }
+
+        if ("progress" in options) {
+          elProgress.value = options["progress"];
+          elProgress.style.display = "inline-block";
+        } else {
+          elProgress.style.display = "none";
+        }
+    }
+
+    bluetooth.setStatusCallback(statusCallback );
+    procSetStatusCallback(statusCallback);
+
+    // Connect Button (search for BLE Devices only if BLE is available)
+    connectButton.addEventListener("click", (event) => bluetooth.connect());
+    disconnectButton.addEventListener("click", (event) => bluetooth.disconnect());
+    fullscreenButton.addEventListener("click", (event) => toggleFullscreen());
+
+    buttonConfigDownload.addEventListener("click", () => downloadConfig());
+    buttonConfigUpload.addEventListener("click", () => uploadConfig());
+    buttonConfigReset.addEventListener("click", () => resetConfig());
+    buttonConfigLoad.addEventListener("click", () => loadConfig());
+    buttonConfigSave.addEventListener("click", () => saveConfig());
+    buttonNewProc.addEventListener("click", () => newProc());
+
+    /** Shows the tab with the given ID by hiding all others and showing the selected one */
+    function showTab(evt, elTab) {
+      // Get all elements with class="tabcontent" and hide them
+      const tabcontent = document.getElementsByClassName("tabcontent");
+      for (let i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+
+      // Get all elements with class="tabButton" and remove the class "active"
+      const tabButton = document.getElementsByClassName("tabButton");
+      for (let i = 0; i < tabButton.length; i++) {
+        tabButton[i].className = tabButton[i].className.replace(" active", "");
+      }
+
+      // Show the current tab, and add an "active" class to the button that opened the tab
+      if (elTab == tabControl) {
+        elTab.style.display = "flex";
+      } else {
+        elTab.style.display = "block";
+      }
+      evt.currentTarget.className += " active";
+    }
+
+    function toggleFullscreen() {
+      let elem = document.getElementById("body");
+
+      if (!document.fullscreenElement) {
+        elem.requestFullscreen().catch((err) => {
+          alert(
+            `Error attempting to enable fullscreen mode: ${err.message} (${err.name})`,
+          );
+        });
+
+        // force a landscape mode for mobiles, which works much better
+        /*
+        try {
+          let myScreenOrientation = window.screen.orientation;
+          myScreenOrientation.lock("landscape");
+        } catch (e) {
+            // on some devices it's just not supported
+        }
+        */
+
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    statusCallback("Disconnected", {"color": "red", "connected": false});
+    // show the signals tab by default
+    document.getElementById("tabButtonControl").click();
+
+</script>
+
+</html>

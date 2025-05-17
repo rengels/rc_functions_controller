@@ -1,0 +1,81 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 23,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Default Config",
+      "description": "Default build for x86",
+      "binaryDir": "${sourceDir}/build/default",
+      "cacheVariables": {
+          "CMAKE_C_FLAGS": "-Wall --pedantic",
+          "CMAKE_CXX_FLAGS": "-Wall --pedantic",
+          "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "esp32",
+      "displayName": "Arduino Config",
+      "description": "Build for ESP32",
+      "binaryDir": "${sourceDir}/build/esp32",
+      "cacheVariables": {
+          "ARDUINO": "10607",
+          "CMAKE_TOOLCHAIN_FILE": "$env{IDF_PATH}/tools/cmake/toolchain-esp32.cmake"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default"
+    },
+    {
+      "name": "esp32",
+      "configurePreset": "esp32"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default",
+      "output": {"outputOnFailure": true},
+      "execution": {"noTestsAction": "error", "stopOnFailure": true}
+    }
+  ],
+  "packagePresets": [
+    {
+      "name": "default",
+      "configurePreset": "default",
+      "generators": [
+        "TGZ"
+      ]
+    }
+  ],
+  "workflowPresets": [
+    {
+      "name": "default",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "default"
+        },
+        {
+          "type": "build",
+          "name": "default"
+        },
+        {
+          "type": "test",
+          "name": "default"
+        },
+        {
+          "type": "package",
+          "name": "default"
+        }
+      ]
+    }
+  ]
+}

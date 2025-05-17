@@ -1,0 +1,330 @@
+[
+  {
+    "name": "PROC_GROUP",
+    "types": {},
+    "values": {
+      "type": [
+        0
+      ],
+      "numChilds": [
+        1
+      ]
+    }
+  },
+  {
+    "name": "INPUT_DEMO",
+    "types": {},
+    "values": {
+      "scriptType": [
+        "0"
+      ]
+    }
+  },
+  {
+    "name": "PROC_GROUP",
+    "types": {},
+    "values": {
+      "type": [
+        1
+      ],
+      "numChilds": [
+        6
+      ]
+    }
+  },
+  {
+    "name": "ENGINE_REVERSE",
+    "types": {},
+    "values": {
+      "engineType": [
+        "2"
+      ],
+      "reverseDelayMs": [
+        2000
+      ],
+      "crankingTimeMs": [
+        778
+      ],
+      "offTimeMs": [
+        5000
+      ],
+      "massEngine": [
+        "100"
+      ],
+      "massVehicle": [
+        "800"
+      ],
+      "maxPower": [
+        "32000"
+      ],
+      "rpmMax": [
+        2200
+      ],
+      "idleManager": [
+        {
+          "rpmIdleStart": 900,
+          "rpmIdleRunning": 800,
+          "loadStart": "10",
+          "timeStart": 2000,
+          "throttleStep": 30
+        }
+      ],
+      "wheelDiameter": [
+        "0.5"
+      ],
+      "rpmShift": [
+        1000
+      ],
+      "gearDecouplingTime": [
+        200
+      ],
+      "gearCouplingTime": [
+        700
+      ],
+      "gearDoubleDeclutchTime": [
+        0
+      ],
+      "fullGears": [
+        [
+          -3.8,
+          3.8,
+          2,
+          1.2
+        ]
+      ],
+      "brakePower": [
+        "160000"
+      ],
+      "resistance": [
+        "200"
+      ],
+      "airResistance": [
+        "2"
+      ]
+    }
+  },
+  {
+    "name": "PROC_AUTO",
+    "types": {},
+    "values": {}
+  },
+  {
+    "name": "PROC_INDICATOR",
+    "types": {
+      "types": [
+        "ST_INDICATOR_LEFT",
+        "ST_INDICATOR_RIGHT",
+        "ST_NONE",
+        "ST_NONE"
+      ]
+    },
+    "values": {}
+  },
+  {
+    "name": "PROC_FADE",
+    "types": {
+      "types": [
+        "ST_INDICATOR_LEFT",
+        "ST_INDICATOR_RIGHT",
+        "ST_BRAKE",
+        "ST_TAIL"
+      ]
+    },
+    "values": {
+      "fadeIn": [
+        1000
+      ],
+      "fadeOut": [
+        80
+      ]
+    }
+  },
+  {
+    "name": "PROC_CRANKING",
+    "types": {
+      "types": [
+        "ST_HIGHBEAM",
+        "ST_LOWBEAM",
+        "ST_ROOF",
+        "ST_TAIL"
+      ]
+    },
+    "values": {}
+  },
+  {
+    "name": "PROC_GROUP",
+    "types": {},
+    "values": {
+      "type": [
+        3
+      ],
+      "numChilds": [
+        6
+      ]
+    }
+  },
+  {
+    "name": "AUDIO_ENGINE",
+    "types": {
+      "throttleType": [
+        "ST_THROTTLE"
+      ]
+    },
+    "values": {
+      "volume": [
+        50,
+        50
+      ],
+      "samples": [
+        "CV2",
+        "CV3",
+        "CV4",
+        "CV5",
+        "Osi"
+      ],
+      "throttles": [
+        "150",
+        "900",
+        "150",
+        "900",
+        "0"
+      ]
+    }
+  },
+  {
+    "name": "AUDIO_SIMPLE",
+    "types": {
+      "triggerType": [
+        "ST_IGNITION"
+      ]
+    },
+    "values": {
+      "volume": [
+        50,
+        50
+      ],
+      "sample": [
+        "CV1"
+      ]
+    }
+  },
+  {
+    "name": "PROC_COMBINE",
+    "types": {
+      "inTypes": [
+        "ST_INDICATOR_RIGHT",
+        "ST_INDICATOR_LEFT"
+      ],
+      "outTypes": [
+        "ST_AUX1",
+        "ST_NONE"
+      ]
+    },
+    "values": {
+      "func": [
+        "1"
+      ]
+    }
+  },
+  {
+    "name": "AUDIO_SIMPLE",
+    "types": {
+      "triggerType": [
+        "ST_AUX1"
+      ]
+    },
+    "values": {
+      "volume": [
+        100,
+        100
+      ],
+      "sample": [
+        "CIN"
+      ]
+    }
+  },
+  {
+    "name": "AUDIO_LOOP",
+    "types": {
+      "triggerType": [
+        "ST_SIREN"
+      ]
+    },
+    "values": {
+      "volume": [
+        100,
+        100
+      ],
+      "loopBegin": [
+        0
+      ],
+      "loopEnd": [
+        14244
+      ],
+      "sample": [
+        "Si1"
+      ]
+    }
+  },
+  {
+    "name": "AUDIO_LOOP",
+    "types": {
+      "triggerType": [
+        "ST_HORN"
+      ]
+    },
+    "values": {
+      "volume": [
+        50,
+        50
+      ],
+      "loopBegin": [
+        902
+      ],
+      "loopEnd": [
+        1505
+      ],
+      "sample": [
+        "CHO"
+      ]
+    }
+  },
+  {
+    "name": "PROC_GROUP",
+    "types": {},
+    "values": {
+      "type": [
+        2
+      ],
+      "numChilds": [
+        2
+      ]
+    }
+  },
+  {
+    "name": "OUTPUT_LED",
+    "types": {
+      "types": [
+        "ST_INDICATOR_LEFT",
+        "ST_LOWBEAM",
+        "ST_INDICATOR_RIGHT",
+        "ST_ROOF",
+        "ST_TAIL",
+        "ST_FOG",
+        "ST_REVERSING",
+        "ST_SIDE",
+        "ST_BEACON1",
+        "ST_BEACON2",
+        "ST_CABIN",
+        "ST_SHAKER",
+        "ST_BRAKE"
+      ]
+    },
+    "values": {}
+  },
+  {
+    "name": "OUTPUT_AUDIO",
+    "types": {},
+    "values": {}
+  }
+]
