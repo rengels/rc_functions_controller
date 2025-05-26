@@ -7,8 +7,12 @@ RC models like sound and lights and more.
 It is tailored for the ESP32 controller, as it makes usage of many of
 the features of that device.
 
-It's inspired by https://github.com/TheDIYGuy999/Rc_Engine_Sound_ESP32
+It's inspired by [Rc_Engine_Sound_ESP32](https://github.com/TheDIYGuy999/Rc_Engine_Sound_ESP32)
 but the code is completely new.
+
+Web frontend:
+![QR code for web frontend](./doc/qrcode.png)
+[web frontend](./web/index.html)
 
 ## License
 
@@ -30,6 +34,7 @@ extra functions.
 ### Outputs
 
 - PWM dimmed ports
+- PWM servo output
 - ESC controller output (power stage necessary)
 - Two channel 22050kHz 8 bit audio output
 - BLE (Bluetooth low energy)
@@ -41,7 +46,7 @@ extra functions.
 - vehicle simulation
 - freely connect inputs to outputs directly or via functions
 - different utility functions (math, fade, delay, ...)
-- configurable via Bluetooth
+- configurable via Bluetooth [web frontend](./web/index.html)
 
 ## Architecture
 
@@ -50,17 +55,7 @@ extra functions.
 ## Hardware
 
 For HW schematics and layout look at:
-Rc_Engine_Sound_ESP32 https://github.com/TheDIYGuy999/Rc_Engine_Sound_ESP32
-
-## Contributors
-
-Contributors:
-
-- Sound files converted with: https://github.com/TheDIYGuy999/Rc_Engine_Sound_ESP32
-- Based on the code for ATmega 328: https://github.com/TheDIYGuy999/Rc_Engine_Sound
-- Parts of automatic transmision code from Wombii's fork: https://github.com/Wombii/Rc_Engine_Sound_ESP32
-- Dashboard, Neopixel and SUMD support by Gamadril: https://github.com/Gamadril/Rc_Engine_Sound_ESP32
-- Christian Fiebig https://github.com/fiechr
+[Rc_Engine_Sound_ESP32](https://github.com/TheDIYGuy999/Rc_Engine_Sound_ESP32)
 
 ## Getting started
 
@@ -140,20 +135,14 @@ to with e.g. a mobile phone.
 In order for Web Bluetooth to work you need to enable it (at least on Chrome) and
 the website needs to be secure, so it needs to be local or connected via https.
 
-See: chrome: about://bluetooth-internals
+See: [chrome bt internals](about://bluetooth-internals)
 
 ## Preparing sounds
 
 All sounds used are 8 bit unsigned PCM 22050 kHz Wav files.
 The ones created by Audacity are working, but not all WAV file features are implemented,
-so there might be issues with extra fancy exports.
+so there might be issues with some WAV files.
 
-
-## Random links:
-
-https://randomnerdtutorials.com/esp32-web-bluetooth/#project-overview
-./arduino-ide_2.3.2_Linux_64bit.AppImage --no-sandbox
-
-https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/kconfig.html
-https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-guides/performance/size.html?highlight=linker
+If the sounds are uploaded via bluetooth (custom sounds) then anything goes, since
+the browser will convert the files correctly.
 
