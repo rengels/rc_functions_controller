@@ -70,6 +70,13 @@ void InputPpm::start() {
             .clk_src = RMT_CLK_SRC_DEFAULT,
             .resolution_hz = RESOLUTION_HZ,
             .mem_block_symbols = 64, // must be at least 64
+            .intr_priority = 0,
+            .flags = {
+                .invert_in = false,
+                .with_dma = false,
+                .io_loop_back = false,
+                .allow_pd = false
+            }
         };
         ESP_ERROR_CHECK(
             rmt_new_rx_channel(&rx_channel_cfg, &rxChannelHandle));
@@ -83,6 +90,9 @@ void InputPpm::start() {
         receiveConfig = {
             .signal_range_min_ns =  1250, // smallest "min_ns" that I can set here
             .signal_range_max_ns = 5000000, // 5ms, longer signals indicate the gap
+            .flags = {
+                .en_partial_rx = false
+            }
         };
 
         ESP_ERROR_CHECK(

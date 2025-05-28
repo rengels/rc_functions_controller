@@ -8,6 +8,7 @@
 #include "signals.h"
 
 #include <cstdint>
+#include <algorithm>  // for clamp
 
 #include <driver/mcpwm_prelude.h>
 #include <driver/gpio.h>
@@ -22,9 +23,9 @@ namespace rcOutput {
 
 uint32_t OutputPwm::signalToUs(rcSignals::RcSignal signal) const {
     if (signal == RCSIGNAL_INVALID) {
-        return 0; // should not produce any signals
+        return 0;  // does not produce any signals
     } else {
-        return (signal / 2) + 1500;
+        return std::clamp((signal / 2) + 1500, 900, 2100);
     }
 }
 
@@ -42,8 +43,7 @@ OutputPwm::OutputPwm():
     pins {
             GPIO_NUM_12,
             GPIO_NUM_13,
-            // GPIO_NUM_14
-            GPIO_NUM_27
+            GPIO_NUM_14
         }
     {
 }
