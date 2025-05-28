@@ -131,7 +131,7 @@ div.switch > img {
     position: absolute;
     top: 50%;
     left: 50%;
-    height: 60%;
+    height: 60cqmin;
     margin: 0;
 
     transform: translateY(-50%) translateX(-50%);
@@ -156,7 +156,7 @@ div.switch > span:not(.overrideButton) {
 
     transform: translateY(-50%) translateX(-50%);
 
-    font-size: min(50cqh, 12cqw);
+    font-size: min(50cqh, 14cqw);
 }
 
 /** this is the small override symbol on the control pane

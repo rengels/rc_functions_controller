@@ -83,6 +83,9 @@ function connect() {
   if (!isWebBluetoothEnabled()) {
     return;
   }
+  if (bleServer) {
+    return;  // already connected
+  }
   connectToDevice();
 }
 

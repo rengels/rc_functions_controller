@@ -674,11 +674,19 @@ async function downloadConfig() {
   }
 
   let dataView = await bluetooth.downloadConfig()
-  console.log("Received " + dataView.byteLength + " bytes.");
-  updateConfigFromData(dataView);
 
-  if (procStatusCallback) {
-    procStatusCallback("Downloading done.", {"color": "green"});
+  if (dataView) {
+    console.log("Received " + dataView.byteLength + " bytes.");
+    updateConfigFromData(dataView);
+
+    if (procStatusCallback) {
+      procStatusCallback("Downloading done.", {"color": "green"});
+    }
+
+  } else {
+    if (procStatusCallback) {
+      procStatusCallback("Downloading failed.", {"color": "red"});
+    }
   }
 }
 
