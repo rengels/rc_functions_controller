@@ -8,7 +8,7 @@
 #include "signals.h"
 
 #include <cstdint>
-#include <cmath>
+#include <cmath>  // for min/max
 
 #include <driver/mcpwm_prelude.h>
 #include <driver/gpio.h>
@@ -206,22 +206,22 @@ void OutputEsc::step(const rcProc::StepInfo& info) {
     // -- call the actual step function
     switch (maxFreqType) {
     case FreqType::KHZ10:
-        stepFast(info, 10000u);
+        stepFast(info, 100u);
         break;
     case FreqType::KHZ5:
-        stepFast(info, 5000u);
+        stepFast(info, 500u);
         break;
     case FreqType::KHZ1:
         stepFast(info, 1000u);
         break;
     case FreqType::HZ100:
-        stepSlow(info, 200u);
+        stepFast(info, 10000u);
         break;
     case FreqType::HZ10:
-        stepSlow(info, 20u);
+        stepSlow(info, 200u);
         break;
     case FreqType::HZ5:
-        stepSlow(info, 10u);
+        stepSlow(info, 100u);
         break;
     default:
         ; // do nothing

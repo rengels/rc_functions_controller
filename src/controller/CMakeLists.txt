@@ -22,19 +22,6 @@ if (${Python3_FOUND})
             ${CMAKE_CURRENT_SOURCE_DIR}/serialization.cpp)
 endif()
 
-# add_custom_command (
-# OUTPUT
-# bell_wav.obj
-# COMMAND
-# ld -r -b binary bell.wav -z noexecstack -o "${CMAKE_CURRENT_BINARY_DIR}/bell_wav.obj"
-# COMMAND
-# objcopy --rename-section .data=.rodata,alloc,load,readonly,data,contents "${CMAKE_CURRENT_BINARY_DIR}/bell_wav.obj"
-# DEPENDS
-# "${CMAKE_CURRENT_SOURCE_DIR}/../audio/samples/ship/bell.wav"
-# WORKING_DIRECTORY
-# "${CMAKE_CURRENT_SOURCE_DIR}/../audio/samples/ship"
-# )
-
 
 if (${ESP_PLATFORM})
     idf_component_register(
@@ -49,6 +36,7 @@ if (${ESP_PLATFORM})
         INCLUDE_DIRS "."
         PRIV_REQUIRES
             nvs_flash
+            spi_flash
             esp_timer
 
             signals
