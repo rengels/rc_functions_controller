@@ -285,38 +285,39 @@ function getCoordinates(evt) {
   return cursorPoint.matrixTransform(directionCtrl.getScreenCTM().inverse());
 }
 
-function directionLeaveEvent(evt) {
-  mousePressed = false;
+function directionDownEvent(evt) {
+  directionMoveEvent(evt);
+  directionCtrl.addEventListener("pointermove", directionMoveEvent)
+  directionCtrl.setPointerCapture(evt.pointerId);
+}
+
+function directionUpEvent(evt) {
   directionCtrlCircle.setAttribute('cx', 0);
   directionCtrlCircle.setAttribute('cy', 0);
 
+  overrideSignals[signalNameMapping["ST_SPEED"]] = RCSIGNAL_INVALID;
   overrideSignals[signalNameMapping["ST_THROTTLE"]] = RCSIGNAL_INVALID;
   overrideSignals[signalNameMapping["ST_YAW"]] = RCSIGNAL_INVALID;
   triggerOverrideSignals();
+
+  directionCtrl.removeEventListener("pointermove", directionMoveEvent)
+  directionCtrl.releasePointerCapture(evt.pointerId);
 }
 
 function directionMoveEvent(evt) {
-  if (mousePressed) {
-    const loc = getCoordinates(evt);
-    directionCtrlCircle.setAttribute('cx', loc.x);
-    directionCtrlCircle.setAttribute('cy', loc.y);
+  const loc = getCoordinates(evt);
+  directionCtrlCircle.setAttribute('cx', loc.x);
+  directionCtrlCircle.setAttribute('cy', loc.y);
 
-    overrideSignals[signalNameMapping["ST_THROTTLE"]] = -loc.y * 20.0;
-    overrideSignals[signalNameMapping["ST_YAW"]] = loc.x * 20.0;
-    triggerOverrideSignals();
-  }
+  // TODO: should we clamp?
+  overrideSignals[signalNameMapping["ST_SPEED"]] = -loc.y * 20.0;
+  overrideSignals[signalNameMapping["ST_THROTTLE"]] = -loc.y * 20.0;
+  overrideSignals[signalNameMapping["ST_YAW"]] = loc.x * 20.0;
+  triggerOverrideSignals();
 }
 
-directionCtrl.addEventListener("pointerdown",
-  (evt) => {
-    mousePressed = true;
-    directionMoveEvent(evt);
-  }
-);
-
-directionCtrl.addEventListener("pointerleave", directionLeaveEvent);
-directionCtrl.addEventListener("pointerup", directionLeaveEvent);
-directionCtrl.addEventListener("pointermove", directionMoveEvent)
+directionCtrl.addEventListener("pointerdown", directionDownEvent);
+directionCtrl.addEventListener("pointerup", directionUpEvent);
 
 
 /** Update the status of the button div for a specific signal. */
