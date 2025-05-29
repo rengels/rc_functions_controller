@@ -102,7 +102,7 @@ void OutputEsc::stepSlow(const rcProc::StepInfo& info, uint16_t stepIncrement) {
         step = 0u;
     }
 
-    uint32_t period = 20000u; // 20ms, a cycle period
+    uint32_t period = 20000u; // 20ms, a cycle period of the main task
 
     ESP_ERROR_CHECK(
         mcpwm_timer_set_period(handleTimer, period));

@@ -291,7 +291,7 @@ void app_main(void) {
     xTaskCreatePinnedToCore(
         statusTask,   // Task function
         "statusTask", // name of task
-        10240,       // Stack size of task (1024)
+        10240,       // Stack size of task (1024) TODO: optimize memory
         nullptr,    // parameter of the task
         1,          // priority of the task (1 = low, 3 = medium, 5 = highest)
         &Task2,     // Task handle to keep track of created task
@@ -309,17 +309,20 @@ void app_main(void) {
  *  This task is scheduled every 20ms and
  *  does:
  *
- *  - call input modules to get new input signals
- *  - call mapper to map the input to processed signals
- *  - call processors and effects to further determine signals
- *  - call output modules to call their step functions.
+ *  - prepares a StepInfo structure by
+ *    - initializing all signals from the BT input signals
+ *    - initializing audio buffers from ringbuffer
+ *  - call proc storage to execute all procs
+ *  - updates bluetooth signals
  *
  */
 void mainTask(void *pvParameters) {
 
+    const TickType_t frequencyTick = 20U / portTICK_PERIOD_MS;  // wake up ever 20 ms
+    uint8_t btNotifyCounter = 0;  // keep track if we want to send out bt notification
+
     auto& ringbuffer = rcAudio::getRingbuffer();
     TickType_t lastWakeTime;
-    const TickType_t frequencyTick = 20U / portTICK_PERIOD_MS; // wake up ever 20 ms
 
     lastWakeTime = xTaskGetTickCount();
     for (;;) {
@@ -331,7 +334,7 @@ void mainTask(void *pvParameters) {
         signals = signalsBt;
 
         rcProc::StepInfo info = {
-            .deltaMs = 20U, // TODO
+            .deltaMs = 20U, // TODO: might not be accurate
             .signals = &signals,
             .intervals = {ringbuffer.getEmptyBlocks(),
                 ringbuffer.getEmptyBlocks()}
@@ -343,11 +346,18 @@ void mainTask(void *pvParameters) {
         ringbuffer.setBlocksFull(info.intervals[0]);
         ringbuffer.setBlocksFull(info.intervals[1]);
 
+        // -- update bluetooth
         updateBluetoothSignals();
         updateBluetoothConfig();
         updateBluetoothAudio();
+        // send out notifications every 200ms
+        btNotifyCounter++;
+        if (btNotifyCounter > 10) {
+            btNotify();
+        }
         // rtc_wdt_feed();
 
+        // -- update task time info
         int64_t timeEnd = esp_timer_get_time();
         lastTaskTime = timeEnd - timeStart;
         if (lastTaskTime > maxTaskTime) {

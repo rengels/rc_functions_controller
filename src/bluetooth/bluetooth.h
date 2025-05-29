@@ -8,6 +8,10 @@
 #define _RC_BLUETOOTH_
 
 #include <stdint.h>
+#include <stddef.h>  // for size_t
+
+#include <freertos/FreeRTOS.h>
+#include <freertos/queue.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,26 +29,18 @@ typedef struct {
     size_t len;
 } QueueByteBuffer;
 
-/** Initializes and starts the bluetooth component (in a thread) */
+/** Initializes and starts the bluetooth component (in a thread)
+ *
+ *  nv_flash_init should have been called before
+ *
+ */
 void btStart(void);
+
+/** Triggers sending of registered notifications. */
+void btNotify(void);
 
 /** Stops the bluetooth component */
 void btStop(void);
-
-
-/** Proposed size for the buffer containing signals in bytes.
- */
-#define BUFFER_SIGNAL_SIZE 140
-
-/** Proposed size for the buffer containing configuration in bytes */
-#define BUFFER_CONFIG_SIZE 500
-
-/** Size for the buffer containing audio sample commands in bytes */
-#define BUFFER_AUDIO_SIZE 150
-
-/** Proposed size for the buffer containing audio list in bytes */
-#define BUFFER_AUDIO_LIST_SIZE 150
-
 
 /** Message queue containing a byte buffer with the latest signals. */
 extern QueueHandle_t queueOutSignals;

@@ -63,11 +63,15 @@ For HW schematics and layout look at:
 
 The project uses the following tools:
 
+- esp-idf v5.4 (https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/index.html)
 - cmake
-- Arduino IDE (https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/index.html)
 - libboost-program-options-dev (optional for the engine emulation)
 - compiler toolchain (optional for tests)
 - python 3 (optional for generating scripts)
+
+Note:
+  The espressif esp-idf version 5.4.1 has a security relevant fix: Disable debug vendor HCI command on ESP32
+  So you might want to use that.
 
 #### esp-ide build
 
