@@ -94,17 +94,17 @@ void ProcSwitch::step(const StepInfo& info) {
 
     // -- output all signals
     for (uint8_t i = 0; i < NUM_CHANNELS; i++) {
-        if (outTypesMomentary[i] != rcSignals::SignalType::ST_NONE) {
-            (*signals)[outTypesMomentary[i]] =
-                signalMomentary[i] ? RCSIGNAL_MAX: RCSIGNAL_NEUTRAL;
+        if ((outTypesMomentary[i] != rcSignals::SignalType::ST_NONE) &&
+            signalMomentary[i]) {
+            (*signals)[outTypesMomentary[i]] = RCSIGNAL_MAX;
         }
-        if (outTypesShort[i] != rcSignals::SignalType::ST_NONE) {
-            (*signals)[outTypesShort[i]] =
-                signalShort[i] ? RCSIGNAL_MAX: RCSIGNAL_NEUTRAL;
+        if ((outTypesShort[i] != rcSignals::SignalType::ST_NONE) &&
+            signalShort[i]) {
+            (*signals)[outTypesShort[i]] = RCSIGNAL_MAX;
         }
-        if (outTypesLong[i] != rcSignals::SignalType::ST_NONE) {
-            (*signals)[outTypesLong[i]] =
-                signalLong[i] ? RCSIGNAL_MAX: RCSIGNAL_NEUTRAL;
+        if ((outTypesLong[i] != rcSignals::SignalType::ST_NONE) &&
+            signalLong[i]) {
+            (*signals)[outTypesLong[i]] = RCSIGNAL_MAX;
         }
     }
 }
