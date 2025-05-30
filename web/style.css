@@ -27,13 +27,11 @@ body {
 div.header {
     margin: 0;
     padding: .5em 1em;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
 }
-div.header h1 {
-    margin: 0;
-}
-
-/** For the header title font */
-span.header {
+div.logo {
     font-size: 200%;
     font-weight: 800;
 }
@@ -45,7 +43,7 @@ div.content {
 }
 
 /* My own button. Browser independent */
-span.button {
+span.button, div.button {
     display: inline-block;
     margin: 0.2em 0.2em;
     padding: 0.1em 0.3em;
@@ -58,6 +56,10 @@ span.button {
 
     user-select: none;
     cursor: default;
+}
+
+div.button {
+    margin-top: auto;
 }
 
 span.button:hover {

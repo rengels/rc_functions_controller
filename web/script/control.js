@@ -70,10 +70,10 @@ for (let i = 0; i < buttons.length; i++) {
 
   // for horn and siren
   if ("toggle" in buttonEntry && buttonEntry["toggle"] == false) {
-    buttonEntry["el"].addEventListener("mousedown",
+    buttonEntry["el"].addEventListener("pointerdown",
       (evt) => {buttonClicked(evt, buttonEntry["el"], buttonEntry["signalName"])});
       buttonEntry["el"].toggleAttribute("auto", true);
-    buttonEntry["el"].addEventListener("mouseup",
+    buttonEntry["el"].addEventListener("pointerup",
       (evt) => {buttonClicked(evt, buttonEntry["el"], buttonEntry["signalName"])});
       buttonEntry["el"].toggleAttribute("auto", true);
 
@@ -295,7 +295,6 @@ function directionUpEvent(evt) {
   directionCtrlCircle.setAttribute('cx', 0);
   directionCtrlCircle.setAttribute('cy', 0);
 
-  overrideSignals[signalNameMapping["ST_SPEED"]] = RCSIGNAL_INVALID;
   overrideSignals[signalNameMapping["ST_THROTTLE"]] = RCSIGNAL_INVALID;
   overrideSignals[signalNameMapping["ST_YAW"]] = RCSIGNAL_INVALID;
   triggerOverrideSignals();
@@ -310,7 +309,6 @@ function directionMoveEvent(evt) {
   directionCtrlCircle.setAttribute('cy', loc.y);
 
   // TODO: should we clamp?
-  overrideSignals[signalNameMapping["ST_SPEED"]] = -loc.y * 20.0;
   overrideSignals[signalNameMapping["ST_THROTTLE"]] = -loc.y * 20.0;
   overrideSignals[signalNameMapping["ST_YAW"]] = loc.x * 20.0;
   triggerOverrideSignals();

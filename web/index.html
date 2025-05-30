@@ -23,16 +23,16 @@
 
 <body id="body" style="display: flex; flex-direction: column;">
   <div class="header">
-    <span class="header">RcFuncCntrl</span>
-    <span class="button" id="fullscreenButton" style="float: right">Fullscreen</span>
-  </div>
-
-  <div>
-    <span class="button" id="connectBleButton"
-      style="animation-duration: 0.6s; animation-name: highlight; animation-iteration-count: 3;">Connect</span>
-    <span class="button" id="disconnectBleButton">Disconnect</span>
-    <strong><span id="stateText">Disconnected</span></strong>
-    <progress id="stateProgress" style="display: none;" max="100" value="0"></progress>
+    <div class="logo">RcFuncCntrl</div>
+    <div style="flex-grow: 1;"><!-- some space><--></div>
+    <div class="button" id="connectBleButton"
+      style="animation-duration: 0.6s; animation-name: highlight; animation-iteration-count: 3;">Connect</div>
+    <div class="button" id="disconnectBleButton">Disconnect</div>
+    <div id="stateText" style="flex-grow: 5; font-weight: 600; margin-top: auto;">
+      Disconnected
+      <progress id="stateProgress" style="display: none;" max="100" value="0"></progress>
+    </div>
+    <div class="button" id="fullscreenButton">Fullscreen</div>
   </div>
 
   <div class="tab">
