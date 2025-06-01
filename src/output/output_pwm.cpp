@@ -172,6 +172,8 @@ void OutputPwm::stop() {
                 mcpwm_del_operator(handleOper[i]));
             handleOper[i] = nullptr;
         }
+        ESP_ERROR_CHECK(
+            gpio_reset_pin(pins[i]));
     }
 
     if (handleTimer != nullptr) {
