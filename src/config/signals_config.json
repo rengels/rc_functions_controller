@@ -53,11 +53,7 @@
     },
     {
         "name": "ST_BRAKE",
-        "description": "Positive signal will activate brakes."
-    },
-    {
-        "name": "ST_PARKING_BRAKE",
-        "description": "Positive signal will activate parking brake."
+        "description": "Positive signal will slow down the vehicle simulation"
     },
     {
         "name": "ST_GEAR",
@@ -201,6 +197,10 @@
     {
         "name": "ST_TURBO",
         "description": "Sound volume for a turbo and/or wastegate."
+    },
+    {
+        "name": "ST_PARKING_BRAKE",
+        "description": "Signal for the parking brake sound."
     },
     {
         "name": "ST_HYDRAULIC",

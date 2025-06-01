@@ -230,7 +230,7 @@ int8_t EngineGear::chooseGear(bool faster) {
         // should we upshift
         if (gearCurrent < gears.size()) {
             if ((rpmUpshift >= rpmShift) ||
-                (gearCurrent == 0)) {
+                ((gearCurrent == 0) && rpm >= rpmShift)) {
                 return gearCurrent + 1;
             }
         }
@@ -432,12 +432,12 @@ void EngineGear::step(const rcProc::StepInfo& info) {
     }
 
     // -- handle gear
-    auto gearOrig = signals[SignalType::ST_GEAR];
+    const auto gearOrig = signals[SignalType::ST_GEAR];
+    const auto faster = wantFaster(signals);
     if (gearOrig == RCSIGNAL_INVALID) {
         // choose a new target gear
         if ((gearNext == gearCurrent) &&
             (gearState == GearState::COUPLED)) {
-            const bool faster = wantFaster(signals);
             gearNext = chooseGear(faster);
         }
 
@@ -453,13 +453,14 @@ void EngineGear::step(const rcProc::StepInfo& info) {
     EngineSimple::step(info);
 
     // we want to keep a minimum RPM
-    // for gear 0 and 1 we want to allow the engine to spool up to rpmShift
+    // for gear 1 we want to allow the engine to spool up to rpmShift
     // for all other gears we need to allow the engine to slow down
     //   below the downshift RPM (idle * 0.85)
-    float rpmMin = rpmShift;
+    float rpmMin = rpmMin = rpmShift;
     if (gearCurrent > 1) {
         rpmMin = (idleManager.getRPM() * 0.7f);
     }
+
     float energyMinRPM = Energy::energyFromSpeed(rpmMin / 60.0f, massEngine);
     float energyMaxRPM = Energy::energyFromSpeed(rpmMax / 60.0f, massEngine);
     if (clutchEngaged()) {

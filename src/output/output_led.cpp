@@ -72,9 +72,10 @@ void OutputLed::stop() {
         }
 
         const StaticConfig &config = CONFIG[i];
-
         ESP_ERROR_CHECK(
             ledc_stop(config.mode, config.channel, 0)); // idle level 0
+        ESP_ERROR_CHECK(
+            gpio_reset_pin(config.pin));
     }
 }
 

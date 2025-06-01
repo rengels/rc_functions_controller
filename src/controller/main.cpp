@@ -319,7 +319,7 @@ void app_main(void) {
 void mainTask(void *pvParameters) {
 
     const TickType_t frequencyTick = 20U / portTICK_PERIOD_MS;  // wake up ever 20 ms
-    uint8_t btNotifyCounter = 0;  // keep track if we want to send out bt notification
+    uint8_t btNotifyCounter = 0u;  // keep track if we want to send out bt notification
 
     auto& ringbuffer = rcAudio::getRingbuffer();
     TickType_t lastWakeTime;
@@ -352,8 +352,9 @@ void mainTask(void *pvParameters) {
         updateBluetoothAudio();
         // send out notifications every 200ms
         btNotifyCounter++;
-        if (btNotifyCounter > 10) {
+        if (btNotifyCounter > 10u) {
             btNotify();
+            btNotifyCounter = 0u;
         }
         // rtc_wdt_feed();
 
