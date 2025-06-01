@@ -26,6 +26,8 @@
 #include <vector>
 #include <span>
 
+#include <regex>
+
 #include <boost/program_options.hpp>
 
 namespace po = boost::program_options;
@@ -386,8 +388,9 @@ public:
 };
 
 
-int main(int argc, char* argv[]) {
-
+/** Creates the complete options description for the simulator.
+ */
+po::options_description createOptions() {
 
     // --- command line options
     po::options_description optSimulation("Simulation options");
@@ -402,6 +405,9 @@ int main(int argc, char* argv[]) {
         ("demo,d",
             po::value<std::string>()->default_value("truck"),
             "Demo type. One of \"truck\", \"train\" or \"car\".")
+        ("format,f",
+            po::value<std::string>()->default_value("text"),
+            "Output format. One of \"text\" or \"svg\".")
     ;
 
     po::options_description optEngine("Engine options");
@@ -463,26 +469,12 @@ int main(int argc, char* argv[]) {
     po::options_description optAll;
     optAll.add(optSimulation).add(optEngine).add(optOther);
 
-    po::variables_map vm;
+    return optAll;
+}
 
-    try {
-        po::store(po::parse_command_line(argc, argv, optAll), vm);
-        po::notify(vm);
 
-    } catch (po::error const& e) {
-        std::cerr << e.what() << std::endl;
-        optAll.print(std::cerr);
-        return 1;
-    }
-
-    if (vm.count("help")) {
-        cout << optAll << "\n";
-        return 1;
-    }
-
-    // --- run simulation
-    EngineSimulator sim(vm);
-    sim.engineTest();
+/** Prints out the meassurements on the console as text. */
+void outputText(vector<EngineSimulator::Meassurement> meassurements, std::string args) {
 
     // --- output results
     cout << "  Time," <<
@@ -497,7 +489,7 @@ int main(int argc, char* argv[]) {
         "energyVehicle, " <<
         "gear " <<
         endl;
-    for (const auto& mes : sim.meassurements) {
+    for (const auto& mes : meassurements) {
 
         cout << setprecision(1) << std::fixed <<
             setw(5) << (mes.time / 1000.0) << "s, " <<
@@ -533,6 +525,213 @@ int main(int argc, char* argv[]) {
             mes.strGearState << " " <<
             mes.strDrivingState <<
             endl;
+    }
+}
+
+/** Prints a single meassurement as an svg element on std-out */
+void outputSvgLine(std::vector<float> times, std::vector<float> values,
+                    float factor, std::string color, std::string name) {
+
+    if (values.size() == 0) {
+        return;
+    }
+
+    cout << "<g>\n";
+
+    float firstY = (-(values.front() * factor));
+    cout << "  <text style=\"font-size:50px; fill:" << color << ";\" "
+        << "x=\"-100\" "
+        << "y=\"" << setprecision(5) << (firstY) << "\">"
+        << name << "</text>\n";
+
+    cout << "  <path style=\"fill:none; stroke-width:6px; stroke:" << color
+        << "\" d=\"";
+    for (unsigned int i = 0; i < times.size() && i < values.size(); i++) {
+        if (i == 0) {
+            cout << "M ";
+        } else {
+            cout << " L ";
+        }
+        cout << setprecision(8) << (times[i]) << ","
+            << setprecision(8) << (-(values[i] * factor)) << " ";
+    }
+    cout << "\"/>\n";
+
+    cout << "</g>\n";
+}
+
+/** Prints a single meassurement as a sequence of blocks */
+void outputSvgBox(std::vector<float> times, std::vector<string> values,
+                    float offset, std::string color1, std::string color2,
+                    std::string name) {
+
+    if (values.size() == 0) {
+        return;
+    }
+
+    std::string lastValue = values.front();
+    float lastX = 0.0f;
+    bool flip = false;
+    cout << "<g>\n";
+
+    for (unsigned int i = 0; i < times.size() && i < values.size(); i++) {
+        if ((values[i] != lastValue) || (i == (values.size() - 1))) {
+            float newX = times[i];
+            cout << "  <rect stroke=\"none=\" fill=\""
+                << (flip ? color1 : color2) << "\" "
+                << "x=\"" << setprecision(8) << (lastX)  << "\" "
+                << "y=\"" << setprecision(8) << (offset) << "\" "
+                << "width=\"" << setprecision(8) << (newX - lastX)  << "\" "
+                << "height=\"" << setprecision(8) << (50) << "\" />";
+
+            cout << "  <text font-size=\"50px\" fill=\"white=\" dominant-baseline=\"middle\" text-anchor=\"middle\" "
+                << "x=\"" << setprecision(8) << ((lastX + newX) / 2.0f) << "\" "
+                << "y=\"" << setprecision(8) << (offset + 25) << "\">"
+                << lastValue << "</text>\n";
+
+            flip = !flip;
+            lastValue = values[i];
+            lastX = newX;
+        }
+    }
+
+    cout << "</g>\n";
+}
+
+/** Prints out the meassurements on the console as text. */
+void outputSvg(vector<EngineSimulator::Meassurement> meassurements, std::string args) {
+
+    float timeMax = 6.0f; // in seconds
+    if (meassurements.size() > 0) {
+        timeMax = std::max(timeMax, meassurements.back().time / 1000.0f);
+    }
+
+    // --- header
+    // our view box is timeMax * 1000 x -1000 to 1000 + 100 bottom border and 100 left border
+    cout <<
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
+        "<!-- by engine_simulation\n" << args << "\n -->\n"
+        "<svg\n"
+        "   width=\"" << setprecision(3) << (timeMax * 100.0f + 10) << "mm\"\n"
+        "   height=\"210mm\"\n"
+        "   viewBox=\"-100 -1000 "
+        << setprecision(8) << (timeMax * 1000.0f + 100.0f) << " 2100\"\n"
+        "   version=\"1.1\"\n"
+        "   xml:space=\"preserve\"\n"
+        "   xmlns=\"http://www.w3.org/2000/svg\"\n"
+        "   xmlns:svg=\"http://www.w3.org/2000/svg\">\n";
+
+    cout << "<g>\n";
+    // --- time scale
+    for (float time = 0; time < timeMax; time += 1.0f) {
+        cout << "  <line style=\"stroke-width: 4px; stroke: black;\" "
+            << "x1=\"" << setprecision(8) << (time * 1000.0f) << "\" "
+            << "y1=\"1000\" "
+            << "x2=\"" << setprecision(8) << (time * 1000.0f) << "\" "
+            << "y2=\"1050\"/>";
+        cout << "  <text style=\"font-size: 50px; fill: black;\" "
+            << "x=\"" << setprecision(5) << (time * 1000.0f) << "\" "
+            << "y=\"1100\">" << setprecision(5) << (time) << "s</text>\n";
+    }
+    cout << "</g>\n";
+
+    std::vector<float> times;
+    std::vector<std::string> strStates;
+    std::vector<float> speedSigs;
+    std::vector<float> throttlesOrig;
+    std::vector<float> throttles;
+    std::vector<float> speedsOrig;
+    std::vector<float> speeds;
+    std::vector<float> brakes;
+    std::vector<float> powers;
+    std::vector<float> rpms;
+    std::vector<float> speedVals;
+    std::vector<float> energyEngines;
+    std::vector<float> energyVehicles;
+    std::vector<float> gears;
+    std::vector<std::string> strGearStates;
+    std::vector<std::string> strDrivingStates;
+
+    for (const auto& mes : meassurements) {
+        times.push_back(mes.time);
+        strStates.push_back(mes.strState);
+        speedSigs.push_back(mes.speedSig);
+        throttlesOrig.push_back(mes.throttleOrig);
+        throttles.push_back(mes.throttle);
+        speedsOrig.push_back(mes.speedOrig);
+        speeds.push_back(mes.speed);
+        brakes.push_back(mes.brake);
+        powers.push_back(mes.power);
+        rpms.push_back(mes.rpm);
+        speedVals.push_back(mes.speedVal);
+        energyEngines.push_back(mes.energyEngine);
+        energyVehicles.push_back(mes.energyVehicle);
+        gears.push_back(mes.gear);
+        strGearStates.push_back(mes.strGearState);
+        strDrivingStates.push_back(mes.strDrivingState);
+    }
+
+    outputSvgLine(times, speedSigs, 1.0f, "black", "speed");
+    outputSvgLine(times, throttlesOrig, 1.0f, "red", "throttle signal orig");
+    outputSvgLine(times, throttles, 1.0f, "pink", "throttle signal out");
+    outputSvgLine(times, speedsOrig, 1.0f, "#008800", "speed signal orig");
+    outputSvgLine(times, speeds, 1.0f, "#00ff00", "speed signal out");
+    outputSvgLine(times, brakes, 1.0f, "#000080", "brake signal");
+    outputSvgLine(times, powers, 0.0001f, "#808080", "engine power");
+    outputSvgLine(times, rpms, 0.5f, "#808080", "rpm");
+    outputSvgLine(times, speedVals, 50.0f, "#80ff80", "speed");
+
+    outputSvgLine(times, gears, 100.0f, "#ff00ff", "gear");
+
+    outputSvgBox(times, strStates, 850.0f, "#909090", "#a0a0a0", "state");
+    outputSvgBox(times, strGearStates, 900.0f, "#900090", "#ff00ff", "gear state");
+    outputSvgBox(times, strDrivingStates, 950.0f, "#009090", "#00ffff", "driving state");
+
+    cout << "</svg>";
+}
+
+
+int main(int argc, char* argv[]) {
+
+    auto optAll = createOptions();
+    po::variables_map vm;
+
+    try {
+        po::store(po::parse_command_line(argc, argv, optAll), vm);
+        po::notify(vm);
+
+    } catch (po::error const& e) {
+        std::cerr << e.what() << std::endl;
+        optAll.print(std::cerr);
+        return 1;
+    }
+
+    if (vm.count("help")) {
+        cout << optAll << "\n";
+        return 1;
+    }
+
+    // --- run simulation
+    EngineSimulator sim(vm);
+    sim.engineTest();
+
+    // collect all the args, we might want to print them out.
+    std::string args;
+    for (int i = 0; i < argc; i++) {
+        args = args +
+            std::regex_replace(argv[i], std::regex("--"), "\\-\\-") + " ";
+    }
+
+    if (vm.count("format")) {
+        auto strFormat = vm["format"].as<string>();
+        if (strFormat == "text") {
+            outputText(sim.meassurements, args);
+        } else if (strFormat == "svg") {
+            outputSvg(sim.meassurements, args);
+        } else {
+            cerr << "Invalid parameter for --format: " << strFormat << endl;
+            exit(1);
+        }
     }
 
     return 0;
