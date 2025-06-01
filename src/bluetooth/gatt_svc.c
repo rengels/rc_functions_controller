@@ -88,7 +88,8 @@ static int generic_desc_chr_access(uint16_t conn_handle, uint16_t attr_handle,
 
 static uint16_t signals_chr_conn_handle = 0;
 static bool signals_chr_conn_handle_inited = false;
-static bool signals_ind_status = false;
+static bool signals_not_status = false;  // if notifications were requested
+static bool signals_ind_status = false;  // if indications were requested
 
 
 /// UUID for the rc signals service. Random
@@ -240,7 +241,7 @@ static int sendTopQueue(QueueHandle_t queue, struct ble_gatt_access_ctxt *ctxt) 
 
     QueueByteBuffer buffer;
     if (xQueuePeek(queue, (void*)&buffer, (TickType_t)0)) {
-        ESP_LOGI(TAG, "sendTopQueue; 1=%c 2=%c len=%d", buffer.data[0], buffer.data[1], buffer.len);
+        // too many messages ESP_LOGI(TAG, "sendTopQueue; 1=%c 2=%c len=%d", buffer.data[0], buffer.data[1], buffer.len);
         int rc = os_mbuf_append(ctxt->om,
                             buffer.data,
                             buffer.len);
@@ -288,9 +289,13 @@ static int receiveToQueue(QueueHandle_t queue, struct ble_gatt_access_ctxt *ctxt
 
 /* Public functions */
 void send_signals_indication(void) {
+    if (signals_not_status && signals_chr_conn_handle_inited) {
+        ble_gatts_notify(signals_chr_conn_handle, signals_chr_val_handle);
+        // too many messages ESP_LOGI(TAG, "signals notification sent!");
+    }
     if (signals_ind_status && signals_chr_conn_handle_inited) {
         ble_gatts_indicate(signals_chr_conn_handle, signals_chr_val_handle);
-        // ESP_LOGI(TAG, "signals indication sent!");
+        // too many messages ESP_LOGI(TAG, "signals indication sent!");
     }
 }
 
@@ -342,7 +347,7 @@ void gatt_svr_register_cb(struct ble_gatt_register_ctxt *ctxt, void *arg) {
 
 /*
  *  GATT server subscribe event callback
- *      1. Update heart rate subscription status
+ *      1. Update signals subscription status
  */
 void gatt_svr_subscribe_cb(struct ble_gap_event *event) {
     if (event->subscribe.conn_handle != BLE_HS_CONN_HANDLE_NONE) {
@@ -354,9 +359,10 @@ void gatt_svr_subscribe_cb(struct ble_gap_event *event) {
     }
 
     if (event->subscribe.attr_handle == signals_chr_val_handle) {
-        // update subscription status (TODO: handle several subscriptions
+        // update subscription status (TODO: handle several subscriptions)
         signals_chr_conn_handle = event->subscribe.conn_handle;
         signals_chr_conn_handle_inited = true;
+        signals_not_status = event->subscribe.cur_notify;
         signals_ind_status = event->subscribe.cur_indicate;
     }
 }
@@ -373,6 +379,7 @@ static int generic_chr_access(uint16_t conn_handle, uint16_t attr_handle,
     }
 
     if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR) {
+        /* too many messages
         if (conn_handle != BLE_HS_CONN_HANDLE_NONE) {
             ESP_LOGI(TAG, "Descriptor read; %s conn_handle=%d attr_handle=%d",
                         aArgs->characteristicsName, conn_handle, attr_handle);
@@ -380,6 +387,7 @@ static int generic_chr_access(uint16_t conn_handle, uint16_t attr_handle,
             ESP_LOGI(TAG, "Descriptor read by NimBLE stack; %s attr_handle=%d",
                         aArgs->characteristicsName, attr_handle);
         }
+        */
 
         if (aArgs->outQueue != NULL) {
             return sendTopQueue(*(aArgs->outQueue), ctxt);
