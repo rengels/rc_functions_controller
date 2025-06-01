@@ -25,7 +25,7 @@ void ProcExpo::step(const StepInfo& info) {
 
     if (sig != RCSIGNAL_INVALID) {
 
-        const float fIn = sig / RCSIGNAL_MAX;
+        const float fIn = static_cast<float>(sig) / RCSIGNAL_MAX;
         const float fOut = b * fIn + (1 - b) * fIn * fIn * fIn;
 
         RcSignal out = fOut * RCSIGNAL_MAX;
