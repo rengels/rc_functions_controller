@@ -503,7 +503,7 @@
         "id": "Ex",
         "name": "PROC_EXPO",
         "filename": "proc_expo",
-        "description": "Exponential (actual just a 2nd degree function)",
+        "description": "Exponential (actual a 3nd degree function)",
         "types": [
             {
                 "name" : "inType",
@@ -995,6 +995,7 @@
             {
                 "name": "resistance",
                 "type": "float",
+                "unit": "Watt",
                 "description": "Flat out resistance for the vehicle in Watts."
             },
             {
@@ -1130,6 +1131,7 @@
             {
                 "name": "resistance",
                 "type": "float",
+                "unit": "Watt",
                 "description": "Flat out resistance for the vehicle in Watts."
             },
             {

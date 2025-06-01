@@ -126,8 +126,8 @@ int16_t InputSrxl::parseForMsg(const uint8_t* data, int16_t dataLen) {
         if (((data[25] << 8) | data[26]) == crc) {
 
             for (uint8_t i = 0; i < 12 && i < NUM_CHANNELS; i += 2) {
-                RcSignal rawSignal = ((data[i + 1] << 8) | data[i + 2]) & 0x0FFF;
-                lastSignals[i]  = (rawSignal / 2) - 1024;
+                int32_t rawSignal = ((data[i + 1] << 8) | data[i + 2]) & 0x0FFF;
+                lastSignals[i]  = (rawSignal - 2048) * 1024 / 1200;
                 notUpdatedCtr[i] = 0;
             }
         }
@@ -137,8 +137,8 @@ int16_t InputSrxl::parseForMsg(const uint8_t* data, int16_t dataLen) {
     } else if (data[0] == 0xA5 && (data[1] & 0xF0) == 0) {
 
         for (uint8_t i = 0; i < 7 && i < NUM_CHANNELS; i += 2) {
-            RcSignal rawSignal = ((data[i + 1] << 8) | data[i + 2]) & 0x0FFF;
-            lastSignals[i]  = (rawSignal / 2) - 1024;
+            int32_t rawSignal = ((data[i + 1] << 8) | data[i + 2]) & 0x0FFF;
+            lastSignals[i]  = (rawSignal - 2048) * 1024 / 1200;
             notUpdatedCtr[i] = 0;
         }
 
