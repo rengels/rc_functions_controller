@@ -295,8 +295,8 @@ function directionUpEvent(evt) {
   directionCtrlCircle.setAttribute('cx', 0);
   directionCtrlCircle.setAttribute('cy', 0);
 
-  overrideSignals[signalNameMapping["ST_THROTTLE"]] = RCSIGNAL_INVALID;
-  overrideSignals[signalNameMapping["ST_YAW"]] = RCSIGNAL_INVALID;
+  overrideSignals[signalNameMapping["ST_THROTTLE"]] = 0;
+  overrideSignals[signalNameMapping["ST_YAW"]] = 0;
   triggerOverrideSignals();
 
   directionCtrl.removeEventListener("pointermove", directionMoveEvent)
@@ -393,6 +393,12 @@ function updateSignals(dataView) {
 }
 
 
+/** Called when the tab is entered. */
+function startSignals() {
+  triggerOverrideSignals();
+}
+
+
 function getOverrideSignals() {
   const buffer = new ArrayBuffer(NUM_SIGNALS * 2);
   const dataView = new DataView(buffer);
@@ -427,5 +433,6 @@ function triggerOverrideSignals() {
 
 export {
   updateSignals,
+  startSignals,
 }
 
