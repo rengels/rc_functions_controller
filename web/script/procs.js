@@ -119,7 +119,7 @@ function createGroupMenuButton(elGroup) {
   elDropdown.appendChild(elAD1)
 
   let elAD2 = document.createElement('li');
-  elAD2.textContent = "Replace Group from file.."
+  elAD2.textContent = "Load Group.."
   elAD2.title = "Replace the group including it's content with elements loaded from a .json file."
   elAD2.addEventListener("click", (event) => {
     loadGroupConfig(elGroup);

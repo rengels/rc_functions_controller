@@ -43,7 +43,7 @@ div.content {
 }
 
 /* My own button. Browser independent */
-span.button, div.button {
+.button {
     display: inline-block;
     margin: 0.2em 0.2em;
     padding: 0.1em 0.3em;
@@ -62,19 +62,19 @@ div.button {
     margin-top: auto;
 }
 
-span.button:hover {
+.button:hover {
     background-color: var(--color_lv_9);
     box-shadow: 0px 0px 5px 5px var(--color_lv_1);
 }
-span.button[active],
-span.button:active {
+.button[active],
+.button:active {
     background-color: var(--color_lv_5);
 }
 
-span.button[disabled],
-span.button[disabled]:hover,
-span.button.disabled,
-span.button.disabled:hover {
+.button[disabled],
+.button[disabled]:hover,
+.button.disabled,
+.button.disabled:hover {
     box-shadow: none;
     border: 2px solid gray;
     background-color: var(--color_lv_10);

@@ -350,7 +350,15 @@ function getOverrideSignals() {
   return dataView;
 }
 
+
+/** Called when the tab is entered. */
+function startSignals() {
+  bluetooth.uploadSignals(getOverrideSignals());
+}
+
+
 export {
   fillTable,
   updateSignals,
+  startSignals
 }
