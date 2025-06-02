@@ -124,18 +124,25 @@ TEST(EngineGearTest, DistributeEnergy) {
     // -- Completely balance it
     engine.energyEngine.set(300);
     engine.energyVehicle.set(0);
+    EXPECT_FALSE(engine.isEnergyBalanced());
 
-    engine.distributeEnergy(0.0f, 1000.0f);
+    engine.distributeEnergy(0.0f, 1000.0f, 9999.9f);
     EXPECT_NEAR(100, engine.energyEngine.get(), EPSILON);
     EXPECT_NEAR(200, engine.energyVehicle.get(), EPSILON);
+    EXPECT_TRUE(engine.isEnergyBalanced());
 
     // -- keep min RPM-energy
     engine.energyEngine.set(300);
     engine.energyVehicle.set(0);
+    EXPECT_FALSE(engine.isEnergyBalanced());
 
-    engine.distributeEnergy(300.0f, 1000.0f);
+    engine.distributeEnergy(300.0f, 1000.0f, 9999.9f);
     EXPECT_NEAR(300, engine.energyEngine.get(), EPSILON);
     EXPECT_NEAR(0, engine.energyVehicle.get(), EPSILON);
+    EXPECT_FALSE(engine.isEnergyBalanced());
+
+    // -- max energy transfer
+    // TODO
 }
 
 /** Unit test for EngineGear::rpmForGear()

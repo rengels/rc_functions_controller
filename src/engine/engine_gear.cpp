@@ -131,28 +131,44 @@ float EngineGear::vehicleEnergyFactor(const int8_t gear) const {
     return massVehicle / (massEngine * sqr(getRotationRatio(gear)));
 }
 
-bool EngineGear::clutchEngaged() const {
+float EngineGear::maxPowerTransfer() const {
     if (gears.size() == 0) {
-        return true;
+        return maxPower * 10.0f;
     }
     if (gearCurrent == 0) {
-        return false;
+        return 0.0f;
     }
 
     switch (gearState) {
     case GearState::DECOUPLED:
-        return false;
+        return 0.0f;
     case GearState::COUPLING:
+        return maxPower * 1.5f;
     case GearState::COUPLED:
-        return true;
+        return maxPower * 10.0f;
     case GearState::DECOUPLING:
-        return false;
+        return 0.0f;
     default:
-        return false;
+        return 0.0f;
     }
 }
 
-void EngineGear::distributeEnergy(const float energyEngineMin, const float energyEngineMax) {
+
+bool EngineGear::isEnergyBalanced() const {
+    const float epsilon = 1.0f; // a small energy difference
+
+    // we assume a gear when distributing
+    // in gear 0 we assume we want to distribute it correctly for gear 1
+    int8_t adjustedGear = std::max(gearCurrent, static_cast<int8_t>(1));
+
+    float disFactor = vehicleEnergyFactor(adjustedGear);
+    float deltaEnergy = (energyEngine.get() * disFactor) - energyVehicle.get();
+
+    return std::abs(deltaEnergy) < epsilon;
+}
+
+
+void EngineGear::distributeEnergy(const float energyEngineMin, const float energyEngineMax, const float maxEnergyTransfer) {
 
     // we assume a gear when distributing
     // in gear 0 we assume we want to distribute it correctly for gear 1
@@ -167,6 +183,17 @@ void EngineGear::distributeEnergy(const float energyEngineMin, const float energ
 
     // distribute according to the coupling factor:
     float deltaEnergy = energyEnginePerfect - energyEngine.get();
+
+    // Limit the power transfered through the clutch
+    if (deltaEnergy > 0.0f) {
+        if (deltaEnergy > maxEnergyTransfer) {
+            deltaEnergy = maxEnergyTransfer;
+        }
+    } else {
+        if (deltaEnergy < -maxEnergyTransfer) {
+            deltaEnergy = -maxEnergyTransfer;
+        }
+    }
 
     // kind of a smart clutch.
     // we move energy between engine and vehicle
@@ -281,14 +308,15 @@ void EngineGear::selectGear(TimeMs deltaTime) {
 
     case GearState::COUPLING:
         if (gearStepTime >= gearCouplingTime) {
+        // if (isEnergyBalanced()) {
             gearStepTime -= gearCouplingTime;
             gearState = GearState::COUPLED;
         }
         break;
 
     case GearState::COUPLED:
-        gearStepTime = 0;
         if (gearCurrent != gearNext) {
+            gearStepTime = 0;
             gearState = GearState::DECOUPLING;
         }
         break;
@@ -456,16 +484,16 @@ void EngineGear::step(const rcProc::StepInfo& info) {
     // for gear 1 we want to allow the engine to spool up to rpmShift
     // for all other gears we need to allow the engine to slow down
     //   below the downshift RPM (idle * 0.85)
-    float rpmMin = rpmMin = rpmShift;
+    float rpmMin = rpmShift;
     if (gearCurrent > 1) {
         rpmMin = (idleManager.getRPM() * 0.7f);
     }
 
     float energyMinRPM = Energy::energyFromSpeed(rpmMin / 60.0f, massEngine);
     float energyMaxRPM = Energy::energyFromSpeed(rpmMax / 60.0f, massEngine);
-    if (clutchEngaged()) {
-        distributeEnergy(energyMinRPM, energyMaxRPM);
-    }
+
+    float maxEnergyTransfer = maxPowerTransfer() * info.deltaMs / 1000.0f;
+    distributeEnergy(energyMinRPM, energyMaxRPM, maxEnergyTransfer);
 
     // -- write back signals
     signals[SignalType::ST_GEAR] = gearCurrent;

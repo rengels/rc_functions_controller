@@ -204,8 +204,8 @@ class EngineGear: public EngineSimple {
          */
         uint16_t rpmShift;
 
-        rcSignals::TimeMs gearDecouplingTime; ///< The time it takes to gradualy disengage the gear. Set to 0 for double-clutch
-        rcSignals::TimeMs gearCouplingTime; ///< The time it takes to gradualy engage the gear. Set to 0 for double-clutch
+        rcSignals::TimeMs gearDecouplingTime; ///< The time it takes to gradualy disengage the gear. Set to 0 for dual clutch
+        rcSignals::TimeMs gearCouplingTime; ///< The time it takes to gradualy engage the gear. Set to 0 for dual clutch
         rcSignals::TimeMs gearDoubleDeclutchTime; ///< The time between disengaging and engaging used to bring the gear up to speed. Set to 0 for a synchronized gear.
 
         /** Kinetic energy of the vehicle in Joule
@@ -288,12 +288,21 @@ class EngineGear: public EngineSimple {
          */
         float vehicleEnergyFactor(int8_t gear) const;
 
-        /** Returns true if the clutch is considered engaged.
+        /** Returns the maximum power that can be transfered throught the clutch
          *
          *  If the clutch is engaged, we distribute the energy between
-         *  engine and vehicle.
+         *  engine and vehicle, but that is limited, through the clutch.
          */
-        bool clutchEngaged() const;
+        float maxPowerTransfer() const;
+
+
+        /** Returns true if the energy is balanced for vehicle and engine.
+         *
+         *  This means that there is no power transmitted through the clutch
+         *  as the rotation of the engine via the gear is the same as the rotation
+         *  on the other side of the gear.
+         */
+        bool isEnergyBalanced() const;
 
         /** This will distribute the energy between engine and vehicle
          *
@@ -307,8 +316,13 @@ class EngineGear: public EngineSimple {
          *  @param[in] energyEngineMin The minimum energy that we will
          *    allow the engine to have.
          *    So energy is moved in favor of the engine (min RPM).
+         *
+         *  @returns true If we could balance the energy completely
+         *    false, if the distribution was limited because of energyEngineMin,
+         *    energyEngineMax or maxEnergyTransfer.
          */
-        void distributeEnergy(float energyEngineMin, float energyEngineMax);
+        void distributeEnergy(float energyEngineMin, float energyEngineMax,
+            float maxEnergyTransfer);
 
         /** Calculates the RPM if the given \p gear would have been
          *  engaged.
