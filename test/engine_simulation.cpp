@@ -528,13 +528,22 @@ void outputText(vector<EngineSimulator::Meassurement> meassurements, std::string
     }
 }
 
+
 /** Prints a single meassurement as an svg element on std-out */
 void outputSvgLine(std::vector<float> times, std::vector<float> values,
-                    float factor, std::string color, std::string name) {
+                   std::string color, std::string name) {
 
     if (values.size() == 0) {
         return;
     }
+
+    float maxElement = *(std::max_element(values.begin(), values.end()));
+    // for now, ignore negative maximum elements, since we are marking
+    // invalid values with large negative numbers
+    // float minElement = *(std::min_element(values.begin(), values.end()));
+    float minElement = 0.0f;
+    float factor = 1000.0f /
+        std::max(std::max(std::abs(maxElement), std::abs(minElement)), 1.0f);
 
     cout << "<g>\n";
 
@@ -556,9 +565,9 @@ void outputSvgLine(std::vector<float> times, std::vector<float> values,
             << setprecision(8) << (-(values[i] * factor)) << " ";
     }
     cout << "\"/>\n";
-
     cout << "</g>\n";
 }
+
 
 /** Prints a single meassurement as a sequence of blocks */
 void outputSvgBox(std::vector<float> times, std::vector<string> values,
@@ -573,6 +582,11 @@ void outputSvgBox(std::vector<float> times, std::vector<string> values,
     float lastX = 0.0f;
     bool flip = false;
     cout << "<g>\n";
+
+    cout << "  <text style=\"font-size:50px; fill:" << color1 << ";\" "
+        << "x=\"-100\" "
+        << "y=\"" << setprecision(5) << (offset) << "\">"
+        << name << "</text>\n";
 
     for (unsigned int i = 0; i < times.size() && i < values.size(); i++) {
         if ((values[i] != lastValue) || (i == (values.size() - 1))) {
@@ -594,9 +608,9 @@ void outputSvgBox(std::vector<float> times, std::vector<string> values,
             lastX = newX;
         }
     }
-
     cout << "</g>\n";
 }
+
 
 /** Prints out the meassurements on the console as text. */
 void outputSvg(vector<EngineSimulator::Meassurement> meassurements, std::string args) {
@@ -671,17 +685,18 @@ void outputSvg(vector<EngineSimulator::Meassurement> meassurements, std::string 
         strDrivingStates.push_back(mes.strDrivingState);
     }
 
-    outputSvgLine(times, speedSigs, 1.0f, "black", "speed");
-    outputSvgLine(times, throttlesOrig, 1.0f, "red", "throttle signal orig");
-    outputSvgLine(times, throttles, 1.0f, "pink", "throttle signal out");
-    outputSvgLine(times, speedsOrig, 1.0f, "#008800", "speed signal orig");
-    outputSvgLine(times, speeds, 1.0f, "#00ff00", "speed signal out");
-    outputSvgLine(times, brakes, 1.0f, "#000080", "brake signal");
-    outputSvgLine(times, powers, 0.0001f, "#808080", "engine power");
-    outputSvgLine(times, rpms, 0.5f, "#808080", "rpm");
-    outputSvgLine(times, speedVals, 50.0f, "#80ff80", "speed");
-
-    outputSvgLine(times, gears, 100.0f, "#ff00ff", "gear");
+    outputSvgLine(times, speedSigs, "black", "speed");
+    outputSvgLine(times, throttlesOrig, "red", "throttle signal orig");
+    outputSvgLine(times, throttles, "pink", "throttle signal out");
+    outputSvgLine(times, speedsOrig, "#008800", "speed signal orig");
+    outputSvgLine(times, speeds, "#00ff00", "speed signal out");
+    outputSvgLine(times, brakes, "#000080", "brake signal");
+    outputSvgLine(times, powers, "#808080", "engine power");
+    outputSvgLine(times, rpms, "#808080", "rpm");
+    outputSvgLine(times, speedVals, "#80ff80", "speed");
+    outputSvgLine(times, energyEngines, "#00ffff", "engine energy");
+    outputSvgLine(times, energyVehicles, "#008888", "vehicle energy");
+    outputSvgLine(times, gears, "#ff00ff", "gear");
 
     outputSvgBox(times, strStates, 850.0f, "#909090", "#a0a0a0", "state");
     outputSvgBox(times, strGearStates, 900.0f, "#900090", "#ff00ff", "gear state");

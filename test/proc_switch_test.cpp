@@ -163,14 +163,16 @@ TEST(ProcSwitchTest, Output) {
     EXPECT_FALSE(proc.posDebouncedLast.isValid());
 
     // -- first step. Not debounced, all outputs NEUTRAL
+    signals.reset();
     signals[SignalType::ST_NONE] = RCSIGNAL_NEUTRAL;
     signals[SignalType::ST_YAW] = -RCSIGNAL_MAX;
+    signals[SignalType::ST_AUX1] = 123;  // should keep the original signal
     info.deltaMs = proc.TIME_MS_DEBOUNCE + 1;
     proc.step(info);
 
-    EXPECT_EQ(RCSIGNAL_NEUTRAL, signals[SignalType::ST_AUX1]);
-    EXPECT_EQ(RCSIGNAL_NEUTRAL, signals[SignalType::ST_AUX2]);
-    EXPECT_EQ(RCSIGNAL_NEUTRAL, signals[SignalType::ST_TEMP1]);
+    EXPECT_EQ(123, signals[SignalType::ST_AUX1]);
+    EXPECT_EQ(RCSIGNAL_INVALID, signals[SignalType::ST_AUX2]);
+    EXPECT_EQ(RCSIGNAL_INVALID, signals[SignalType::ST_TEMP1]);
 
     // -- Debounced, Momentary high
     signals[SignalType::ST_NONE] = RCSIGNAL_NEUTRAL;
@@ -179,8 +181,8 @@ TEST(ProcSwitchTest, Output) {
     proc.step(info);
 
     EXPECT_EQ(RCSIGNAL_MAX, signals[SignalType::ST_AUX1]);
-    EXPECT_EQ(RCSIGNAL_NEUTRAL, signals[SignalType::ST_AUX2]);
-    EXPECT_EQ(RCSIGNAL_NEUTRAL, signals[SignalType::ST_TEMP1]);
+    EXPECT_EQ(RCSIGNAL_INVALID, signals[SignalType::ST_AUX2]);
+    EXPECT_EQ(RCSIGNAL_INVALID, signals[SignalType::ST_TEMP1]);
 
     // -- toggle short
     signals[SignalType::ST_NONE] = RCSIGNAL_NEUTRAL;
@@ -191,9 +193,9 @@ TEST(ProcSwitchTest, Output) {
     signals[SignalType::ST_YAW] = RCSIGNAL_NEUTRAL;
     proc.step(info);
     proc.step(info);
-    EXPECT_EQ(RCSIGNAL_NEUTRAL, signals[SignalType::ST_AUX1]);
+    EXPECT_EQ(RCSIGNAL_MAX, signals[SignalType::ST_AUX1]);
     EXPECT_EQ(RCSIGNAL_MAX, signals[SignalType::ST_AUX2]);
-    EXPECT_EQ(RCSIGNAL_NEUTRAL, signals[SignalType::ST_TEMP1]);
+    EXPECT_EQ(RCSIGNAL_INVALID, signals[SignalType::ST_TEMP1]);
 
     // -- toggle long
     signals[SignalType::ST_NONE] = RCSIGNAL_NEUTRAL;
@@ -203,9 +205,10 @@ TEST(ProcSwitchTest, Output) {
     proc.step(info);
 
     signals[SignalType::ST_YAW] = RCSIGNAL_NEUTRAL;
+    signals[SignalType::ST_AUX1] = 123;  // should overwrite
     proc.step(info);
     proc.step(info);
-    EXPECT_EQ(RCSIGNAL_NEUTRAL, signals[SignalType::ST_AUX1]);
+    EXPECT_EQ(RCSIGNAL_MAX, signals[SignalType::ST_AUX1]);
     EXPECT_EQ(RCSIGNAL_MAX, signals[SignalType::ST_AUX2]);
     EXPECT_EQ(RCSIGNAL_MAX, signals[SignalType::ST_TEMP1]);
 }
