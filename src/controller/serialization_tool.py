@@ -23,6 +23,35 @@ def to_camel_case(name):
     return "".join((x.title() for x in tokens))
 
 
+def output_signals_array(defs_signals, out_file):
+    def signal_map_line(signal):
+        """Converts an entry in def_signals to a line for id map"""
+        if "id" in signal:
+            return f"  '{signal["id"]}',  // {signal["name"]}";
+        return ""
+
+    print(
+        f"""
+namespace rcSignals {{
+
+/** Signals map
+ *
+ * We don't want to invalidate configuration just because
+ * a signal is added, removed or moved.
+ * That's why they have an ID for serialization.
+ */
+extern const char signalsMap[];
+
+const char signalsMap[] = {{
+{"\n".join([signal_map_line(signal) for signal in defs_signals])}
+    }};
+
+}}  // namespace
+""",
+        file=out_file,
+    )
+
+
 def output_cpp_proc(proc, out_file):
     """Outputs the serialization an deserialization code for a single proc
     classes into the out file.
@@ -266,6 +295,13 @@ parser.add_argument(
     default=str(pathlib.Path(__file__).parent.parent / "config" / "procs_config.json"),
 )
 parser.add_argument(
+    "--signals",
+    "-s",
+    type=argparse.FileType("r"),
+    help="Signals definition file",
+    default=str(pathlib.Path(__file__).parent.parent / "config" / "signals_config.json"),
+)
+parser.add_argument(
     "--cpp",
     "-c",
     type=argparse.FileType("w"),
@@ -273,8 +309,17 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
-defs_proc = json.load(args.procs)
 
+defs_signals = json.load(args.signals)
+# ensure no duplicate IDs
+signal_ids = set()
+for signal in defs_signals:
+    if "id" in signal:
+        if signal["id"] in signal_ids:
+            exit(f"Duplicate id {signal['id']} in signal {signal['name']}")
+        signal_ids.add(signal["id"])
+
+defs_proc = json.load(args.procs)
 # ensure no duplicate IDs
 ids = set()
 for proc in defs_proc:
@@ -300,3 +345,4 @@ for proc in defs_proc:
 
 if args.cpp:
     output_cpp(defs_proc, args.cpp)
+    output_signals_array(defs_signals, args.cpp)

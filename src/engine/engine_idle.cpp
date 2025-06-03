@@ -21,7 +21,7 @@ Idle::Idle() :
     rpmIdleRunning(900),
     loadStart(5),
     timeStart(10),
-    throttleStep(10),
+    throttleStep(5),
     timePassed(0u),
     throttleLast(RCSIGNAL_MAX / 4) {
 }
@@ -85,23 +85,23 @@ void Idle::step(
 
     // time to target RPM
     float changePerMs = (rpm - rpmLast) / deltaMs;
-    float timeToTarget = 1000.0f;
+    float timeToTargetMs = 1000.0f;
     if (changePerMs != 0.0f) {
-        timeToTarget = (rpmTarget - rpm) / changePerMs;
+        timeToTargetMs = (rpmTarget - rpm) / changePerMs;
     }
 
     bool keep = false;  // true if we should keep the throttle
     bool more = false;  // true if we need more throttle
 
-    if (timeToTarget < 0.0f) {
+    if (timeToTargetMs < 0.0f) {
         // RPM goes in the wrong direction
         more = (rpm < rpmTarget);
 
-    } else if (timeToTarget < 20.0f) {
+    } else if (timeToTargetMs < 20.0f) {
         // RPM goes in the right direction but too fast
         more = (rpm > rpmTarget);
 
-    } else if (timeToTarget > 40.0f) {
+    } else if (timeToTargetMs > 400.0f) {
         // RPM goes in the right direction but too slow
         more = (rpm < rpmTarget);
 
@@ -114,7 +114,7 @@ void Idle::step(
         if (more) {
             throttleLast = std::min(
                 static_cast<RcSignal>(throttleLast + throttleStep),
-                RCSIGNAL_MAX);
+                static_cast<RcSignal>(RCSIGNAL_MAX / 2));  // don't give more than 50% throttle
 
         } else {
             throttleLast = std::max(

@@ -52,13 +52,13 @@
         "700"
       ],
       "massVehicle": [
-        "20000"
+        "10000"
       ],
       "maxPower": [
         "370000"
       ],
       "rpmMax": [
-        1800
+        5500
       ],
       "idleManager": [
         {
@@ -66,7 +66,7 @@
           "rpmIdleRunning": 800,
           "loadStart": "10",
           "timeStart": 2000,
-          "throttleStep": 30
+          "throttleStep": 10
         }
       ],
       "wheelDiameter": [
@@ -76,13 +76,13 @@
         1100
       ],
       "gearDecouplingTime": [
-        500
+        200
       ],
-      "gearCouplingTime": [
-        800
-      ],
-      "gearDoubleDeclutchTime": [
+      "gearCouplingFactor": [
         100
+      ],
+      "gearDoubleDeclutch": [
+        true
       ],
       "fullGears": [
         [
@@ -145,8 +145,8 @@
     },
     "values": {
       "volume": [
-        70,
-        70
+        50,
+        50
       ],
       "samples": [
         "TD1",
@@ -157,9 +157,9 @@
       ],
       "throttles": [
         "0",
-        "200",
-        "0",
-        "900",
+        "100",
+        "100",
+        "500",
         "0"
       ]
     }
@@ -173,8 +173,8 @@
     },
     "values": {
       "volume": [
-        70,
-        70
+        50,
+        50
       ],
       "sample": [
         "TDS"

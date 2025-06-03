@@ -18,7 +18,7 @@ namespace rcEngine {
 // --- GearCollection
 
 GearCollection::GearCollection() :
-            gearRatios{5.4f, 2.6f, 2.2f, 1.5f, 1.2f, 1.0f, 0.0f},
+            gearRatios{2.3f, 1.7f, 1.3f, 1.0f, 0.0f},
             numGears(0) {
     updateGearList();
 }
@@ -94,8 +94,14 @@ EngineGear::EngineGear() :
             wheelDiameter(0.7f),
             rpmShift(900u),
             gearDecouplingTime(200),
-            gearCouplingTime(500),
-            gearDoubleDeclutchTime(100)
+            gearCouplingFactor(150u),
+            gearDoubleDeclutch(false),
+            idleTimeMs(0U),
+            gearCurrent(0),
+            gearNext(0),
+            gearState(GearState::STARTING),
+            gearStepTime(0u),
+            speedMax(1.0f)
              {
 
     // override values from EngineSimple
@@ -140,10 +146,16 @@ float EngineGear::maxPowerTransfer() const {
     }
 
     switch (gearState) {
-    case GearState::DECOUPLED:
+    case GearState::STARTING:
         return 0.0f;
+    case GearState::DOUBLE_CLUTCH:
+        if (rpmForGear(gearNext) > getRPM()) {
+            return 0.0f;  // we throttle up only the engine
+        } else {
+            return maxPower * 0.5f;  // we slow down the engine
+        }
     case GearState::COUPLING:
-        return maxPower * 1.5f;
+        return maxPower * static_cast<uint8_t>(gearCouplingFactor) / 100.0f;
     case GearState::COUPLED:
         return maxPower * 10.0f;
     case GearState::DECOUPLING:
@@ -154,20 +166,6 @@ float EngineGear::maxPowerTransfer() const {
 }
 
 
-bool EngineGear::isEnergyBalanced() const {
-    const float epsilon = 1.0f; // a small energy difference
-
-    // we assume a gear when distributing
-    // in gear 0 we assume we want to distribute it correctly for gear 1
-    int8_t adjustedGear = std::max(gearCurrent, static_cast<int8_t>(1));
-
-    float disFactor = vehicleEnergyFactor(adjustedGear);
-    float deltaEnergy = (energyEngine.get() * disFactor) - energyVehicle.get();
-
-    return std::abs(deltaEnergy) < epsilon;
-}
-
-
 void EngineGear::distributeEnergy(const float energyEngineMin, const float energyEngineMax, const float maxEnergyTransfer) {
 
     // we assume a gear when distributing
@@ -175,6 +173,7 @@ void EngineGear::distributeEnergy(const float energyEngineMin, const float energ
     int8_t adjustedGear = std::max(gearCurrent, static_cast<int8_t>(1));
 
     float disFactor = vehicleEnergyFactor(adjustedGear);
+
     float energy = energyEngine.get() + energyVehicle.get();
 
     // this would be the perfect distribution with
@@ -213,10 +212,11 @@ void EngineGear::distributeEnergy(const float energyEngineMin, const float energ
     energyVehicle.add(-deltaEnergy);
 }
 
+
 float EngineGear::rpmForGear(int8_t gear) const {
 
     if (gear == 0) {
-        return getRPM();  // gear 0 means clutch disconnected, so return current RPM
+        return getRPM();  // gear 0 means disconnected, so return current RPM
     }
 
     float disFactor = vehicleEnergyFactor(gear);
@@ -247,89 +247,101 @@ bool EngineGear::wantFaster(const rcSignals::Signals& signals) {
 
 int8_t EngineGear::chooseGear(bool faster) {
 
-    // Prevent switching gears all the time with a hysteresis
-    const float rpmShiftHysteresis = std::abs(rpmShift - idleManager.getRPM()) / 8;
-
-    const float rpm = getRPM();
-    const float rpmUpshift = rpmForGear(gearCurrent + 1);
-
+    float rpmTarget;
     if (faster) {
-        // should we upshift
-        if (gearCurrent < gears.size()) {
-            if ((rpmUpshift >= rpmShift) ||
-                ((gearCurrent == 0) && rpm >= rpmShift)) {
-                return gearCurrent + 1;
-            }
-        }
-        // should we downshift
-        if (gearCurrent > 1) { // never downshift to 0 when we want to accelerate
-            if (rpm < (rpmShift - rpmShiftHysteresis)) {
-                return gearCurrent - 1;
-            }
-        }
+        rpmTarget = rpmShift;
     } else {
-        // should we upshift
-        // don't upshift from neutral when deccelerating
-        if (gearCurrent < gears.size() && (gearCurrent > 0)) {
-            if (rpmUpshift >= idleManager.getRPM()) {
-                return gearCurrent + 1;
-            }
-        }
-        // should we downshift
-        if (gearCurrent == 1) {
-            // only downshift to gear 0 if vehicle is stopped
-            if (energyVehicle.get() == 0.0f) {
-                return 0;
-            }
+        rpmTarget = idleManager.getRPM();
+    }
 
-        } else if (gearCurrent > 1) {
-            const float rpm = getRPM();
-            if (rpm < (idleManager.getRPM() * 0.85)) {
-                return gearCurrent - 1;
-            }
+    // the current or dedicated next gear get's a bonus
+    const float rpmBonus = std::abs(rpmShift - idleManager.getRPM()) * 0.2f;
+
+    for (int8_t gear = gears.size(); gear > 1; gear--) {
+
+        float rpmAfterShift = rpmForGear(gear);
+        if ((gear == gearCurrent) || (gear == gearNext)) {
+            rpmAfterShift += rpmBonus;
+        }
+
+        if ((rpmAfterShift >= rpmTarget) &&
+            (rpmAfterShift < rpmMax)) {
+            return gear;
         }
     }
 
-    return gearCurrent;
+    if (faster) {
+        return 1;
+    } else {
+        // only downshift to gear 0 if vehicle is stopped
+        if (energyVehicle.get() == 0.0f) {
+            return 0;
+        } else {
+            return 1;
+        }
+    }
 }
 
-void EngineGear::selectGear(TimeMs deltaTime) {
+
+void EngineGear::stepGear(TimeMs deltaTime, bool shift) {
 
     gearStepTime += deltaTime;
 
     switch (gearState) {
-    case GearState::DECOUPLED:
-        if (gearStepTime >= gearDoubleDeclutchTime) {
-            gearStepTime -= gearDoubleDeclutchTime;
+    case GearState::STARTING:
+        if (getRPM() >= rpmShift) {
             gearState = GearState::COUPLING;
             gearCurrent = gearNext;
         }
         break;
 
+    case GearState::DOUBLE_CLUTCH:
+        if (gearNext == 0) {
+            gearState = GearState::STARTING;
+
+        } else if (std::abs(rpmForGear(gearCurrent) - getRPM()) < 10.0f) {
+            gearState = GearState::COUPLING;
+        }
+        break;
+
     case GearState::COUPLING:
-        if (gearStepTime >= gearCouplingTime) {
-        // if (isEnergyBalanced()) {
-            gearStepTime -= gearCouplingTime;
+        if (shift) {  // we changed our mind.
+            gearState = GearState::DECOUPLING;
+            gearStepTime = 0;
+
+        } else if (std::abs(rpmForGear(gearCurrent) - getRPM()) < 10.0f) {
             gearState = GearState::COUPLED;
         }
         break;
 
     case GearState::COUPLED:
-        if (gearCurrent != gearNext) {
+        if (shift) {
             gearStepTime = 0;
             gearState = GearState::DECOUPLING;
         }
         break;
 
+    // this is where we are depressing the clutch
     case GearState::DECOUPLING:
         if (gearStepTime >= gearDecouplingTime) {
+
             gearStepTime -= gearDecouplingTime;
-            gearState = GearState::DECOUPLED;
+            gearCurrent = gearNext;
+
+            if (gearCurrent == 0) {
+                gearState = GearState::STARTING;
+
+            } else if (!gearDoubleDeclutch) {  // jump over DOUBLE_CLUTCH state
+                gearState = GearState::COUPLING;
+
+            } else {
+                gearState = GearState::DOUBLE_CLUTCH;
+            }
         }
         break;
 
     default:
-        gearState = GearState::DECOUPLED;
+        gearState = GearState::DOUBLE_CLUTCH;
     }
 }
 
@@ -385,7 +397,7 @@ rcSignals::RcSignal EngineGear::getIgnition(const rcSignals::Signals& signals) {
         // don't turn ignition off if the vehicle is still
         // coasting along.
         if (wantIgnition ||
-            (abs(energyVehicle.get()) > 10.0)) {
+            (energyVehicle.get() > 0.0)) {
             idleTimeMs = 0u;
         }
     }
@@ -401,26 +413,30 @@ RcSignal EngineGear::getThrottle(
     Signals& signals = *(info.signals);
 
     // -- gears (double-declutch, switching gears
-    if (gearNext != gearCurrent) {
-        switch (gearState) {
-        case GearState::DECOUPLED:
-            if ((gearNext < gearCurrent) &&
-                (gearDoubleDeclutchTime > 0)) {
-                throttle = RCSIGNAL_MAX / 2;  // double-declutch, Zwischengas
-            } else {
-                throttle = RCSIGNAL_NEUTRAL;
-            }
-            break;
-        case GearState::COUPLING:
-        case GearState::COUPLED:
-            // keep original throttle
-            break;
-        case GearState::DECOUPLING:
+    switch (gearState) {
+    case GearState::STARTING:
+        // keep original throttle
+        break;
+
+    case GearState::DOUBLE_CLUTCH:
+        if (rpmForGear(gearNext) > getRPM()) {
+            throttle = RCSIGNAL_MAX / 2;  // double-declutch, Zwischengas
+        } else {
             throttle = RCSIGNAL_NEUTRAL;
-            break;
-        default:
-            ; // keep original throttle
         }
+        break;
+
+    case GearState::COUPLING:
+    case GearState::COUPLED:
+        // keep original throttle
+        break;
+
+    case GearState::DECOUPLING:
+        throttle = RCSIGNAL_NEUTRAL;
+        break;
+
+    default:
+        ; // keep original throttle
     }
 
     // -- throttle from speed
@@ -434,11 +450,12 @@ RcSignal EngineGear::getThrottle(
     return EngineSimple::getThrottle(throttle, info);
 }
 
+
 void EngineGear::start() {
 
     gearNext = 0;
     gearCurrent = 0;
-    gearState = GearState::DECOUPLED;
+    gearState = GearState::STARTING;
     gearStepTime = 0;
     idleTimeMs = 0;
 
@@ -463,28 +480,26 @@ void EngineGear::step(const rcProc::StepInfo& info) {
     const auto gearOrig = signals[SignalType::ST_GEAR];
     const auto faster = wantFaster(signals);
     if (gearOrig == RCSIGNAL_INVALID) {
-        // choose a new target gear
-        if ((gearNext == gearCurrent) &&
-            (gearState == GearState::COUPLED)) {
-            gearNext = chooseGear(faster);
-        }
-
+        gearNext = chooseGear(faster);
     } else {
         gearNext = std::clamp(
-            static_cast<int8_t>(gearOrig),
-            static_cast<int8_t>(0),
-            static_cast<int8_t>(gears.size()));
+          static_cast<int8_t>(gearOrig),
+          static_cast<int8_t>(0),
+          static_cast<int8_t>(gears.size()));
     }
-    selectGear(info.deltaMs);
+    bool shift = (gearNext != gearCurrent);
+    stepGear(info.deltaMs, shift);
 
     // -- call EngineSimple
     EngineSimple::step(info);
 
+    // -- distribute energy between engine and vehicle
+
     // we want to keep a minimum RPM
-    // for gear 1 we want to allow the engine to spool up to rpmShift
+    // for gear 1 we want to allow the engine to spool up to idle RPM
     // for all other gears we need to allow the engine to slow down
     //   below the downshift RPM (idle * 0.85)
-    float rpmMin = rpmShift;
+    float rpmMin = idleManager.getRPM();
     if (gearCurrent > 1) {
         rpmMin = (idleManager.getRPM() * 0.7f);
     }

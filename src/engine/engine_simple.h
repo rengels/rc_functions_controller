@@ -167,12 +167,14 @@ class EngineSimple: public rcProc::Proc {
          *
          *  @param[in] rpm The current RPM of the engine.
          *  @param[in] throttleRatio The ratio of the total available power,
-         *   e.g. 0.5 for half throttle.
+         *    e.g. 0.5 for half throttle.
+         *  @param[in] ignition If we have ignition. Some engine have extra braking
+         *    force without ignition.
          *
          *  @returns The power produced by the engine in Watt.
          *    Negative if the engine is braking.
          */
-        virtual float getPower(const float rpm, const float throttleRatio) const;
+        virtual float getPower(float rpm, float throttleRatio, bool ignition) const;
 
     protected:
         /** Get engine RPM.

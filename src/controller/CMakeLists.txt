@@ -17,6 +17,7 @@ if (${Python3_FOUND})
         DEPENDS
             ${CMAKE_CURRENT_SOURCE_DIR}/serialization_tool.py
             ${CMAKE_CURRENT_SOURCE_DIR}/../config/procs_config.json
+            ${CMAKE_CURRENT_SOURCE_DIR}/../config/signals_config.json
     )
     add_custom_target (generate_serialization_cpp DEPENDS
             ${CMAKE_CURRENT_SOURCE_DIR}/serialization.cpp)

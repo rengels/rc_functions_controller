@@ -73,11 +73,11 @@ static DemoStep scriptTrain[] = {
     {0, SignalType::ST_HORN, RCSIGNAL_NEUTRAL},
 
     {    0, SignalType::ST_IGNITION, RCSIGNAL_MAX},
-    { 3000, SignalType::ST_THROTTLE, -100}, // slowly backwards
+    { 3000, SignalType::ST_THROTTLE, -250}, // slowly backwards
     { 6500, SignalType::ST_THROTTLE, 0}, // stop
     { 7000, SignalType::ST_BRAKE,    RCSIGNAL_MAX}, // Braking
     { 8000, SignalType::ST_TRAILER_SWITCH, RCSIGNAL_MAX},
-    { 8500, SignalType::ST_THROTTLE, 100}, // slowly forward
+    { 8500, SignalType::ST_THROTTLE, 250}, // slowly forward
     { 8500, SignalType::ST_BRAKE,    RCSIGNAL_NEUTRAL},
 
     {12000, SignalType::ST_HORN, RCSIGNAL_MAX},
@@ -85,8 +85,8 @@ static DemoStep scriptTrain[] = {
     {13000, SignalType::ST_HORN, RCSIGNAL_MAX},
     {14500, SignalType::ST_HORN, RCSIGNAL_NEUTRAL},
 
-    {16000, SignalType::ST_THROTTLE, RCSIGNAL_MAX}, // full speed
-    {30000, SignalType::ST_THROTTLE, RCSIGNAL_NEUTRAL}, // Braking
+    {16000, SignalType::ST_THROTTLE, 1000}, // full speed
+    {30000, SignalType::ST_THROTTLE, 0}, // Braking
     {30000, SignalType::ST_BRAKE,    RCSIGNAL_MAX}, // Braking
 
     {41000, SignalType::ST_IGNITION, RCSIGNAL_NEUTRAL},

@@ -28,24 +28,39 @@ EngineSimple::EngineSimple() :
     massEngine = 5e+06;  // a synthetic value since the engine simple simulation does not actually simulate vehicle mass
 }
 
-float EngineSimple::getPower(const float rpm, float throttle) const {
+float EngineSimple::getPower(const float rpm, float throttle, const bool ignition) const {
     throttle = std::clamp(throttle, 0.0f, 1.0f);
     float relativeRPM = rpm / std::max(static_cast<float>(rpmMax), 1.0f);
 
-    float positivePower;
-    float negativePower = powerCurveMotorBrake.map(relativeRPM);
+    float positivePower = 0.0f;
+    float negativePower = 0.0f;
     switch (engineType) {
     case EngineType::ELECTRIC:
         positivePower = powerCurveElectric.map(relativeRPM);
         break;
     case EngineType::DIESEL:
         positivePower = powerCurveDiesel.map(relativeRPM);
+        if (ignition) {
+            negativePower = powerCurveMotorBrake.map(relativeRPM);
+        } else {
+            negativePower = -0.4f;
+        }
         break;
     case EngineType::PETROL:
         positivePower = powerCurvePetrol.map(relativeRPM);
+        if (ignition) {
+            negativePower = powerCurveMotorBrake.map(relativeRPM);
+        } else {
+            negativePower = -0.4f;
+        }
         break;
     case EngineType::PETROL_TURBO:
         positivePower = powerCurvePetrolTurbo.map(relativeRPM);
+        if (ignition) {
+            negativePower = powerCurveMotorBrake.map(relativeRPM);
+        } else {
+            negativePower = -0.4f;
+        }
         break;
     case EngineType::STEAM:
         positivePower = powerCurveSteam.map(relativeRPM);
@@ -56,7 +71,7 @@ float EngineSimple::getPower(const float rpm, float throttle) const {
         negativePower = relativeRPM / 3.0f - 0.1f;
         break;
     default:
-        positivePower = 0.0f;
+        ;  // nothing to do
     }
 
     float relPower = (throttle * positivePower) + ((1.0f - throttle) * negativePower);
@@ -95,20 +110,21 @@ RcSignal EngineSimple::getThrottle(
 
     Signals& signals = *info.signals;
 
-    // -- idle
-    RcSignal throttleIdle;
-    RcSignal loadIdle;
-    idleManager.step(info.deltaMs, getRPM(), throttle, &throttleIdle, &loadIdle);
-    throttle = std::max(throttle, throttleIdle);
-
     // -- engine state
     if (state != EngineState::ON) {
         throttle = 0;
-    }
 
-    // -- additional load from idle
-    auto load = signals.get(SignalType::ST_ENGINE_LOAD, RCSIGNAL_NEUTRAL) * 1000.0f;
-    signals[SignalType::ST_ENGINE_LOAD] = load + loadIdle;
+    } else {
+        // -- idle
+        RcSignal throttleIdle;
+        RcSignal loadIdle;
+        idleManager.step(info.deltaMs, getRPM(), throttle, &throttleIdle, &loadIdle);
+        throttle = std::max(throttle, throttleIdle);
+
+        // -- additional load from idle
+        auto load = signals.get(SignalType::ST_ENGINE_LOAD, RCSIGNAL_NEUTRAL) * 1000.0f;
+        signals[SignalType::ST_ENGINE_LOAD] = load + loadIdle;
+    }
 
     return throttle;
 }
@@ -177,7 +193,7 @@ void EngineSimple::step(const rcProc::StepInfo& info) {
 
     // -- update energy (RPM)
     const float throttleRatio = static_cast<float>(throttle) / RCSIGNAL_MAX;
-    const float power = getPower(getRPM(), throttleRatio);
+    const float power = getPower(getRPM(), throttleRatio, ignition >= RCSIGNAL_TRUE);
     energyEngine.add(
         (power - load) * (static_cast<float>(info.deltaMs) / 1000.0f));
 

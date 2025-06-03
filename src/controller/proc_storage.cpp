@@ -84,9 +84,9 @@ void ProcStorage::createDefaultConfig() {
     procs.push_back(new rcInput::InputDemo(
         rcInput::InputDemo::DemoType::TRUCK));
 
-    // vehicleSteamTrain();
+    vehicleSteamTrain();
     // vehicleTruck();
-    vehicleCar();
+    // vehicleCar();
     // vehicleShip();
 
     // output procs
@@ -115,9 +115,9 @@ void ProcStorage::vehicleSteamTrain() {
     engine->rpmMax = 25.0f /* around 80kph */ / (M_PI * 1.6f) /* wheel diameter */ * 60.0f,
     engine->idleManager = rcEngine::Idle(0, 0, 0, 0, 0);
     engine->rpmShift = 0.0f;
-    engine->gearCouplingTime = 0.0f;
     engine->gearDecouplingTime = 0.0f;
-    engine->gearDoubleDeclutchTime = 0.0f;
+    engine->gearCouplingFactor = 0u;
+    engine->gearDoubleDeclutch = false;
     engine->wheelDiameter = 1.6f;
     engine->brakePower = 2500000.0f;
     engine->resistance = 20000.0f;
@@ -197,11 +197,11 @@ void ProcStorage::vehicleShip() {
     engine->brakePower = 40000.0f;
     engine->maxPower = 4000.0f;
     engine->rpmMax = 900.0f;
-    engine->idleManager = rcEngine::Idle(600, 400, 10, 2000, 10);
+    engine->idleManager = rcEngine::Idle(400, 450, 2, 7000, 10);
     engine->rpmShift = 650.0f;
-    engine->gearCouplingTime = 800.0f;
-    engine->gearDecouplingTime = 800.0f;
-    engine->gearDoubleDeclutchTime = 0.0f;
+    engine->gearDecouplingTime = 400.0f;
+    engine->gearCouplingFactor = 100u;
+    engine->gearDoubleDeclutch = false;
     engine->fullGears.set({-6.0f, 6.0f, 0.0f});
     engine->wheelDiameter = 1.0f;
     engine->resistance = 2000.0f;
@@ -262,15 +262,15 @@ void ProcStorage::vehicleTruck() {
     engine->engineType = rcEngine::EngineSimple::EngineType::DIESEL;
     engine->crankingTimeMs = 1000;  // length of cranking sample minus fadeout
     engine->massEngine = 700.0f;
-    engine->massVehicle = 20000.0f;
+    engine->massVehicle = 10000.0f;
     engine->brakePower = 3700000.0f;
     engine->maxPower = 370000.0f;
-    engine->idleManager = rcEngine::Idle(1100, 800, 10, 2000, 30);
-    engine->rpmMax = 1800.0f;
+    engine->idleManager = rcEngine::Idle(1100, 800, 10, 2000, 10);
+    engine->rpmMax = 5500.0f;
     engine->rpmShift = 1100.0f;
-    engine->gearCouplingTime = 800.0f;
-    engine->gearDecouplingTime = 300.0f;
-    engine->gearDoubleDeclutchTime = 100.0f;
+    engine->gearDecouplingTime = 200.0f;
+    engine->gearCouplingFactor = 100u;
+    engine->gearDoubleDeclutch = true;
     engine->fullGears.set({5.4f, 3.6f, 2.5f, 1.8f, 1.3f, 1.0f, -5.4f, -3.6f, 0.0f});
     engine->wheelDiameter = 1.0f;
     engine->airResistance = 2.0f;
@@ -289,14 +289,14 @@ void ProcStorage::vehicleTruck() {
              ss.getSampleData(rcSamples::AudioId({'T', 'D', '4'})),
              ss.getSampleData(rcSamples::AudioId({'O', 's', 'i'}))
             },
-            {0, 200, 0, 900, 0},
-            {0.7f, 0.7f}));
+            {0, 100, 100, 500, 0},
+            {0.5f, 0.5f}));
 
     procs.push_back(
         new AudioSimple(
             ss.getSampleData(rcSamples::AudioId({'T', 'D', 'S'})),
             SignalType::ST_IGNITION,
-            {0.7f, 0.7f}));
+            {0.5f, 0.5f}));
 
     procs.push_back(
         new ProcCombine(
@@ -359,14 +359,14 @@ void ProcStorage::vehicleCar() {
     engine->brakePower = 160000.0f;
     engine->maxPower = 32000.0f;
     engine->idleManager = rcEngine::Idle(900, 800, 10, 2000, 30);
-    engine->rpmMax = 2200.0f;
+    engine->rpmMax = 3300.0f;
     engine->rpmShift = 1000.0f;
-    engine->gearCouplingTime = 700.0f;
-    engine->gearDecouplingTime = 200.0f;
-    engine->gearDoubleDeclutchTime = 0.0f;
+    engine->gearDecouplingTime = 300.0f;
+    engine->gearCouplingFactor = 80u;
+    engine->gearDoubleDeclutch = false;
     engine->fullGears.set({-3.8f, 3.8f, 2.06f, 1.26f, 0.0f});
     engine->wheelDiameter = 0.5f;
-    engine->airResistance = 2.0f;
+    engine->airResistance = 1.0f;
     procs.push_back(engine);
 
     procs.push_back(new rcProc::ProcAuto());

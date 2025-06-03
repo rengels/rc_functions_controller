@@ -24,7 +24,7 @@ class EngineGearTest_Energy_Test;
 
 class EngineGearTest_Ignition_Test;
 
-class EngineGearTest_SelectGear_Test;
+class EngineGearTest_StepGear_Test;
 class EngineGearTest_RPM_Test;
 class EngineGearTest_Speed_Test;
 
@@ -119,16 +119,13 @@ class GearCollection {
  *  - braking (except with the engine)
  *  - trailer
  *
- *  Two concepts are important:
- *
  *  Split energy
  *  ------------
  *
  *  The energy is split between engine and vehicle and handled
  *  separately.
- *  If the clutch is connected, also the energy is connected via
- *  the vehicleEnergyFactor().
- *  The distributeEnergy() function will re-balance this energy.
+ *  The distributeEnergy() function will re-balance this energy up to
+ *  a point and with some boundary conditions, acting as a smart clutch.
  *
  *  Gear change
  *  -----------
@@ -137,9 +134,8 @@ class GearCollection {
  *
  *  - disengaging gear (takes a fixed gearDecouplingTime)
  *  - double-declutch (Zwischengas) (used the gearDoubleDeclutch time)
- *  - engaging gear (takes a fixed gearCouplingTime)
- *
- *  The double-declutch is only necessary for an unsynchronized gear.
+ *    (@see https://en.wikipedia.org/wiki/Double-clutching_(technique) )
+ *  - engaging gear
  *
  *  In case of no gear (gears.size() == 0) we assume a gear ratio of 1.0
  *  and it's always connected.
@@ -205,8 +201,8 @@ class EngineGear: public EngineSimple {
         uint16_t rpmShift;
 
         rcSignals::TimeMs gearDecouplingTime; ///< The time it takes to gradualy disengage the gear. Set to 0 for dual clutch
-        rcSignals::TimeMs gearCouplingTime; ///< The time it takes to gradualy engage the gear. Set to 0 for dual clutch
-        rcSignals::TimeMs gearDoubleDeclutchTime; ///< The time between disengaging and engaging used to bring the gear up to speed. Set to 0 for a synchronized gear.
+        uint8_t gearCouplingFactor; ///< The percent of engine power that should be transmitted during coupling via the clutch
+        bool gearDoubleDeclutch; ///< We should do double declutch
 
         /** Kinetic energy of the vehicle in Joule
          *
@@ -226,7 +222,7 @@ class EngineGear: public EngineSimple {
 
         /** The current gear.
          *
-         *  Set by selectGear()
+         *  Set by stepGear()
          *
          *  Note: EngineReverse will switch
          *  the gears around when switching driving direction, so this number
@@ -237,9 +233,46 @@ class EngineGear: public EngineSimple {
         /** The gear that we want to switch to (if not equal to gearCurrent) */
         int8_t gearNext;
 
-        /** Enum describing the state of the gear change. */
+        /** Enum describing the state of the gear change.
+         *
+         *  The state influences several parameters:
+         *
+         *  | state | throttle | clutch factor  |
+         *  | ------|----------|----------------|
+         *  | STARTING      | original throttle | 0 |
+         *  | DOUBLE_CLUTCH | 1/2 MAX or 0      | 0 or 1/2 |
+         *  | COUPLING      | original throttle | 1.5 |
+         *  | COUPLED       | original throttle | 10 |
+         *  | DECOUPLING    | 0                 | 0 |
+         *
+         *  The difference between DOUBLE_CLUTCH and COUPLING
+         *  is that in DOUBLE_CLUTCH we throttle up the engine
+         *  to reach the target gear RPM.
+         *  COUPLING only uses clutch and switches back to the original throttle.
+         *
+         * @startuml
+         * STARTING : spool up to rpmShift
+         * DOUBLE_CLUTCH : spool up to next gear RPM
+         * COUPLING : engage clutch\ndistribute energy between engine and vehicle
+         * COUPLED : clutch engaged
+         * DECOUPLING : clutch is disengaged
+         *
+         * [*] --> STARTING
+         * STARTING --> COUPLING : rpmShift is reached
+         * DOUBLE_CLUTCH --> STARTING : next gear == 0
+         * DOUBLE_CLUTCH --> COUPLING : RPM Engine and RPM Vehicle is aligned
+         * COUPLING --> COUPLED : RPM Engine and RPM Vehicle is aligned
+         * COUPLING --> DECOUPLING : different gear selected
+         * COUPLED --> DECOUPLING : different gear selected
+         * DECOUPLING --> STARTING : gearDecouplingTime passed and gear == 0
+         * DECOUPLING --> COUPLING : gearDecouplingTime passed
+         * DECOUPLING --> DOUBLE_CLUTCH : gearDecouplingTime passed and double declutch
+         * @enduml
+         *
+         */
         enum class GearState : uint8_t {
-            DECOUPLED,  ///< Gear is completely disconnected. We can do double-declutch at this point.
+            STARTING,  ///< We are spooling up the RPM for 1st gear.
+            DOUBLE_CLUTCH,  ///< Gear is completely disconnected. We can do double-declutch at this point.
             COUPLING,  ///< We are in the process of connecting the gear.
             COUPLED,  ///< We are in the process of connecting the gear.
             DECOUPLING  ///< We are in the process of disconnecting the gear.
@@ -295,17 +328,9 @@ class EngineGear: public EngineSimple {
          */
         float maxPowerTransfer() const;
 
-
-        /** Returns true if the energy is balanced for vehicle and engine.
-         *
-         *  This means that there is no power transmitted through the clutch
-         *  as the rotation of the engine via the gear is the same as the rotation
-         *  on the other side of the gear.
-         */
-        bool isEnergyBalanced() const;
-
         /** This will distribute the energy between engine and vehicle
          *
+         *  This function implements a smart clutch.
          *  If the vehicle wheels and the engine are connected via
          *  gear and clutch, then the energy is also coupled with the
          *  vehicle energy factor.
@@ -342,44 +367,14 @@ class EngineGear: public EngineSimple {
          *  Returns a gear that should be switched to next.
          *  \ref EngineGear::gearCurrent
          *
-         *  It uses the initial throttle (the one that does not consider
-         *  idle RPM keeping and all the other stuff) to determine
-         *  if we want to go faster and thus a higher gear.
+         *  The gear is the highest gear that:
+         *  - will get an RPM higher than idle RPM (if not accelerating)
+         *  - will get an RPM higher than shift RPM (if not accelerating)
          *
-         * @startuml
-         * start
-         * if (faster?) then (yes)
-         *   :calculate upshift RPM;
-         *   if (upshift RPM > shift RPM?) then (yes)
-         *     :upshift;
-         *     stop
-         *   endif
-         *   if (current rpm < shift RPM?) then (yes)
-         *     :downshift;
-         *     stop
-         *   endif
-         *   :keep gear;
-         *   stop
-         * else (no)
-         *   :calculate upshift RPM;
-         *   if (upshift RPM > idle RPM?) then (yes)
-         *     :upshift;
-         *     stop
-         *   endif
-         *   if (gear == 1) then (yes)
-         *     if (vehicle is stopped) then (yes)
-         *        :gear = 0;
-         *        stop
-         *     endif
-         *   endif
-         *   if (RPM < idle RPM * 0.85?) then (yes)
-         *     :downshift;
-         *     stop
-         *   endif
-         *   :keep gear;
-         *   stop
-         * endif
-         * @enduml
+         *  The current gears will get a bonus, to prevent switching around
+         *  unnecessary.
+         *
+         *  Gear 0 will only be selected if the vehicle is stopped.
          *
          *  @param[in] faster True if we want to accelerate the vehicle.
          *  @returns The new gear or gearCurrent in case of no change.
@@ -389,25 +384,10 @@ class EngineGear: public EngineSimple {
         /** Steps the gear statemachine.
          *
          *  Will try to engage \ref gearNext if not equal to \ref gearCurrent.
-         *
-         * @startuml
-         * DECOUPLED : gear is disconnected\nmight give double-declutching\nthrottle
-         * COUPLING : gear is currently coupling
-         * DECOUPLING : gear is currently decoupling
-         * COUPLED : gear is connected
-         *
-         * [*] --> STARTING
-         * STARTING --> COUPLING : no clutch slipage
-         * DECOUPLED --> STARTING : nextGear == 0
-         * DECOUPLED --> COUPLING : gearDoubleDeclutchTime passed
-         * COUPLING --> COUPLED : gearCouplingTime passed
-         * COUPLED --> DECOUPLING : if gearCurrent != gearChoosen
-         * DECOUPLING --> DECOUPLED : gearDecouplingTime passed
-         * @enduml
-         *
-         * @param[in] deltaTime The time passed since the last call to \ref selectGear()
+         * @param[in] deltaTime The time passed since the last call to \ref stepGear()
+         * @param[in] shift True if we should shift to a new gear.
          */
-        void selectGear(rcSignals::TimeMs deltaTime);
+        void stepGear(rcSignals::TimeMs deltaTime, bool shift);
 
         /** Returns the relative speed scaled to 0-1000 relative to speedMax.
          *
@@ -466,7 +446,7 @@ class EngineGear: public EngineSimple {
 
         friend EngineGearTest_Ignition_Test;
 
-        friend EngineGearTest_SelectGear_Test;
+        friend EngineGearTest_StepGear_Test;
         friend EngineGearTest_RPM_Test;
         friend EngineGearTest_Speed_Test;
 

@@ -15,13 +15,15 @@ using namespace rcSignals;
 
 namespace rcEngine {
 
+static constexpr float ENERGY_EPS = 10.0f;
+
 EngineReverse::EngineReverse() :
             drivingState(DrivingState::STOPPED_FWD),
             stoppedTimeMs(0),
             reverseDelayMs(2000) {
 
     fullGears.set(
-        std::array<float, GearCollection::NUM_GEARS>{-1.0f, 5.4f, 2.6f, 2.2f, 1.5f, 1.2f, 1.0f, 0.0f});
+        std::array<float, GearCollection::NUM_GEARS>{-1.0f, 3.0f, 2.1f, 1.5f, 1.0f, 0.8f, 0.6f, 0.0f});
 }
 
 void EngineReverse::setDrivingState(const DrivingState newState) {
@@ -41,8 +43,6 @@ void EngineReverse::setDrivingState(const DrivingState newState) {
 }
 
 void EngineReverse::drivingStatemachine(rcSignals::RcSignal signal) {
-    const float ENERGY_EPS = 10.0f;
-
     switch (drivingState) {
     case DrivingState::STOPPED_FWD:
         if (abs(energyVehicle.get() > ENERGY_EPS)) {
@@ -88,7 +88,7 @@ void EngineReverse::start() {
 void EngineReverse::step(const rcProc::StepInfo& info) {
 
     // stopped time update
-    if (abs(energyVehicle.get()) <= 100.0f) {
+    if (abs(energyVehicle.get()) <= ENERGY_EPS) {
         stoppedTimeMs += info.deltaMs;
     } else {
         stoppedTimeMs = 0;
@@ -113,7 +113,7 @@ void EngineReverse::step(const rcProc::StepInfo& info) {
 
     } else {
         // ensure that we stop or reverse after the vehicle stopped
-        // due to "neutral" input signals.
+        // due to "invalid" input signals.
         drivingStatemachine(RCSIGNAL_NEUTRAL);
     }
 

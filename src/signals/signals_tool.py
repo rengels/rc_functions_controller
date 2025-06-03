@@ -98,7 +98,6 @@ parser.add_argument(
 args = parser.parse_args()
 
 defs_signals = json.load(args.signals)
-signal_name = args.signals.name
 
 # create a mapping signal name vs index
 signals_mapping = {}

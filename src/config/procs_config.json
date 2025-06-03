@@ -969,16 +969,15 @@
                 "description": "The time in milliseconds it takes to press the clutch. Set to 0 for double-clutch."
             },
             {
-                "name": "gearCouplingTime",
-                "type": "TimeMs",
-                "unit": "ms",
-                "description": "The time in milliseconds it takes to engage the gear. Set to 0 for double-clutch."
+                "name": "gearCouplingFactor",
+                "type": "uint8_t",
+                "unit": "%",
+                "description": "The percent of engine power that is transmitted via the clutch when coupling."
             },
             {
-                "name": "gearDoubleDeclutchTime",
-                "type": "TimeMs",
-                "unit": "ms",
-                "description": "The time between disengaging and engaging used to bring the gear up to speed. Set to 0 for a synchronized gear."
+                "name": "gearDoubleDeclutch",
+                "type": "bool",
+                "description": "If we should do a double declutch"
             },
             {
                 "name": "fullGears",
@@ -1005,18 +1004,30 @@
             }
         ],
         "defaultValues": {
-            "engineType": [ "1" ],
-            "crankingTimeMs": [ 800 ],
+            "engineType": [ "2" ],
+            "reverseDelayMs": [ 2000 ],
+            "crankingTimeMs": [ 778 ],
             "offTimeMs": [ 5000 ],
-            "massEngine": [ "400" ],
+            "massEngine": [ "100" ],
             "massVehicle": [ "800" ],
-            "maxPower": [ "80000" ],
-            "rpmMax": [ "1100" ],
+            "maxPower": [ "32000" ],
+            "rpmMax": [ 3300 ],
+            "idleManager": [ {
+                "rpmIdleStart": 900,
+                "rpmIdleRunning": 800,
+                "loadStart": "10",
+                "timeStart": 2000,
+                "throttleStep": 30
+            } ],
             "wheelDiameter": [ "0.5" ],
-            "downshiftRPM": [ "520" ],
-            "fullGears": [ "-3", "3" ],
-            "brakePower": [ "100000" ],
-            "airResistance": [ "12" ]
+            "rpmShift": [ 1000 ],
+            "gearDecouplingTime": [ 300 ],
+            "gearCouplingFactor": [ 80 ],
+            "gearDoubleDeclutch": [ false ],
+            "fullGears": [ [ -3.8, 3.8, 2, 1.2 ] ],
+            "brakePower": [ "160000" ],
+            "resistance": [ "200" ],
+            "airResistance": [ "1" ]
         }
     },
 
@@ -1111,16 +1122,15 @@
                 "description": "The time in milliseconds it takes to press the clutch. Set to 0 for double-clutch."
             },
             {
-                "name": "gearCouplingTime",
-                "type": "TimeMs",
-                "unit": "ms",
-                "description": "The time in milliseconds it takes to engage the gear. Set to 0 for double-clutch."
+                "name": "gearCouplingFactor",
+                "type": "uint8_t",
+                "unit": "%",
+                "description": "The percent of engine power that is transmitted via the clutch when coupling."
             },
             {
-                "name": "gearDoubleDeclutchTime",
-                "type": "TimeMs",
-                "unit": "ms",
-                "description": "The time between disengaging and engaging used to bring the gear up to speed. Set to 0 for a synchronized gear."
+                "name": "gearDoubleDeclutch",
+                "type": "bool",
+                "description": "If we should do a double declutch"
             },
             {
                 "name": "brakePower",
@@ -1141,18 +1151,29 @@
             }
         ],
         "defaultValues": {
-            "engineType": [ "1" ],
-            "crankingTimeMs": [ 800 ],
+            "engineType": [ "2" ],
+            "crankingTimeMs": [ 778 ],
             "offTimeMs": [ 5000 ],
-            "massEngine": [ "400" ],
+            "massEngine": [ "100" ],
             "massVehicle": [ "800" ],
-            "maxPower": [ "80000" ],
-            "rpmMax": [ "1100" ],
+            "maxPower": [ "32000" ],
+            "rpmMax": [ 3300 ],
+            "idleManager": [ {
+                "rpmIdleStart": 900,
+                "rpmIdleRunning": 800,
+                "loadStart": "10",
+                "timeStart": 2000,
+                "throttleStep": 30
+            } ],
             "wheelDiameter": [ "0.5" ],
-            "gears": [ "-3", "3", "0", "0", "0", "0", "0", "0", "0", "0", "0",
-                "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
-            "brakePower": [ "100000" ],
-            "airResistance": [ "12" ]
+            "rpmShift": [ 1000 ],
+            "gearDecouplingTime": [ 300 ],
+            "gearCouplingFactor": [ 80 ],
+            "gearDoubleDeclutch": [ false ],
+            "fullGears": [ [ -3.8, 3.8, 2, 1.2 ] ],
+            "brakePower": [ "160000" ],
+            "resistance": [ "200" ],
+            "airResistance": [ "1" ]
         }
     },
 
@@ -1247,16 +1268,15 @@
                 "description": "The time in milliseconds it takes to press the clutch. Set to 0 for double-clutch."
             },
             {
-                "name": "gearCouplingTime",
-                "type": "TimeMs",
-                "unit": "ms",
-                "description": "The time in milliseconds it takes to engage the gear. Set to 0 for double-clutch."
+                "name": "gearCouplingFactor",
+                "type": "uint8_t",
+                "unit": "%",
+                "description": "The percent of engine power that is transmitted via the clutch when coupling."
             },
             {
-                "name": "gearDoubleDeclutchTime",
-                "type": "TimeMs",
-                "unit": "ms",
-                "description": "The time between disengaging and engaging used to bring the gear up to speed. Set to 0 for a synchronized gear."
+                "name": "gearDoubleDeclutch",
+                "type": "bool",
+                "description": "If we should do a double declutch"
             }
         ]
     },

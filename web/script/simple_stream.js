@@ -30,14 +30,9 @@ let signalIndex = 0;
 for (let i = 0; i < defSignals.length; i++ ) {
     let signal = defSignals[i]
 
-    if ("index" in signal) {
-        signalIndex = signal["index"];
-    }
     if ("name" in signal) {
-      signalsIdMapping[signalIndex] = signal;
+      signalsIdMapping[signal["id"]] = signal;
       signalsNameMapping[signal["name"]] = signal;
-      signal["index"] = signalIndex;  // ensure that every signal has an index
-      signalIndex++;
     }
 }
 
@@ -148,9 +143,9 @@ class SimpleInputStream {
   *  @returns the SignalType name or "ST_NONE"
   *     in case the stream was at eof.  */
   readSignalType() {
-    signalIndex = this.readUint8();
-    if (signalIndex in signalsIdMapping) {
-      return signalsIdMapping[signalIndex]["name"];
+    const signalId = String.fromCharCode(this.readUint8());
+    if (signalId in signalsIdMapping) {
+      return signalsIdMapping[signalId]["name"];
     }
     return "ST_NONE";
   }
@@ -446,7 +441,7 @@ class SimpleOutputStream {
   writeSignalType(value) {
     if (typeof value == "string") {
       if (value in signalsNameMapping) {
-          value = signalsNameMapping[value]["index"];
+          value = (signalsNameMapping[value]["id"]).charCodeAt(0);
       } else {
           value = 0;
       }
