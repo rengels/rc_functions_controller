@@ -58,7 +58,7 @@
         "32000"
       ],
       "rpmMax": [
-        2200
+        3300
       ],
       "idleManager": [
         {
@@ -76,13 +76,13 @@
         1000
       ],
       "gearDecouplingTime": [
-        200
+        300
       ],
-      "gearCouplingTime": [
-        700
+      "gearCouplingFactor": [
+        80
       ],
-      "gearDoubleDeclutchTime": [
-        0
+      "gearDoubleDeclutch": [
+        false
       ],
       "fullGears": [
         [
@@ -99,7 +99,7 @@
         "200"
       ],
       "airResistance": [
-        "2"
+        "1"
       ]
     }
   },

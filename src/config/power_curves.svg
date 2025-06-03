@@ -24,9 +24,9 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="0.96104058"
-     inkscape:cx="4.6824245"
-     inkscape:cy="392.28312"
+     inkscape:zoom="0.9610406"
+     inkscape:cx="140.47273"
+     inkscape:cy="428.70197"
      inkscape:window-width="1466"
      inkscape:window-height="921"
      inkscape:window-x="0"
@@ -68,7 +68,7 @@
        sodipodi:nodetypes="ccccccc"><title
          id="title21189">Ecoboost 50HP</title></path><path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.126163px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 0,176.54 8.1665989,-19.36172 10.8897671,-50.53309 63.872862,22.38502 18.675952,23.94696"
+       d="m 0,190.66324 11.866066,-86.43437 10.699955,-0.61562 60.363207,14.30735 18.675952,15.78195"
        id="MotorBrake"
        sodipodi:nodetypes="ccccc"><title
          id="title21164">Motor braking power</title></path><path
@@ -88,54 +88,54 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.3333px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect21402);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"><tspan
          x="412.65039"
          y="23.565232"
-         id="tspan455">This svg contains the power graphs for the </tspan><tspan
+         id="tspan402">This svg contains the power graphs for the </tspan><tspan
          x="412.65039"
          y="40.231856"
-         id="tspan457">rc_functions_controller. 
+         id="tspan404">rc_functions_controller. 
 </tspan><tspan
          x="412.65039"
          y="56.89848"
-         id="tspan459">
+         id="tspan406">
 </tspan><tspan
          x="412.65039"
          y="73.565103"
-         id="tspan461">The Graphs are scaled to max RPM at the x-axis and </tspan><tspan
+         id="tspan408">The Graphs are scaled to max RPM at the x-axis and </tspan><tspan
          x="412.65039"
          y="90.231728"
-         id="tspan463">max power at the y axis.
+         id="tspan410">max power at the y axis.
 </tspan><tspan
          x="412.65039"
          y="106.89835"
-         id="tspan465">
+         id="tspan412">
 </tspan><tspan
          x="412.65039"
          y="123.56498"
-         id="tspan467">The graphs should end with a negative power or the </tspan><tspan
+         id="tspan414">The graphs should end with a negative power or the </tspan><tspan
          x="412.65039"
          y="140.2316"
-         id="tspan469">simulated engine would never slow down.
+         id="tspan416">simulated engine would never slow down.
 </tspan><tspan
          x="412.65039"
          y="156.89822"
-         id="tspan471">
+         id="tspan418">
 </tspan><tspan
          x="412.65039"
          y="173.56485"
-         id="tspan473">Use the convert_power.py script to convert the curves </tspan><tspan
+         id="tspan420">Use the convert_power.py script to convert the curves </tspan><tspan
          x="412.65039"
          y="190.23148"
-         id="tspan475">to .cpp.
+         id="tspan422">to .cpp.
 </tspan><tspan
          x="412.65039"
          y="206.8981"
-         id="tspan477">
+         id="tspan424">
 </tspan><tspan
          x="412.65039"
          y="223.56473"
-         id="tspan479">You might need to change the inkscape svg-output </tspan><tspan
+         id="tspan426">You might need to change the inkscape svg-output </tspan><tspan
          x="412.65039"
          y="240.23135"
-         id="tspan481">settings to always create absolute coordinates.</tspan></text><text
+         id="tspan428">settings to always create absolute coordinates.</tspan></text><text
        xml:space="preserve"
        style="font-size:3.52777px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';letter-spacing:0px;word-spacing:0px;fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="140.68301"

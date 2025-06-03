@@ -12,6 +12,10 @@
 #include <cstdlib>
 #include <algorithm>  // clamp
 
+namespace rcSignals {
+extern const char signalsMap[];  // from serialization.cpp
+}
+
 using namespace rcSignals;
 
 SimpleInStream::SimpleInStream(const std::span<const uint8_t>& bufVal) :
@@ -258,13 +262,27 @@ SimpleInStream& operator>>(SimpleInStream& in, rcSignals::RcSignal& val) {
 }
 
 SimpleOutStream& operator<<(SimpleOutStream& out, const rcSignals::SignalType& val) {
-    return out << static_cast<uint8_t>(val);
+    // map to ID
+    uint8_t index = static_cast<uint8_t>(val);
+    if (index >= static_cast<uint8_t>(rcSignals::SignalType::ST_NUM)) {
+        index = 0;
+    }
+    return out << rcSignals::signalsMap[index];
 }
 
 SimpleInStream& operator>>(SimpleInStream& in, rcSignals::SignalType& val) {
-    uint8_t u8;
-    in >> u8;
-    val = static_cast<rcSignals::SignalType>(u8);
+    // search for the ID
+    char id = in.read<char>();
+
+    val = rcSignals::SignalType::ST_NONE;
+    for (uint8_t index = 0;
+        index < static_cast<uint8_t>(rcSignals::SignalType::ST_NUM); index++) {
+        if (id == rcSignals::signalsMap[index]) {
+            val = static_cast<rcSignals::SignalType>(index);
+            break;
+        }
+    }
+
     return in;
 }
 

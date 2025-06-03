@@ -124,22 +124,18 @@ TEST(EngineGearTest, DistributeEnergy) {
     // -- Completely balance it
     engine.energyEngine.set(300);
     engine.energyVehicle.set(0);
-    EXPECT_FALSE(engine.isEnergyBalanced());
 
     engine.distributeEnergy(0.0f, 1000.0f, 9999.9f);
     EXPECT_NEAR(100, engine.energyEngine.get(), EPSILON);
     EXPECT_NEAR(200, engine.energyVehicle.get(), EPSILON);
-    EXPECT_TRUE(engine.isEnergyBalanced());
 
     // -- keep min RPM-energy
     engine.energyEngine.set(300);
     engine.energyVehicle.set(0);
-    EXPECT_FALSE(engine.isEnergyBalanced());
 
     engine.distributeEnergy(300.0f, 1000.0f, 9999.9f);
     EXPECT_NEAR(300, engine.energyEngine.get(), EPSILON);
     EXPECT_NEAR(0, engine.energyVehicle.get(), EPSILON);
-    EXPECT_FALSE(engine.isEnergyBalanced());
 
     // -- max energy transfer
     // TODO
@@ -188,71 +184,126 @@ TEST(EngineGearTest, ChooseGear) {
     EXPECT_EQ(1, engine.chooseGear(true));
 
     // no throttle, upshift as long as we are over idle RPM
+    engine.setRPM(350.0f);
     engine.gearCurrent = 1;
     EXPECT_EQ(2, engine.chooseGear(false));
 
     engine.gearCurrent = 2;
-    EXPECT_EQ(2, engine.chooseGear(true));
+    EXPECT_EQ(1, engine.chooseGear(true));
 
     // throttle, downshift to keep over rpmShift
     engine.setRPM(100.0f);
     engine.gearCurrent = 2;
     EXPECT_EQ(1, engine.chooseGear(true));
 
-    // no, upshift as long as we are over idle RPM
-    engine.setRPM(500.0f);
+    // keep in 1st gear as long as we are not stopped
+    engine.setRPM(90.0f);
+    engine.energyVehicle.set(100.0f);
     engine.gearCurrent = 1;
-    EXPECT_EQ(2, engine.chooseGear(false));
+    EXPECT_EQ(1, engine.chooseGear(false));
+
+    // zero gear if we are stopped
+    engine.setRPM(150.0f);
+    engine.energyVehicle.set(0.0f);
+    engine.gearCurrent = 1;
+    EXPECT_EQ(0, engine.chooseGear(false));
 }
 
-/** Unit test for EngineGear::selectGear()
+/** Unit test for EngineGear::stepGear()
  */
-TEST(EngineGearTest, SelectGear) {
+TEST(EngineGearTest, StepGear) {
 
     EngineGear engine;
-    engine.gearCouplingTime = 2u;
-    engine.gearDecouplingTime = 3u;
-    engine.gearDoubleDeclutchTime = 4u;
     engine.start();
     engine.gearCurrent = 2u;
-    engine.gearNext = 2u;
+    engine.gearNext = 3u;
 
-    // -- COUPLED
-    engine.selectGear(10);
-    EXPECT_EQ(2, engine.gearCurrent);
-    EXPECT_EQ(0, engine.gearStepTime);
-    EXPECT_EQ(EngineGear::GearState::COUPLED, engine.gearState);
+    // -- STARTING
+    EXPECT_EQ(EngineGear::GearState::STARTING, engine.gearState);
+    engine.stepGear(10u, false);
+    EXPECT_EQ(EngineGear::GearState::STARTING, engine.gearState);
 
-    // -- stay COUPLED
-    engine.selectGear(10);
-    EXPECT_EQ(2, engine.gearCurrent);
-    EXPECT_EQ(0, engine.gearStepTime);
-    EXPECT_EQ(EngineGear::GearState::COUPLED, engine.gearState);
-
-    // -- DECOUPLING
-    engine.gearNext = 1u;
-    engine.selectGear(10);
-    EXPECT_EQ(2, engine.gearCurrent);
-    EXPECT_EQ(0, engine.gearStepTime);
-    EXPECT_EQ(EngineGear::GearState::DECOUPLING, engine.gearState);
-
-    // -- DECOUPLED
-    engine.selectGear(10);
-    EXPECT_EQ(2, engine.gearCurrent);
-    EXPECT_EQ(7, engine.gearStepTime);
-    EXPECT_EQ(EngineGear::GearState::DECOUPLED, engine.gearState);
-
-    // -- COUPLING
-    engine.selectGear(10);
-    EXPECT_EQ(1, engine.gearCurrent);
-    EXPECT_EQ(13, engine.gearStepTime);
+    // until shift RPM has reached
+    engine.setRPM(engine.rpmShift);
+    engine.stepGear(10u, false);
     EXPECT_EQ(EngineGear::GearState::COUPLING, engine.gearState);
 
-    // -- COUPLED
-    engine.selectGear(10);
-    EXPECT_EQ(1, engine.gearCurrent);
-    EXPECT_EQ(21, engine.gearStepTime);
+    // -- DOUBLE_CLUTCH
+    engine.gearState = EngineGear::GearState::DOUBLE_CLUTCH;
+    engine.energyVehicle.set(1000.0f);
+    engine.setRPM(0);
+    engine.stepGear(10u, false);
+    EXPECT_EQ(EngineGear::GearState::DOUBLE_CLUTCH, engine.gearState);
+
+    // until shift RPM has reached
+    engine.distributeEnergy(0.0f, 10000.0f, 10000.0f);
+    engine.stepGear(10u, false);
+    EXPECT_EQ(EngineGear::GearState::COUPLING, engine.gearState);
+
+    // -- COUPLING
+    engine.energyEngine.set(1000.0f);
+    engine.energyVehicle.set(10.0f);
+    engine.gearState = EngineGear::GearState::COUPLING;
+    engine.stepGear(10u, false);
+    EXPECT_EQ(EngineGear::GearState::COUPLING, engine.gearState);
+
+    engine.gearState = EngineGear::GearState::COUPLING;
+    engine.stepGear(10u, true);
+    EXPECT_EQ(EngineGear::GearState::DECOUPLING, engine.gearState);
+
+    engine.gearState = EngineGear::GearState::COUPLING;
+    engine.distributeEnergy(0.0f, 10000.0f, 10000.0f);
+    engine.stepGear(10u, false);
     EXPECT_EQ(EngineGear::GearState::COUPLED, engine.gearState);
+
+    // -- COUPLED
+    engine.gearState = EngineGear::GearState::COUPLED;
+    engine.stepGear(10u, false);
+    EXPECT_EQ(EngineGear::GearState::COUPLED, engine.gearState);
+
+    engine.gearState = EngineGear::GearState::COUPLED;
+    engine.stepGear(10u, true);
+    EXPECT_EQ(EngineGear::GearState::DECOUPLING, engine.gearState);
+
+    // -- DECOUPLING
+    engine.gearDecouplingTime = 12u;
+    engine.gearCurrent = 0u;
+    engine.gearDoubleDeclutch = true;
+
+    // time not passed yet
+    engine.gearStepTime = 0u;
+    engine.gearState = EngineGear::GearState::DECOUPLING;
+    engine.stepGear(10u, false);
+    EXPECT_EQ(EngineGear::GearState::DECOUPLING, engine.gearState);
+    EXPECT_EQ(10u, engine.gearStepTime);
+
+    // time passed, change states
+    engine.gearCurrent = 2u;
+    engine.gearNext = 0u;
+
+    engine.gearState = EngineGear::GearState::DECOUPLING;
+    engine.stepGear(10, false);
+    EXPECT_EQ(EngineGear::GearState::STARTING, engine.gearState);
+    EXPECT_EQ(0, engine.gearCurrent);
+    EXPECT_EQ(8u, engine.gearStepTime);
+
+    engine.gearNext = 1u;
+    engine.gearStepTime = 10u;
+    engine.gearDoubleDeclutch = true;
+    engine.gearState = EngineGear::GearState::DECOUPLING;
+    engine.stepGear(10, false);
+    EXPECT_EQ(EngineGear::GearState::DOUBLE_CLUTCH, engine.gearState);
+    EXPECT_EQ(1, engine.gearCurrent);
+    EXPECT_EQ(8u, engine.gearStepTime);
+
+    engine.gearNext = 1u;
+    engine.gearStepTime = 10u;
+    engine.gearDoubleDeclutch = false;
+    engine.gearState = EngineGear::GearState::DECOUPLING;
+    engine.stepGear(10, false);
+    EXPECT_EQ(EngineGear::GearState::COUPLING, engine.gearState);
+    EXPECT_EQ(1, engine.gearCurrent);
+    EXPECT_EQ(8u, engine.gearStepTime);
 }
 
 /** Unit test for EngineGear for auto ignition
@@ -315,7 +366,7 @@ TEST(EngineGearTest, Ignition) {
     EXPECT_NEAR(signals[SignalType::ST_RPM], engine.getRPM(), 10);
 
     // -- the motor should switch off eventually
-    for (int i = 0; i < 80; i++) {
+    for (int i = 0; i < 800; i++) {
         signals.reset();
         signals[SignalType::ST_GEAR] = 0;
         signals[SignalType::ST_THROTTLE] = RCSIGNAL_NEUTRAL;
@@ -351,15 +402,15 @@ TEST(EngineGearTest, RPM) {
     EngineGear engine;
     engine.crankingTimeMs = 1;
     engine.idleManager = rcEngine::Idle(500, 500, 0, 0, 10);
-    engine.gears.set({3.0f, 2.0f, 1.3f, 1.0f, 0.0f}); // four gears
-    engine.rpmMax = 1000u;
+    engine.gears.set({2.5f, 1.8f, 1.5f, 1.2f, 0.0f}); // four gears
+    engine.rpmMax = 2000u;
     engine.rpmShift = 600;
     engine.gearDecouplingTime = 0;
-    engine.gearCouplingTime = 0;
-    engine.gearDoubleDeclutchTime = 0;
+    engine.gearCouplingFactor = 200;
+    engine.gearDoubleDeclutch = false;
     engine.massEngine = 10.0f;
     engine.massVehicle = 30.0f;
-    engine.maxPower = 5000.0f;
+    engine.maxPower = 20000.0f;
     engine.start();
 
     Signals signals;
@@ -411,7 +462,7 @@ TEST(EngineGearTest, RPM) {
     // std::cout << "--- decelerating " << std::endl;
 
     // -- bring throttle down
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 250; i++) {
         signals.reset();
         signals[SignalType::ST_IGNITION] = RCSIGNAL_MAX;
         signals[SignalType::ST_THROTTLE] = RCSIGNAL_NEUTRAL;
@@ -446,15 +497,15 @@ TEST(EngineGearTest, Speed) {
     engine.engineType = EngineSimple::EngineType::PETROL;
     engine.crankingTimeMs = 1;
     engine.idleManager = rcEngine::Idle(500, 500, 0, 0, 10);
-    engine.gears.set({3.0f, 2.0f, 1.3f, 1.0f, 0.0f}); // four gears
-    engine.rpmMax = 1000u;
+    engine.gears.set({2.5f, 1.8f, 1.5f, 1.2f, 0.0f}); // four gears
+    engine.rpmMax = 2000u;
     engine.rpmShift = 600;
     engine.gearDecouplingTime = 0;
-    engine.gearCouplingTime = 0;
-    engine.gearDoubleDeclutchTime = 0;
+    engine.gearCouplingFactor = 200;
+    engine.gearDoubleDeclutch = false;
     engine.massEngine = 10.0f;
     engine.massVehicle = 30.0f;
-    engine.maxPower = 5000.0f;
+    engine.maxPower = 20000.0f;
     engine.start();
 
     Signals signals;
@@ -468,7 +519,7 @@ TEST(EngineGearTest, Speed) {
     };
 
     // -- Accelerating
-    for (int i = 0; i < 120; i++) {
+    for (int i = 0; i < 100; i++) {
         signals.reset();
         signals[SignalType::ST_IGNITION] = RCSIGNAL_MAX;
         signals[SignalType::ST_SPEED] = 1000;
@@ -498,11 +549,11 @@ TEST(EngineGearTest, Speed) {
     // std::cout << "--- decelerating " << std::endl;
 
     // -- bring throttle down
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 150; i++) {
         signals.reset();
         signals[SignalType::ST_IGNITION] = RCSIGNAL_MAX;
         signals[SignalType::ST_SPEED] = 0;
-        signals[SignalType::ST_ENGINE_LOAD] = 10;  // to brake faster
+        signals[SignalType::ST_ENGINE_LOAD] = 100;  // to brake faster
         info.deltaMs = 20U;
         engine.step(info);
 
@@ -517,10 +568,12 @@ TEST(EngineGearTest, Speed) {
         */
     }
 
-    EXPECT_GT(1, signals[SignalType::ST_GEAR]);
+    // since it's not EngineBrake the vehicle will never stop and so we will
+    // never fall back to 0 gear.
+    EXPECT_EQ(1, signals[SignalType::ST_GEAR]);
     EXPECT_GT(1000, signals[SignalType::ST_RPM]);
     // since there is no braking happening, the speed
     // of the vehicle will stay high
-    EXPECT_GT(200, signals[SignalType::ST_SPEED]);
+    EXPECT_LT(200, signals[SignalType::ST_SPEED]);
 }
 

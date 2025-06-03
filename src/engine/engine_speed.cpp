@@ -55,27 +55,27 @@ void Speed::step(
 
     // time to target SPEED
     float changePerMs = (speedCurrent - speedLast) / deltaMs;
-    float timeToTarget = 10000.0f;
+    float timeToTargetMs = 10000.0f;
     if (changePerMs != 0.0f) {
-        timeToTarget = (speedTarget - speedCurrent) / changePerMs;
+        timeToTargetMs = (speedTarget - speedCurrent) / changePerMs;
     }
 
     bool keep = false;  // true if we should keep the throttle
     bool more = false;  // true if we need more throttle
 
-    if (timeToTarget < 0.0f) {
+    if (timeToTargetMs < 0.0f) {
         // SPEED goes in the wrong direction
         more = (speedCurrent < speedTarget);
 
-    } else if (timeToTarget < 40.0f) {
+    } else if (timeToTargetMs < 40.0f) {
         // stop now with changes
         keep = true;
 
-    } else if (timeToTarget < 100.0f) {
+    } else if (timeToTargetMs < 100.0f) {
         // SPEED goes in the right direction but too fast
         more = (speedCurrent > speedTarget);
 
-    } else if (timeToTarget > 2000.0f) {
+    } else if (timeToTargetMs > 2000.0f) {
         // SPEED goes in the right direction but too slow
         more = (speedCurrent < speedTarget);
 

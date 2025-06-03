@@ -50,13 +50,12 @@ public:
     struct Meassurement {
         rcSignals::TimeMs time; ///< absolute simulation time
         std::string strState;
-        rcSignals::RcSignal speedSig; ///< the speed signal
+        rcSignals::RcSignal speedOrig;  ///< original speed signal
+        rcSignals::RcSignal speed;        ///< speed signal after proc
 
         rcSignals::RcSignal throttleOrig; ///< original throttle signal
         rcSignals::RcSignal throttle;     ///< throttle signal after proc
 
-        rcSignals::RcSignal speedOrig;    ///< original speed signal
-        rcSignals::RcSignal speed;        ///< speed signal after proc
 
         rcSignals::RcSignal brake;        ///< brake ratio
 
@@ -65,7 +64,8 @@ public:
         float speedVal;         ///< calculated speed of the vehicle in m/s
         float energyEngine;     ///< kinetic energy of the engine in Joule
         float energyVehicle;    ///< kinetic energy of the vehicle in Joule
-        int16_t gear;           ///< current selected gear
+        int8_t gear;            ///< current selected gear
+        int8_t gearNext;        ///< next selected gear
         std::string strGearState;
         std::string strDrivingState;
     };
@@ -186,14 +186,14 @@ public:
             if (config.count("rpmShift")) {
                 engineGear->rpmShift = config["rpmShift"].as<float>();
             }
-            if (config.count("timeCouple")) {
-                engineGear->gearCouplingTime = config["timeCouple"].as<rcSignals::TimeMs>();
+            if (config.count("couplingFactor")) {
+                engineGear->gearCouplingFactor = config["couplingFactor"].as<int>();
             }
             if (config.count("timeDecouple")) {
                 engineGear->gearDecouplingTime = config["timeDecouple"].as<rcSignals::TimeMs>();
             }
-            if (config.count("timeDoubleDeclutch")) {
-                engineGear->gearDoubleDeclutchTime = config["timeDoubleDeclutch"].as<float>();
+            if (config.count("doubleDeclutch")) {
+                engineGear->gearDoubleDeclutch = config["doubleDeclutch"].as<bool>();
             }
         }
 
@@ -203,6 +203,9 @@ public:
             }
             if (config.count("airResistance")) {
                 engineBrake->airResistance = config["airResistance"].as<float>();
+            }
+            if (config.count("resistance")) {
+                engineBrake->resistance = config["resistance"].as<float>();
             }
         }
 
@@ -250,19 +253,25 @@ public:
 
         meas->rpm = engine->getRPM();
         meas->power = engine->getPower(meas->rpm,
-            static_cast<float>(meas->throttle) / RCSIGNAL_MAX);
+            static_cast<float>(meas->throttle) / RCSIGNAL_MAX, true);
         meas->energyEngine = engine->energyEngine.get();
         meas->energyVehicle = 0.0f;
         meas->gear = 0;
-        meas->strGearState = "--";
+        meas->gearNext = 0;
+        meas->strGearState = "-";
+        meas->strDrivingState = "-";
 
         if (engineGear) {
             meas->gear = engineGear->gearCurrent;
+            meas->gearNext = engineGear->gearNext;
             meas->energyVehicle = engineGear->energyVehicle.get();
             meas->speedVal = engineGear->energyVehicle.speed(engineGear->massVehicle);
 
             switch (engineGear->gearState) {
-            case rcEngine::EngineGear::GearState::DECOUPLED:
+            case rcEngine::EngineGear::GearState::STARTING:
+                meas->strGearState = "S";
+                break;
+            case rcEngine::EngineGear::GearState::DOUBLE_CLUTCH:
                 meas->strGearState = "D";
                 break;
             case rcEngine::EngineGear::GearState::COUPLING:
@@ -303,6 +312,7 @@ public:
                 (engineReverse->drivingState == rcEngine::EngineReverse::DrivingState::STOPPED_BCK)) {
                 meas->speedVal = -meas->speedVal;
                 meas->gear = -meas->gear;
+                meas->gearNext = -meas->gearNext;
             }
         }
     }
@@ -366,6 +376,7 @@ public:
             meas.energyEngine = 0.0f;
             meas.energyVehicle = 0.0f;
             meas.gear = 0;
+            meas.gearNext = 0;
 
             if (doBreak) {
                 raise(SIGTRAP);
@@ -432,7 +443,10 @@ po::options_description createOptions() {
             "Brake max power in Watts.")
         ("airResistance",
             po::value<float>(),
-            "Value for the air resistance")
+            "Value for the air resistance (2.0 is a nice starting point.)")
+        ("resistance",
+            po::value<float>(),
+            "Value for vehicle resistance in Watts.")
         ("rpmMax,r",
             po::value<float>(),
             "Max RPM in rev per minute.")
@@ -442,15 +456,15 @@ po::options_description createOptions() {
         ("rpmShift,s",
             po::value<float>(),
             "RPM to keep when switching gears")
-        ("timeCouple",
-            po::value<rcSignals::TimeMs>(),
-            "Time to engage the gear in ms")
+        ("couplingFactor",
+            po::value<int>(),
+            "Percentage for coupling clutch energy transfer")
         ("timeDecouple",
             po::value<rcSignals::TimeMs>(),
             "Time to disengage the gear in ms")
-        ("timeDoubleDeclutch",
-            po::value<rcSignals::TimeMs>(),
-            "Double declutch (Zwischengas) time in ms")
+        ("doubleDeclutch",
+            po::value<bool>(),
+            "Double declutch (Zwischengas)")
         ("wheel,w",
             po::value<float>(),
             "Wheel diameter in Meters")
@@ -547,13 +561,15 @@ void outputSvgLine(std::vector<float> times, std::vector<float> values,
 
     cout << "<g>\n";
 
+    // -- label
     float firstY = (-(values.front() * factor));
-    cout << "  <text style=\"font-size:50px; fill:" << color << ";\" "
+    cout << "  <text font-size=\"50px\" fill=\"" << color << ";\" "
         << "x=\"-100\" "
-        << "y=\"" << setprecision(5) << (firstY) << "\">"
+        << "y=\"" << setprecision(8) << (firstY) << "\">"
         << name << "</text>\n";
 
-    cout << "  <path style=\"fill:none; stroke-width:6px; stroke:" << color
+    // -- line
+    cout << "  <path fill=\"none\" stroke-width=\"6px\" stroke=\"" << color
         << "\" d=\"";
     for (unsigned int i = 0; i < times.size() && i < values.size(); i++) {
         if (i == 0) {
@@ -565,6 +581,24 @@ void outputSvgLine(std::vector<float> times, std::vector<float> values,
             << setprecision(8) << (-(values[i] * factor)) << " ";
     }
     cout << "\"/>\n";
+
+    // -- more lables along the line
+    float lastTime = 0.0f;
+    for (unsigned int i = 1; i < times.size() && (i + 1) < values.size(); i++) {
+        bool wasBigger = values[i-1] < values[i];
+        bool getsBigger = values[i] < values[i+1];
+
+        if (((wasBigger != getsBigger) && ((lastTime + 2000.0f) < times[i])) ||
+            ((lastTime + 8000.0f) < times[i])) {
+            lastTime = times[i];
+
+            cout << "  <text font-size=\"50px\" text-anchor=\"middle\" fill=\"" << color << "\" "
+                << "x=\"" << setprecision(8) << (times[i]) << " \" "
+                << "y=\"" << setprecision(8) << (-(values[i] * factor)) << "\">"
+                << name << ": " << setprecision(8) << values[i] << "</text>\n";
+        }
+    }
+
     cout << "</g>\n";
 }
 
@@ -651,11 +685,10 @@ void outputSvg(vector<EngineSimulator::Meassurement> meassurements, std::string 
 
     std::vector<float> times;
     std::vector<std::string> strStates;
-    std::vector<float> speedSigs;
-    std::vector<float> throttlesOrig;
-    std::vector<float> throttles;
     std::vector<float> speedsOrig;
     std::vector<float> speeds;
+    std::vector<float> throttlesOrig;
+    std::vector<float> throttles;
     std::vector<float> brakes;
     std::vector<float> powers;
     std::vector<float> rpms;
@@ -663,17 +696,17 @@ void outputSvg(vector<EngineSimulator::Meassurement> meassurements, std::string 
     std::vector<float> energyEngines;
     std::vector<float> energyVehicles;
     std::vector<float> gears;
+    std::vector<float> gearsNext;
     std::vector<std::string> strGearStates;
     std::vector<std::string> strDrivingStates;
 
     for (const auto& mes : meassurements) {
         times.push_back(mes.time);
         strStates.push_back(mes.strState);
-        speedSigs.push_back(mes.speedSig);
-        throttlesOrig.push_back(mes.throttleOrig);
-        throttles.push_back(mes.throttle);
         speedsOrig.push_back(mes.speedOrig);
         speeds.push_back(mes.speed);
+        throttlesOrig.push_back(mes.throttleOrig);
+        throttles.push_back(mes.throttle);
         brakes.push_back(mes.brake);
         powers.push_back(mes.power);
         rpms.push_back(mes.rpm);
@@ -681,15 +714,15 @@ void outputSvg(vector<EngineSimulator::Meassurement> meassurements, std::string 
         energyEngines.push_back(mes.energyEngine);
         energyVehicles.push_back(mes.energyVehicle);
         gears.push_back(mes.gear);
+        gearsNext.push_back(mes.gearNext);
         strGearStates.push_back(mes.strGearState);
         strDrivingStates.push_back(mes.strDrivingState);
     }
 
-    outputSvgLine(times, speedSigs, "black", "speed");
+    outputSvgLine(times, speedsOrig, "#008800", "speed signal orig");
+    outputSvgLine(times, speeds, "black", "speed signal");
     outputSvgLine(times, throttlesOrig, "red", "throttle signal orig");
     outputSvgLine(times, throttles, "pink", "throttle signal out");
-    outputSvgLine(times, speedsOrig, "#008800", "speed signal orig");
-    outputSvgLine(times, speeds, "#00ff00", "speed signal out");
     outputSvgLine(times, brakes, "#000080", "brake signal");
     outputSvgLine(times, powers, "#808080", "engine power");
     outputSvgLine(times, rpms, "#808080", "rpm");
@@ -697,6 +730,7 @@ void outputSvg(vector<EngineSimulator::Meassurement> meassurements, std::string 
     outputSvgLine(times, energyEngines, "#00ffff", "engine energy");
     outputSvgLine(times, energyVehicles, "#008888", "vehicle energy");
     outputSvgLine(times, gears, "#ff00ff", "gear");
+    outputSvgLine(times, gearsNext, "#ff0080", "gear next");
 
     outputSvgBox(times, strStates, 850.0f, "#909090", "#a0a0a0", "state");
     outputSvgBox(times, strGearStates, 900.0f, "#900090", "#ff00ff", "gear state");

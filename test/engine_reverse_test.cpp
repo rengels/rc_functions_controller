@@ -57,8 +57,8 @@ TEST(EngineReverseTest, Reverse) {
     engine.massVehicle = 2.0f;
     engine.rpmShift = 120;
     engine.gearDecouplingTime = 0;
-    engine.gearCouplingTime = 0;
-    engine.gearDoubleDeclutchTime = 0;
+    engine.gearCouplingFactor = 200;
+    engine.gearDoubleDeclutch = false;
     engine.resistance = 0.0f;
     engine.airResistance = 0.0f;
     engine.maxPower = 50.0f;

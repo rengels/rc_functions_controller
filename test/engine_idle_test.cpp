@@ -44,8 +44,8 @@ TEST(EngineIdleTest, step) {
     EXPECT_EQ(throttleIdleLast, throttleIdle);
 
     // -- throttle going into the right direction but too slow
-    idle.step(20, 80, 0, &throttleIdleLast, &loadEngine);
-    idle.step(20, 81, 0, &throttleIdle, &loadEngine);
+    idle.step(200, 80, 0, &throttleIdleLast, &loadEngine);
+    idle.step(200, 81, 0, &throttleIdle, &loadEngine);
     EXPECT_LT(throttleIdleLast, throttleIdle);
 
 }
