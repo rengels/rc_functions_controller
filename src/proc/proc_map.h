@@ -15,7 +15,7 @@ namespace rcProc {
 /** Map effect proc
  *
  *  Maps the input signal to a different range.
- *  This function can also be used for a "constant", "absolute" or "reverse" function.
+ *  This function can also be used for an "absolute" or "reverse" function.
  *
  *  The input range -1000, 0, 1000 is mapped to negative, zero positive.
  *  Note: Input signals out of the range (1200) will produce outputs also out of range
@@ -23,9 +23,10 @@ namespace rcProc {
  */
 class ProcMap: public Proc {
     private:
-        rcSignals::RcSignal negative;
+        rcSignals::RcSignal negative;  ///< input of -1000 is mapped to this value
         rcSignals::RcSignal zero;
-        rcSignals::RcSignal positive;
+        rcSignals::RcSignal positive;  ///< input of 1000 is mapped to this value
+
 
         rcSignals::SignalType inType;
         rcSignals::SignalType outType;

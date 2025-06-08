@@ -14,6 +14,7 @@ set(proc_srcs
     proc_indicator.cpp
     proc_map.cpp
     proc_misfire.cpp
+    proc_neutral.cpp
     proc_periodic.cpp
     proc_power.cpp
     proc_random.cpp
