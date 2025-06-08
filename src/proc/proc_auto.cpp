@@ -31,11 +31,7 @@ void ProcAuto::step(const StepInfo& info) {
 
     // determine the input
     RcSignal steering      = (*signals)[SignalType::ST_YAW];
-    /*
-    RcSignal throttle      = abs(signals->get(SignalType::ST_THROTTLE, 0));
-    RcSignal throttleRight = abs(signals->get(SignalType::ST_THROTTLE_RIGHT, 0));
-    RcSignal throttleLeft  = abs(signals->get(SignalType::ST_THROTTLE_LEFT, 0));
-    */
+
     RcSignal parking  = (*signals)[SignalType::ST_PARKING_BRAKE];
     RcSignal brake    = (*signals)[SignalType::ST_BRAKE];
     RcSignal gear     = (*signals)[SignalType::ST_GEAR];

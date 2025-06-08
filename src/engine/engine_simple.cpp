@@ -93,8 +93,6 @@ rcSignals::RcSignal EngineSimple::getIgnition(const rcSignals::Signals& signals)
     auto ignition = signals[SignalType::ST_IGNITION];
 
     if (ignition == RCSIGNAL_INVALID) {
-        // note: negative throttle does not start the motor (see EngineReverse)
-        // note2: invalid signals don't start the engine either.
         const bool wantIgnition =
             (signals.get(SignalType::ST_THROTTLE, RCSIGNAL_NEUTRAL) >
                 rcSignals::RCSIGNAL_EPSILON);
@@ -167,7 +165,6 @@ void EngineSimple::stepEngine(rcSignals::TimeMs deltaMs, rcSignals::RcSignal ign
             state = EngineState::OFF;
             stepTimeMs = 0u;
         }
-
         break;
     default:
         state = EngineState::OFF;

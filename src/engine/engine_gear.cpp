@@ -254,6 +254,11 @@ int8_t EngineGear::chooseGear(bool faster) {
         rpmTarget = idleManager.getRPM();
     }
 
+    // downshift to gear 0 if vehicle is stopped
+    if ((!faster) && (energyVehicle.get() == 0.0f)) {
+        return 0;
+    }
+
     // the current or dedicated next gear get's a bonus
     const float rpmBonus = std::abs(rpmShift - idleManager.getRPM()) * 0.2f;
 
@@ -270,16 +275,7 @@ int8_t EngineGear::chooseGear(bool faster) {
         }
     }
 
-    if (faster) {
-        return 1;
-    } else {
-        // only downshift to gear 0 if vehicle is stopped
-        if (energyVehicle.get() == 0.0f) {
-            return 0;
-        } else {
-            return 1;
-        }
-    }
+    return 1;
 }
 
 
@@ -291,6 +287,10 @@ void EngineGear::stepGear(TimeMs deltaTime, bool shift) {
     case GearState::STARTING:
         if (getRPM() >= rpmShift) {
             gearState = GearState::COUPLING;
+            gearCurrent = gearNext;
+
+        // fall back to neutral gear if we arent't already
+        } else if (gearNext == 0) {
             gearCurrent = gearNext;
         }
         break;
@@ -372,7 +372,7 @@ rcSignals::RcSignal EngineGear::getIgnition(const rcSignals::Signals& signals) {
     auto ignition = signals[SignalType::ST_IGNITION];
 
     if (ignition == RCSIGNAL_INVALID) {
-        // note: negative throttle does not start the motor (see EngineReverse)
+        // note: negative throttle does not start the motor (EngineReverse provides positive)
         // note2: invalid signals don't start the engine either.
         const bool wantIgnition =
             (signals.get(SignalType::ST_THROTTLE, RCSIGNAL_NEUTRAL) >
@@ -387,17 +387,16 @@ rcSignals::RcSignal EngineGear::getIgnition(const rcSignals::Signals& signals) {
                 ignition = RCSIGNAL_NEUTRAL;
             }
         } else {
-            if (!wantIgnition && idleTimeMs >= offTimeMs) {
-                ignition = RCSIGNAL_NEUTRAL;
-            } else {
+            if (wantIgnition || (idleTimeMs < offTimeMs)) {
                 ignition = RCSIGNAL_MAX;
+            } else {
+                ignition = RCSIGNAL_NEUTRAL;
             }
         }
 
         // don't turn ignition off if the vehicle is still
         // coasting along.
-        if (wantIgnition ||
-            (energyVehicle.get() > 0.0)) {
+        if (wantIgnition || (energyVehicle.get() > 0.0)) {
             idleTimeMs = 0u;
         }
     }
