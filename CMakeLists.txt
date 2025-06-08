@@ -6,7 +6,7 @@ if (POLICY CMP0135)
   cmake_policy (SET CMP0135 NEW)
 endif ()
 
-set (CMAKE_CXX_STANDARD 23) # we use std::clamp and std::span
+set (CMAKE_CXX_STANDARD 20) # we use std::clamp and std::span
 
 
 if (${ESP_PLATFORM})  # idf build system

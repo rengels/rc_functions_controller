@@ -1,0 +1,319 @@
+[
+  {
+    "name": "PROC_GROUP",
+    "types": {},
+    "values": {
+      "type": [
+        0
+      ],
+      "numChilds": [
+        1
+      ]
+    }
+  },
+  {
+    "name": "INPUT_DEMO",
+    "types": {},
+    "values": {
+      "scriptType": [
+        "0"
+      ]
+    }
+  },
+  {
+    "name": "PROC_GROUP",
+    "types": {},
+    "values": {
+      "type": [
+        1
+      ],
+      "numChilds": [
+        3
+      ]
+    }
+  },
+  {
+    "name": "ENGINE_REVERSE",
+    "types": {},
+    "values": {
+      "engineType": [
+        "4"
+      ],
+      "reverseDelayMs": [
+        2000
+      ],
+      "crankingTimeMs": [
+        0
+      ],
+      "offTimeMs": [
+        5000
+      ],
+      "massEngine": [
+        "2000"
+      ],
+      "massVehicle": [
+        "200000"
+      ],
+      "maxPower": [
+        "1400000"
+      ],
+      "rpmMax": [
+        298
+      ],
+      "idleManager": [
+        {
+          "rpmIdleStart": 0,
+          "rpmIdleRunning": 0,
+          "loadStart": "0",
+          "timeStart": 0,
+          "throttleStep": 0
+        }
+      ],
+      "wheelDiameter": [
+        "1.600000023841858"
+      ],
+      "rpmShift": [
+        0
+      ],
+      "gearDecouplingTime": [
+        0
+      ],
+      "gearCouplingFactor": [
+        0
+      ],
+      "gearDoubleDeclutch": [
+        false
+      ],
+      "fullGears": [
+        []
+      ],
+      "brakePower": [
+        "2500000"
+      ],
+      "resistance": [
+        "20000"
+      ],
+      "airResistance": [
+        "2"
+      ]
+    }
+  },
+  {
+    "name": "PROC_AUTO",
+    "types": {},
+    "values": {}
+  },
+  {
+    "name": "PROC_GROUP",
+    "types": {},
+    "values": {
+      "type": [
+        3
+      ],
+      "numChilds": [
+        8
+      ]
+    }
+  },
+  {
+    "name": "AUDIO_LOOP",
+    "types": {
+      "triggerType": [
+        "ST_HORN"
+      ]
+    },
+    "values": {
+      "volume": [
+        100,
+        100
+      ],
+      "loopBegin": [
+        6295
+      ],
+      "loopEnd": [
+        8157
+      ],
+      "sample": [
+        "TSw"
+      ]
+    }
+  },
+  {
+    "name": "AUDIO_SIMPLE",
+    "types": {
+      "triggerType": [
+        "ST_PARKING_BRAKE"
+      ]
+    },
+    "values": {
+      "volume": [
+        40,
+        40
+      ],
+      "sample": [
+        "TAB"
+      ]
+    }
+  },
+  {
+    "name": "AUDIO_SIMPLE",
+    "types": {
+      "triggerType": [
+        "ST_TRAILER_SWITCH"
+      ]
+    },
+    "values": {
+      "volume": [
+        20,
+        20
+      ],
+      "sample": [
+        "TCO"
+      ]
+    }
+  },
+  {
+    "name": "PROC_FADE",
+    "types": {
+      "types": [
+        "ST_IGNITION",
+        "ST_NONE",
+        "ST_NONE",
+        "ST_NONE"
+      ]
+    },
+    "values": {
+      "fadeIn": [
+        5
+      ],
+      "fadeOut": [
+        5
+      ]
+    }
+  },
+  {
+    "name": "AUDIO_NOISE",
+    "types": {
+      "volumeType": [
+        "ST_IGNITION"
+      ]
+    },
+    "values": {
+      "volume": [
+        1,
+        1
+      ],
+      "noiseType": [
+        "1"
+      ],
+      "freq": [
+        500
+      ]
+    }
+  },
+  {
+    "name": "AUDIO_STEAM",
+    "types": {},
+    "values": {
+      "volume": [
+        15,
+        15
+      ],
+      "tone": [
+        2
+      ],
+      "offset": [
+        "0"
+      ],
+      "cylinderResistance": [
+        "0.0010000000474974513"
+      ],
+      "exaustResistance": [
+        "0.0005000000237487257"
+      ]
+    }
+  },
+  {
+    "name": "AUDIO_STEAM",
+    "types": {},
+    "values": {
+      "volume": [
+        20,
+        20
+      ],
+      "tone": [
+        5
+      ],
+      "offset": [
+        "0.10000000149011612"
+      ],
+      "cylinderResistance": [
+        "0.0020000000949949026"
+      ],
+      "exaustResistance": [
+        "0.0005000000237487257"
+      ]
+    }
+  },
+  {
+    "name": "AUDIO_LOOP",
+    "types": {
+      "triggerType": [
+        "ST_BRAKE"
+      ]
+    },
+    "values": {
+      "volume": [
+        10,
+        10
+      ],
+      "loopBegin": [
+        106459
+      ],
+      "loopEnd": [
+        120854
+      ],
+      "sample": [
+        "TBR"
+      ]
+    }
+  },
+  {
+    "name": "PROC_GROUP",
+    "types": {},
+    "values": {
+      "type": [
+        2
+      ],
+      "numChilds": [
+        2
+      ]
+    }
+  },
+  {
+    "name": "OUTPUT_LED",
+    "types": {
+      "types": [
+        "ST_INDICATOR_LEFT",
+        "ST_LOWBEAM",
+        "ST_INDICATOR_RIGHT",
+        "ST_ROOF",
+        "ST_TAIL",
+        "ST_FOG",
+        "ST_REVERSING",
+        "ST_SIDE",
+        "ST_BEACON1",
+        "ST_BEACON2",
+        "ST_CABIN",
+        "ST_SHAKER",
+        "ST_BRAKE"
+      ]
+    },
+    "values": {}
+  },
+  {
+    "name": "OUTPUT_AUDIO",
+    "types": {},
+    "values": {}
+  }
+]
