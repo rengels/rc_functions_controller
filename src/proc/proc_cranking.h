@@ -21,7 +21,7 @@ namespace rcProc {
 class ProcCranking: public Proc {
     private:
         /** The amount that the signals are dimmed during cranking. */
-        static constexpr rcSignals::RcSignal CRANKING_DIM = 200U;
+        static constexpr rcSignals::RcSignal CRANKING_DIM = 400U;
 
         /** These are the signal types that are dimmed during cranking */
         std::array<rcSignals::SignalType, 4> types;
