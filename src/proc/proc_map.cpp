@@ -8,6 +8,8 @@
 #include "proc_map.h"
 #include "signals.h"
 
+#include <algorithm>  // for clamp
+
 using namespace::rcSignals;
 
 namespace rcProc {
@@ -35,7 +37,7 @@ void ProcMap::step(const StepInfo& info) {
             fSig = ((positive - zero) * fSig) + zero;
         }
 
-        RcSignal out = fSig;
+        RcSignal out = std::clamp(fSig, -3200.0f, 3200.0f);
         (*signals)[outType] = out;
     }
 }
