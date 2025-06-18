@@ -274,24 +274,24 @@ function createProcMenuButton(elProc) {
   elDropdown.className = "options_window";
 
   let elAD1 = document.createElement('li');
-  elAD1.textContent = "Move up"
-  elAD1.title = "Move the proc up."
+  elAD1.textContent = "Move up";
+  elAD1.title = "Move the proc up.";
   elAD1.addEventListener("click", (event) => {
     moveUp(elProc);
   });
   elDropdown.appendChild(elAD1)
 
   let elAD2 = document.createElement('li');
-  elAD2.textContent = "Move down"
-  elAD2.title = "Move the proc down."
+  elAD2.textContent = "Move down";
+  elAD2.title = "Move the proc down.";
   elAD2.addEventListener("click", (event) => {
     moveDown(elProc);
   });
   elDropdown.appendChild(elAD2)
 
   let elAD3 = document.createElement('li');
-  elAD3.textContent = "Remove"
-  elAD3.title = "Remove the proc element."
+  elAD3.textContent = "Remove";
+  elAD3.title = "Remove the proc element.";
   elAD3.addEventListener("click", (event) => {
     elProc.parentElement.removeChild(elProc);  // remove myself
   });
@@ -863,6 +863,7 @@ function procSetStatusCallback(func) {
 }
 
 export {fillConfigTable,
+    getConfigFromTable,
     updateConfigFromConfig,
     updateConfigFromData,
     downloadConfig,

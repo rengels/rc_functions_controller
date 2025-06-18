@@ -835,7 +835,7 @@ function createValueRow(id, type, values) {
       elInput.style = 'width: 5em';
       elInput.value = value ?? 0.0;
       elInput.getConfig = function() {
-        return elInput.value;
+        return elInput.valueAsNumber;
       }
       elInput.setConfig = function(val) {
         elInput.value = val;
@@ -853,7 +853,7 @@ function createValueRow(id, type, values) {
       elInput.style = 'width: 5em';
       elInput.value = value ?? 0;
       elInput.getConfig = function() {
-        return elInput.value;
+        return elInput.valueAsNumber;
       }
       elInput.setConfig = function(val) {
         elInput.value = val;

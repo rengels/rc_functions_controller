@@ -321,22 +321,6 @@ li.procGroup > details > summary {
 }
 
 /* -- slider stuff -- */
-.sliderRed {
-    accent-color:red;
-}
-
-.sliderGreen {
-    accent-color: green;
-}
-
-.sliderBlue {
-    accent-color:blue;
-}
-
-.sliderBlack {
-    accent-color: black;
-}
-
 
 .sliderBubble {
     display: inline-block;
@@ -411,6 +395,20 @@ input[type=number] {
   text-align:right;
 }
 
+/* styles for cpu pinout */
+.cpuBorderTop {
+    border-top: 2px solid var(--color_lv_3);
+}
+.cpuBorderBottom {
+    border-bottom: 2px solid var(--color_lv_3);
+}
+.cpuBorderRight {
+    border-right: 2px solid var(--color_lv_3);
+}
+.cpuBorderLeft {
+    border-left: 2px solid var(--color_lv_3);
+}
+
 /* styles for the circular speed/rpm meter*/
 .meterPointer {
     fill: red;
@@ -483,6 +481,7 @@ input[type=number] {
     font-family: verdana,arial,helvetica,sans-serif;
     fill: #fff;
 }
+
 
 /* Animation to highlight a button. */
 @keyframes highlight {
