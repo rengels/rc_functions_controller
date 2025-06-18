@@ -13,10 +13,15 @@
 
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="Content-Language" content="en-GB">
-    <title>RC functions controller configuration</title>
+    <meta name="theme-color" content="black" />
     <meta name="description" content="Allows viewing and modifying signals and configuration of the rc functions controller via bluetooth.">
+    <meta name="keywords" content="rc, sound, functions, esp32, ble, bluetooth, ">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes" />
+
+    <title>RC functions controller configuration</title>
+
+    <link rel="stylesheet" href="style_print.css" type="text/css" title="Normal" media="print">
     <link rel="stylesheet" href="style.css" type="text/css" title="Normal" media="screen, projection">
 
   </head>
@@ -41,6 +46,7 @@
     <span class="tabButton active" id="tabButtonControl">Control</span>
     <span class="tabButton" id="tabButtonSignals">Signals</span>
     <span class="tabButton" id="tabButtonConfig">Configuration</span>
+    <span class="tabButton" id="tabButtonHW">HW</span>
   </div>
 
   <div id="tabControl" class="tabcontent"
@@ -126,6 +132,19 @@
     </ul>
   </div>
 
+  <div id="tabHW" class="tabcontent">
+    <span class="button" id="buttonHWFlash">Flash</span>
+    <h3>Pinout:</h3>
+    <div id="hwPinout">
+    </div>
+    <h3>Warnings:</h3>
+    <div id="hwWarnings">
+    </div>
+    <h3>Notes:</h3>
+    <div id="hwNotes">
+    </div>
+  </div>
+
   <div>
     <small>rc function controller by Ralf Engels </small>
   </div>
@@ -167,6 +186,27 @@
       newProc,
       procSetStatusCallback,
       } from "./script/procs.js";
+    import * as hw from "./script/hw.js";
+
+    // DOM Elements
+    const connectButton = document.getElementById("connectBleButton");
+    const disconnectButton = document.getElementById("disconnectBleButton");
+    const fullscreenButton = document.getElementById("fullscreenButton");
+
+    const buttonConfigDownload = document.getElementById("buttonConfigDownload");
+    const buttonConfigUpload = document.getElementById("buttonConfigUpload");
+    const buttonConfigReset = document.getElementById("buttonConfigReset");
+    const buttonConfigLoad = document.getElementById("buttonConfigLoad");
+    const buttonConfigSave = document.getElementById("buttonConfigSave");
+    const buttonNewProc = document.getElementById("buttonNewProc");
+
+    const tabControl = document.getElementById("tabControl");
+    const tabSignals = document.getElementById("tabSignals");
+    const tabConfig = document.getElementById("tabConfig");
+    const tabHW = document.getElementById("tabHW");
+
+    signals.fillTable();
+    fillConfigTable(defConfig);
 
     document.querySelector("#tabButtonControl").addEventListener("click",
       (evt) => {
@@ -185,25 +225,11 @@
         bluetooth.stopSignalsNotification();
         showTab(evt, tabConfig);
     });
-
-    // DOM Elements
-    const connectButton = document.getElementById("connectBleButton");
-    const disconnectButton = document.getElementById("disconnectBleButton");
-    const fullscreenButton = document.getElementById("fullscreenButton");
-
-    const buttonConfigDownload = document.getElementById("buttonConfigDownload");
-    const buttonConfigUpload = document.getElementById("buttonConfigUpload");
-    const buttonConfigReset = document.getElementById("buttonConfigReset");
-    const buttonConfigLoad = document.getElementById("buttonConfigLoad");
-    const buttonConfigSave = document.getElementById("buttonConfigSave");
-    const buttonNewProc = document.getElementById("buttonNewProc");
-
-    const tabControl = document.getElementById("tabControl");
-    const tabSignals = document.getElementById("tabSignals");
-    const tabConfig = document.getElementById("tabConfig");
-
-    signals.fillTable();
-    fillConfigTable(defConfig);
+    document.querySelector("#tabButtonHW").addEventListener("click",
+      (evt) => {
+        hw.fillTable();
+        showTab(evt, tabHW);
+    });
 
     /** A function to display the status.
      *
@@ -238,7 +264,7 @@
           elStateText.style.color = "inherit";
         }
 
-        // enable/sidable buttons
+        // enable/disable buttons
         if ("connected" in options) {
           const statusFlag = options["connected"];
           connectButton.toggleAttribute("disabled", statusFlag);

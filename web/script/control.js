@@ -147,12 +147,8 @@ function setGear(newGear) {
   if (!auto) {
     const manualGear = overrideSignals[signalNameMapping["ST_GEAR"]];
     if (manualGear > newGear) {
-      arrow = "\u{2191}";
       arrow = "\u{21E7}";
-      // arrow = "\u{2BC5}";
     } else if (manualGear < newGear) {
-      arrow = "&#8595;";
-      arrow = "&#8681;";
       arrow = "\u{2BC6}";
     } 
   }

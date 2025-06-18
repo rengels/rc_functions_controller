@@ -1,3 +1,9 @@
+
+# Currently configure for 2MB, but we should have 4MB available,
+# so we have some space available
+
+# the samples partition is for the custom samples
+
 # Name,   Type, SubType, Offset,  Size, Flags
 nvs,      data, nvs,     ,        0x6000,
 phy_init, data, phy,     ,        0x1000,
