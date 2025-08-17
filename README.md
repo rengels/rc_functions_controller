@@ -1,4 +1,4 @@
-# Arduino RC functions controller
+# esp32 RC functions controller
 @mainpage
 
 This is an RC functions controller with a wide array of features.

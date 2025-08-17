@@ -69,8 +69,8 @@
           "throttleStep": 10
         }
       ],
-      "wheelDiameter": [
-        "1"
+      "speedFactor": [
+        "3"
       ],
       "rpmShift": [
         1100

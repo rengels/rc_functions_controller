@@ -988,10 +988,10 @@
                 "description": "Idle management settings."
             },
             {
-                "name": "wheelDiameter",
+                "name": "speedFactor",
                 "type": "float",
-                "unit": "m",
-                "description": "Diameter of the wheel in m."
+                "unit": "m/r",
+                "description": "Factor of traveled vehicle distance vs. drive shaft rotations."
             },
             {
                 "name": "rpmShift",
@@ -1055,7 +1055,7 @@
                 "timeStart": 2000,
                 "throttleStep": 30
             } ],
-            "wheelDiameter": [ "0.5" ],
+            "speedFactor": [ "1.5" ],
             "rpmShift": [ 1000 ],
             "gearDecouplingTime": [ 300 ],
             "gearCouplingFactor": [ 80 ],
@@ -1141,10 +1141,10 @@
                 "description": "The gear ratios. e.g. 5.0 means five revolutions of the engine vs. one revolution of the wheels."
             },
             {
-                "name": "wheelDiameter",
+                "name": "speedFactor",
                 "type": "float",
-                "unit": "m",
-                "description": "Diameter of the wheel in m."
+                "unit": "m/r",
+                "description": "Factor of traveled vehicle distance vs. drive shaft rotations."
             },
             {
                 "name": "rpmShift",
@@ -1201,7 +1201,7 @@
                 "timeStart": 2000,
                 "throttleStep": 30
             } ],
-            "wheelDiameter": [ "0.5" ],
+            "speedFactor": [ "1.5" ],
             "rpmShift": [ 1000 ],
             "gearDecouplingTime": [ 300 ],
             "gearCouplingFactor": [ 80 ],
@@ -1287,10 +1287,10 @@
                 "description": "The gear ratios. e.g. 5.0 means five revolutions of the engine vs. one revolution of the wheels."
             },
             {
-                "name": "wheelDiameter",
+                "name": "speedFactor",
                 "type": "float",
-                "unit": "m",
-                "description": "Diameter of the wheel in m."
+                "unit": "m/r",
+                "description": "Factor of traveled vehicle distance vs. drive shaft rotations."
             },
             {
                 "name": "rpmShift",

@@ -71,7 +71,7 @@ TEST(GearCollectionTest, Forward) {
 TEST(EngineGearTest, RotationRatio) {
 
     EngineGear engine;
-    engine.wheelDiameter = 1 / M_PI;
+    engine.speedFactor = 1;
     engine.gears.set({2.0f, 1.0f, 0.0f});
     engine.start();
 
@@ -87,7 +87,7 @@ TEST(EngineGearTest, RotationRatio) {
 TEST(EngineGearTest, VehicleEnergyFactor) {
 
     EngineGear engine;
-    engine.wheelDiameter = 1 / M_PI;
+    engine.speedFactor = 1;
     engine.gears.set({2.0f, 1.0f, 0.0f});
     engine.start();
 
@@ -113,7 +113,7 @@ TEST(EngineGearTest, DistributeEnergy) {
 
     EngineGear engine;
 
-    engine.wheelDiameter = 1 / M_PI;
+    engine.speedFactor = 1;
     engine.gears.set({1.0f, 0.0f});
     engine.massEngine = 1.0f;
     engine.massVehicle = 2.0f;
@@ -147,7 +147,7 @@ TEST(EngineGearTest, RpmForGear) {
 
     EngineGear engine;
     engine.gears.set({2.0f, 1.0f, 0.0f});
-    engine.wheelDiameter = 1 / M_PI;
+    engine.speedFactor = 1;
     engine.massEngine = 1.0f;
     engine.massVehicle = 2.0f;
     engine.start();
@@ -177,15 +177,21 @@ TEST(EngineGearTest, ChooseGear) {
     engine.massVehicle = 30.0f;
     engine.start();
 
+    // vehicle is stopped and we don't want to go faster -> gear 0
+    engine.setRPM(350.0f);
+    engine.gearCurrent = 1;
+    engine.energyVehicle.set(0.0f);
+    EXPECT_EQ(0, engine.chooseGear(false));
+
     // want to accelerate, upshift
     engine.gearCurrent = 0;
     engine.setRPM(500.0f);
-
     EXPECT_EQ(1, engine.chooseGear(true));
 
     // no throttle, upshift as long as we are over idle RPM
     engine.setRPM(350.0f);
     engine.gearCurrent = 1;
+    engine.energyVehicle.set(5.0f);
     EXPECT_EQ(2, engine.chooseGear(false));
 
     engine.gearCurrent = 2;
@@ -379,7 +385,7 @@ TEST(EngineGearTest, Ignition) {
             " gear: " << static_cast<int>(engine.gearCurrent) <<
             " gearNext: " << static_cast<int>(engine.gearNext) <<
             " gear state: " << static_cast<int>(engine.gearState) <<
-            " speed: " << (engine.energyVehicle.speed(engine.massVehicle) / (M_PI * engine.wheelDiameter)) <<
+            " speed: " << (engine.energyVehicle.speed(engine.massVehicle) / engine.speedFactor) <<
             " throttle: " << signals[SignalType::ST_THROTTLE] <<
             " idle: " << engine.idleTimeMs <<
             std::endl;
@@ -452,7 +458,7 @@ TEST(EngineGearTest, RPM) {
             " gear: " << static_cast<int>(engine.gearCurrent) <<
             " gearNext: " << static_cast<int>(engine.gearNext) <<
             " gear state: " << static_cast<int>(engine.gearState) <<
-            " speed: " << (engine.energyVehicle.speed(engine.massVehicle) / (M_PI * engine.wheelDiameter)) <<
+            " speed: " << (engine.energyVehicle.speed(engine.massVehicle) / engine.speedFactor) <<
             " throttle: " << signals[SignalType::ST_THROTTLE] <<
             std::endl;
         */
@@ -475,7 +481,7 @@ TEST(EngineGearTest, RPM) {
             " gear: " << static_cast<int>(engine.gearCurrent) <<
             " gearNext: " << static_cast<int>(engine.gearNext) <<
             " gear state: " << static_cast<int>(engine.gearState) <<
-            " speed: " << (engine.energyVehicle.speed(engine.massVehicle) / (M_PI * engine.wheelDiameter)) <<
+            " speed: " << (engine.energyVehicle.speed(engine.massVehicle) / engine.speedFactor) <<
             " throttle: " << signals[SignalType::ST_THROTTLE] <<
             std::endl;
         */

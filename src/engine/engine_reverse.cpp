@@ -15,7 +15,7 @@ using namespace rcSignals;
 
 namespace rcEngine {
 
-static constexpr float ENERGY_EPS = 10.0f;
+static constexpr float ENERGY_EPS = 5.0f;
 
 EngineReverse::EngineReverse() :
             drivingState(DrivingState::STOPPED_FWD),

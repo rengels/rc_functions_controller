@@ -107,12 +107,13 @@ TEST(EngineReverseTest, Reverse) {
 
         /* for debugging you might want to switch it on
         std::cout << "stat: RPM: " << engine.getRPM() <<
-            " gear: " << static_cast<int>(engine.gearCurrent) <<
+            " gear: " << signals[SignalType::ST_GEAR] <<
             " gearNext: " << static_cast<int>(engine.gearNext) <<
             " gear state: " << static_cast<int>(engine.gearState) <<
             " throttle: " << signals[SignalType::ST_THROTTLE] <<
             " speed: " << signals[SignalType::ST_SPEED] <<
             " energyV: " << engine.energyVehicle.get() <<
+            " drivState: " << static_cast<int>(engine.drivingState) <<
             std::endl;
         */
     }

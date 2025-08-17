@@ -208,11 +208,12 @@ TEST(SimpleByteStreamTest, SignalTypes) {
       SignalType::ST_BRAKE};
 
   SimpleOutStream os;
-  uint8_t* buf = os.buffer().data();
   os << types1;
-  EXPECT_EQ(0x01U, buf[0]);
-  EXPECT_EQ(0x02U, buf[1]);
-  EXPECT_EQ(0x03U, buf[2]);
+  uint8_t* buf = os.buffer().data();
+  // the stream stores the signal ID, not it's index
+  EXPECT_EQ('Y', buf[0]);
+  EXPECT_EQ('T', buf[1]);
+  EXPECT_EQ('<', buf[2]);
   EXPECT_FALSE(os.eof());
   EXPECT_FALSE(os.fail());
 
