@@ -118,7 +118,7 @@ void ProcStorage::vehicleSteamTrain() {
     engine->gearDecouplingTime = 0.0f;
     engine->gearCouplingFactor = 0u;
     engine->gearDoubleDeclutch = false;
-    engine->wheelDiameter = 1.6f;
+    engine->speedFactor = 5.0f;
     engine->brakePower = 2500000.0f;
     engine->resistance = 20000.0f;
     procs.push_back(engine);
@@ -203,7 +203,7 @@ void ProcStorage::vehicleShip() {
     engine->gearCouplingFactor = 100u;
     engine->gearDoubleDeclutch = false;
     engine->fullGears.set({-6.0f, 6.0f, 0.0f});
-    engine->wheelDiameter = 1.0f;
+    engine->speedFactor = 3.0f;
     engine->resistance = 2000.0f;
     engine->airResistance = 4.0f;
     procs.push_back(engine);
@@ -272,7 +272,7 @@ void ProcStorage::vehicleTruck() {
     engine->gearCouplingFactor = 100u;
     engine->gearDoubleDeclutch = true;
     engine->fullGears.set({5.4f, 3.6f, 2.5f, 1.8f, 1.3f, 1.0f, -5.4f, -3.6f, 0.0f});
-    engine->wheelDiameter = 1.0f;
+    engine->speedFactor = 3.0f;
     engine->airResistance = 2.0f;
     procs.push_back(engine);
 
@@ -365,7 +365,7 @@ void ProcStorage::vehicleCar() {
     engine->gearCouplingFactor = 80u;
     engine->gearDoubleDeclutch = false;
     engine->fullGears.set({-3.8f, 3.8f, 2.06f, 1.26f, 0.0f});
-    engine->wheelDiameter = 0.5f;
+    engine->speedFactor = 1.5f;
     engine->airResistance = 1.0f;
     procs.push_back(engine);
 

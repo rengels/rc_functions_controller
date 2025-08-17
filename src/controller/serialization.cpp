@@ -1174,7 +1174,7 @@ SimpleOutStream& operator<<(SimpleOutStream& out,
     out << proc.maxPower;
     out << proc.rpmMax;
     out << proc.idleManager;
-    out << proc.wheelDiameter;
+    out << proc.speedFactor;
     out << proc.rpmShift;
     out << proc.gearDecouplingTime;
     out << proc.gearCouplingFactor;
@@ -1205,7 +1205,7 @@ SimpleInStream& operator>>(SimpleInStream& in,
     in >> proc.maxPower;
     in >> proc.rpmMax;
     in >> proc.idleManager;
-    in >> proc.wheelDiameter;
+    in >> proc.speedFactor;
     in >> proc.rpmShift;
     in >> proc.gearDecouplingTime;
     in >> proc.gearCouplingFactor;
@@ -1237,7 +1237,7 @@ SimpleOutStream& operator<<(SimpleOutStream& out,
     out << proc.rpmMax;
     out << proc.idleManager;
     out << proc.gears;
-    out << proc.wheelDiameter;
+    out << proc.speedFactor;
     out << proc.rpmShift;
     out << proc.gearDecouplingTime;
     out << proc.gearCouplingFactor;
@@ -1267,7 +1267,7 @@ SimpleInStream& operator>>(SimpleInStream& in,
     in >> proc.rpmMax;
     in >> proc.idleManager;
     in >> proc.gears;
-    in >> proc.wheelDiameter;
+    in >> proc.speedFactor;
     in >> proc.rpmShift;
     in >> proc.gearDecouplingTime;
     in >> proc.gearCouplingFactor;
@@ -1298,7 +1298,7 @@ SimpleOutStream& operator<<(SimpleOutStream& out,
     out << proc.rpmMax;
     out << proc.idleManager;
     out << proc.gears;
-    out << proc.wheelDiameter;
+    out << proc.speedFactor;
     out << proc.rpmShift;
     out << proc.gearDecouplingTime;
     out << proc.gearCouplingFactor;
@@ -1325,7 +1325,7 @@ SimpleInStream& operator>>(SimpleInStream& in,
     in >> proc.rpmMax;
     in >> proc.idleManager;
     in >> proc.gears;
-    in >> proc.wheelDiameter;
+    in >> proc.speedFactor;
     in >> proc.rpmShift;
     in >> proc.gearDecouplingTime;
     in >> proc.gearCouplingFactor;

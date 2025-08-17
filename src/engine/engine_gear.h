@@ -180,15 +180,16 @@ class EngineGear: public EngineSimple {
 
         GearCollection gears;
 
-        /** The diameter of the wheels.
+        /** Factor drive shaft vs. drive distance in m per rotation
          *
          *  This is part of the rotation ratio calculation and
          *  mostly influences the speed and the energy distribution
          *  between vehicle and engine.
          *
-         *  in m (e.g. 20inch + tire == .7 m)
+         *  Calculate from the wheel diameter times PI plus
+         *  differential gear ratio.
          */
-        float wheelDiameter;
+        float speedFactor;
 
         /** This is the gear shift trigger RPM.
          *

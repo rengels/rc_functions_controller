@@ -181,7 +181,7 @@ public:
                 engineGear->massVehicle = config["massV"].as<float>();
             }
             if (config.count("wheel")) {
-                engineGear->wheelDiameter = config["wheel"].as<float>();
+                engineGear->speedFactor = config["wheel"].as<float>();
             }
             if (config.count("rpmShift")) {
                 engineGear->rpmShift = config["rpmShift"].as<float>();

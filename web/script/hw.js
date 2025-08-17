@@ -118,7 +118,7 @@ function checkEngine(configs, warnings, notes, pinFunctions) {
     const engineType = Number(conf["values"]["engineType"][0]);
     const idleManager = conf["values"]["idleManager"][0];
     const rpmIdle = Number(idleManager["rpmIdleRunning"][0]);
-    const wheelDiameter = Number(conf["values"]["wheelDiameter"][0]);
+    const speedFactor = Number(conf["values"]["speedFactor"][0]);
 
     const gears = conf["values"]?.["fullGears"]?.[0];
     if (gears == null) {

@@ -69,8 +69,8 @@
           "throttleStep": 0
         }
       ],
-      "wheelDiameter": [
-        "1.600000023841858"
+      "speedFactor": [
+        "5.0"
       ],
       "rpmShift": [
         0

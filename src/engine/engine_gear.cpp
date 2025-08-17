@@ -91,7 +91,7 @@ float GearCollection::get(int8_t index) const {
 
 EngineGear::EngineGear() :
             massVehicle(5000),
-            wheelDiameter(0.7f),
+            speedFactor(2.0f),
             rpmShift(900u),
             gearDecouplingTime(200),
             gearCouplingFactor(150u),
@@ -121,13 +121,13 @@ static float sqr(float a) {
 
 float EngineGear::getRotationRatio(const int8_t gear) const {
     if (gear > 0 && gears.size() > 0) {
-        if (wheelDiameter > 0.0f) {
-            return gears.get(gear - 1) / (wheelDiameter * M_PI);
+        if (speedFactor > 0.0f) {
+            return gears.get(gear - 1) / speedFactor;
         }
     }
 
-    if (wheelDiameter > 0.0f) {
-        return 1.0f / (wheelDiameter * M_PI);
+    if (speedFactor > 0.0f) {
+        return 1.0f / speedFactor;
     }
 
     return 1.0f;
@@ -363,8 +363,7 @@ float EngineGear::getSpeedMax() const {
         minGearRatio = gears.get(gears.size() - 1);
     }
 
-    return rpmMax / 60.0f *
-        (wheelDiameter * M_PI) / minGearRatio;
+    return rpmMax / 60.0f * speedFactor / minGearRatio;
 }
 
 
