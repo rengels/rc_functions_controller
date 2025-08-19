@@ -29,7 +29,8 @@ void OutputLed::start() {
     ESP_LOGI(TAG, "Start configuring LED");
 
     // Prepare and then apply the LEDC PWM timer configuration
-    ledc_timer_config_t ledc_timer = {
+    // low speed
+    ledc_timer_config_t ledcTimerL = {
         .speed_mode       = LEDC_LOW_SPEED_MODE,
         .duty_resolution  = LEDC_DUTY_RES,
         .timer_num        = LEDC_TIMER_0,
@@ -38,7 +39,19 @@ void OutputLed::start() {
         .deconfigure      = false,
     };
     ESP_ERROR_CHECK(
-        ledc_timer_config(&ledc_timer));
+        ledc_timer_config(&ledcTimerL));
+
+    // high speed (note: some chips might not support this)
+    ledc_timer_config_t ledcTimerH = {
+        .speed_mode       = LEDC_HIGH_SPEED_MODE,
+        .duty_resolution  = LEDC_DUTY_RES,
+        .timer_num        = LEDC_TIMER_1,
+        .freq_hz          = LEDC_FREQUENCY,  // Set output frequency at 5 kHz
+        .clk_cfg          = LEDC_AUTO_CLK,
+        .deconfigure      = false,
+    };
+    ESP_ERROR_CHECK(
+        ledc_timer_config(&ledcTimerH));
 
     // Prepare and then apply the LEDC PWM channel configuration
     for (uint8_t i = 0; i < LEDC_NUM; i++) {
@@ -46,16 +59,19 @@ void OutputLed::start() {
             continue;
         }
 
-        ESP_LOGI(TAG, "Configure channel %d", static_cast<int>(i));
         const StaticConfig &config = CONFIG[i];
+        ESP_LOGI(TAG, "Configure channel %d at pin %d",
+            static_cast<int>(i), static_cast<int>(config.pin));
         ledc_channel_config_t ledc_channel = {
             .gpio_num       = config.pin,
             .speed_mode     = config.mode,
             .channel        = config.channel,
             .intr_type      = LEDC_INTR_DISABLE,
-            .timer_sel      = LEDC_TIMER_0,
+            .timer_sel      =
+              (config.mode == LEDC_LOW_SPEED_MODE ? LEDC_TIMER_0: LEDC_TIMER_1),
             .duty           = 0, // starting brighness 0
             .hpoint         = 0,
+            .sleep_mode     = LEDC_SLEEP_MODE_NO_ALIVE_NO_PD,
             .flags = {.output_invert = false},
         };
         ESP_ERROR_CHECK(

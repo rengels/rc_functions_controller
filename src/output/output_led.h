@@ -42,7 +42,7 @@ class OutputLed : public Output {
 
         static constexpr ledc_timer_bit_t LEDC_DUTY_RES = LEDC_TIMER_13_BIT;
         static constexpr uint32_t LEDC_MAX_DUTY = 8191; ///< maximum duty
-        static constexpr uint32_t LEDC_FREQUENCY = 5000U; // Frequency in Hertz. Set frequency at 5 kHz
+        static constexpr uint32_t LEDC_FREQUENCY = 5000U; // PWM Frequency in Herz 5 kHz
 
         static constexpr StaticConfig CONFIG[] = {
             {GPIO_NUM_2,  LEDC_CHANNEL_0, LEDC_LOW_SPEED_MODE},
