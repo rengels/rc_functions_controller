@@ -90,7 +90,12 @@ function createSignalSelect() {
       let elOption = document.createElement("option");
       elOption.value = signal["name"];
 
-      elOption.textContent = niceName(signal["name"]);
+
+      if (signal["name"] == "ST_NONE") { // special name to differentiate it from other options
+        elOption.textContent = "\u{2205}";
+      } else {
+        elOption.textContent = niceName(signal["name"]);
+      }
       elOption.title = signal["description"];
 
       if (elGroup != null) {

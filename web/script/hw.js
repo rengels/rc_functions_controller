@@ -151,8 +151,54 @@ function checkEngine(configs, warnings, notes, pinFunctions) {
 }
 
 
-/** Marks the pins down in for an pwm and esc proc. */
+/** Marks the pins down in for an pwm proc. */
+function checkPwm(configs, warnings, notes, pinFunctions) {
+
+  for (let i = 0; i < configs.length; i++) {
+    const conf = configs[i];
+    const types = conf["types"]["types"];
+    const pins = conf["values"]?.["pins"];
+    for (let j = 0; j < types.length; j++) {
+      if (types[j] != "ST_NONE") {
+        const configName = niceName(conf["name"]) + " / " + niceName(types[j]);
+        let pinNum1 = -1;
+        if (pins && pins?.[j]) {
+          pinNum1 = Number(pins[j]);
+        }
+
+        if (pinNum1 == -1) {
+          ;  // an unused esc channel
+        } else {
+          pinFunctions[pinNum1].push(configName);
+          checkPinOutput(configName, pinNum1, warnings, notes);
+        }
+      }
+    }
+  }
+}
+
+/** Marks the pins down in for an esc proc. */
 function checkEsc(configs, warnings, notes, pinFunctions) {
+
+  // reset conditions according to "6.10 IO MUX Pin List" esp32 technical reference
+  const pinReset = {
+    0: 3,
+    1: 3,
+    2: 2,
+    3: 3,
+    4: 2,
+    5: 3,
+    6: 3,
+    7: 3,
+    8: 3,
+    9: 3,
+    10: 3,
+    11: 3,
+    12: 2,
+    13: 2,
+    14: 3,
+    15: 3
+  };
 
   for (let i = 0; i < configs.length; i++) {
     const conf = configs[i];
@@ -162,15 +208,37 @@ function checkEsc(configs, warnings, notes, pinFunctions) {
     for (let j = 0; j < types.length; j++) {
       if (types[j] != "ST_NONE") {
         const configName = niceName(conf["name"]) + " / " + niceName(types[j]);
+        let pinNum1 = -1;
+        let pinNum2 = -1;
         if (pins && pins?.[j]) {
-          const pinNum = Number(pins[j]);
-          pinFunctions[pinNum].push(configName);
-          checkPinOutput(configName, pinNum, warnings, notes);
+          pinNum1 = Number(pins[j]);
         }
         if (pins2 && pins2?.[j]) {
-          const pinNum = Number(pins2[j]);
-          pinFunctions[pinNum].push(configName);
-          checkPinOutput(configName, pinNum, warnings, notes);
+          pinNum2 = Number(pins2[j]);
+        }
+
+        if (pinNum1 == -1 && pinNum2 == -1) {
+          ;  // an unused esc channel
+        } else if (pinNum1 == -1 || pinNum2 == -1) {
+          warnings.push("Only one output is configured for " +
+            niceName(configs[0]["name"]) + ".");
+        } else {
+
+          pinFunctions[pinNum1].push(configName);
+          checkPinOutput(configName, pinNum1, warnings, notes);
+
+          pinFunctions[pinNum2].push(configName);
+          checkPinOutput(configName, pinNum2, warnings, notes);
+
+          let reset1 = pinReset?.[pinNum1];
+          let reset2 = pinReset?.[pinNum2];
+
+          if (reset1 != reset2) {
+            warnings.push(`The pin ${pinNum1} and ${pinNum2} have ` +
+              "different reset states according to '6.10 IO MUX Pin List' esp32 technical reference. " +
+              "This means different pull-up/down active for " +
+              niceName(configs[0]["name"]) + ".");
+          }
         }
       }
     }
@@ -189,6 +257,33 @@ function checkLed(configs, warnings, notes, pinFunctions) {
       if (types[j] != "ST_NONE") {
         pinFunctions[pinMapping[j]].push(niceName(conf["name"]) + " / " + niceName(types[j]));
       }
+    }
+  }
+}
+
+/** Adds notes if pins with special functions are used. */
+function checkPins(configs, warnings, notes, pinFunctions) {
+
+  const pinMapping = {
+    0: "outputs PWM signal at boot, must be LOW to enter flashing mode.",
+    1: "debug output at boot",
+    2: "connected to on-board LED, must be left floating or LOW to enter flashing mode.",
+    3: "pin	HIGH at boot.",
+    5: "outputs PWM signal at boot, strapping pin.",
+    6: "connected to the integrated SPI flash.",
+    7: "connected to the integrated SPI flash.",
+    8: "connected to the integrated SPI flash.",
+    9: "connected to the integrated SPI flash.",
+    10: "connected to the integrated SPI flash.",
+    11: "connected to the integrated SPI flash.",
+    12: "boot fails if pulled high, strapping pin.",
+    14: "outputs PWM signal at boot.",
+    15: "outputs PWM signal at boot, strapping pin.",
+  };
+
+  for (let i = 0; i < pinFunctions.length; i++) {
+    if (pinFunctions[i].length > 0 && i in pinMapping) {
+        notes.push(`Beware: The pin ${i} ${pinMapping[i]}`);
     }
   }
 }
@@ -243,7 +338,7 @@ const procCheckers = {
     p[26].push(niceName(c[0]["name"]) + " / Channel 2");
   },
   "OUTPUT_PWM": (c, w, n, p) => {
-    checkEsc(c, w, n, p);
+    checkPwm(c, w, n, p);
   },
   "OUTPUT_ESC": (c, w, n, p) => {
     checkEsc(c, w, n, p);
@@ -514,7 +609,7 @@ function checkInputsFirst(config, warnings) {
       ;  // ignore groups
     } else if (procsBySection["Input"].includes(conf?.["name"]))  {
       if (otherProcFound) {
-        warnings.push("The input proc " + niceName(conf?.["name"]) + " is after a non-input proc.");
+        warnings.push(`The input proc ${niceName(conf?.["name"])} is after a non-input proc.`);
       }
     } else {
       otherProcFound = true;
@@ -540,7 +635,7 @@ function checkOutputsLast(config, warnings) {
       ;  // ignore groups
     } else if (procsBySection["Output"].includes(conf?.["name"]))  {
       if (otherProcFound) {
-        warnings.push("The output proc " + niceName(conf?.["name"]) + " is before a non-output proc.");
+        warnings.push(`The output proc ${niceName(conf?.["name"])} is before a non-output proc.`);
       }
     } else {
       otherProcFound = true;
@@ -561,11 +656,9 @@ function fillTable() {
     pinFunctions.push([]);
   }
 
-
   const config = getConfigFromTable();
   checkInputsFirst(config, warnings);
   checkOutputsLast(config, warnings);
-
 
   // collect confs with the same name into a map and
   // then feed it to the checkers
@@ -588,6 +681,9 @@ function fillTable() {
       procCheckers[name](confsByName[name], warnings, notes, pinFunctions);
     }
   }
+
+  // additional notes for pins
+  checkPins(config, warnings, notes, pinFunctions);
 
   const elPinout = document.getElementById("hwPinout");
   elPinout.innerHTML = "";
