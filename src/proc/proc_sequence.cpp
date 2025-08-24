@@ -19,7 +19,8 @@ ProcSequence::ProcSequence() :
     inputType(SignalType::ST_BEACON),
     outputType(SignalType::ST_BEACON1),
     onOffTimes{0, 30, 80, 30, 999, 999},
-    sequenceDurationMs(540) {
+    sequenceDurationMs(540),
+    onlyOnce(false) {
 }
 
 void ProcSequence::start() {
@@ -29,7 +30,7 @@ void ProcSequence::start() {
 void ProcSequence::step(const StepInfo& info) {
 
     auto value = (*(info.signals))[inputType];
-    bool triggered = value > RCSIGNAL_TRUE;
+    bool triggered = (value > RCSIGNAL_TRUE);
 
     if (triggered || (sequenceTimeMs > 0)) {
 
@@ -44,16 +45,14 @@ void ProcSequence::step(const StepInfo& info) {
         }
 
         (*(info.signals))[outputType] =
-            state ? RCSIGNAL_MAX : RCSIGNAL_NEUTRAL;
+            (state ? RCSIGNAL_MAX : RCSIGNAL_NEUTRAL);
 
-        sequenceTimeMs += info.deltaMs;
-        if (sequenceTimeMs > sequenceDurationMs) {
+        if (sequenceTimeMs < sequenceDurationMs) {
+            sequenceTimeMs += info.deltaMs;
+
+        } else if (!onlyOnce || !triggered) {
             sequenceTimeMs = 0;
         }
-
-    } else if (value != RCSIGNAL_INVALID) {
-        (*(info.signals))[outputType] =
-            RCSIGNAL_NEUTRAL;
     }
 }
 

@@ -23,7 +23,8 @@ namespace rcProc {
  *  This effect can be used to implement the double-flash of
  *  US police car beacons and many other things.
  *
- *  Note: the input signal might be modified.
+ *  Note: This proc can output on the input signal.
+ *  Note: This proc can overwrite valid output signals.
  */
 class ProcSequence: public Proc {
     private:
@@ -49,7 +50,11 @@ class ProcSequence: public Proc {
          **/
         std::array<uint16_t, 6> onOffTimes;
 
-        rcSignals::TimeMs sequenceDurationMs; ///< The overall length of the sequence.
+        /** The overall length of the sequence. */
+        rcSignals::TimeMs sequenceDurationMs;
+
+        /** Run as long as trigger is active instead of only once. */
+        bool onlyOnce;
 
     public:
         ProcSequence();

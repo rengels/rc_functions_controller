@@ -276,18 +276,18 @@
                 "type": "OutputEsc::FreqType",
                 "description": "Frequencies for different signal value slots. 0-199, 200-399, ...",
                 "enum": [
-                    {"name": "10kHz", "id": 0,
-                        "description": ""},
-                    {"name": "5kHz", "id": 1,
-                        "description": ""},
-                    {"name": "1kHz", "id": 2,
-                        "description": ""},
-                    {"name": "100Hz", "id": 3,
+                    {"name": "5Hz", "id": 0,
                         "description": "Using a slow logic for motor start"},
-                    {"name": "10Hz", "id": 4,
+                    {"name": "10Hz", "id": 1,
                         "description": "Using a slow logic for motor start"},
-                    {"name": "5Hz", "id": 5,
-                        "description": "Using a slow logic for motor start"}
+                    {"name": "100Hz", "id": 2,
+                        "description": "Using a slow logic for motor start"},
+                    {"name": "1kHz", "id": 3,
+                        "description": ""},
+                    {"name": "5kHz", "id": 4,
+                        "description": ""},
+                    {"name": "10kHz", "id": 5,
+                        "description": ""}
                 ]
             },
             {
@@ -791,8 +791,26 @@
                 "type": "TimeMs",
                 "unit": "ms",
                 "description": "The overall sequence duration im milliseconds."
+            },
+            {
+                "name": "onlyOnce",
+                "type": "bool",
+                "description": "If set, the sequence will be repeated as long as the trigger is active."
             }
-        ]
+        ],
+        "defaultValues": {
+            "onOffTimes": [
+                0,
+                30,
+                80,
+                30,
+                999,
+                999
+            ],
+            "sequenceDurationMs": [
+                540
+            ]
+        }
     },
 
     {
