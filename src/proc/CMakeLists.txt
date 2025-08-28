@@ -7,6 +7,7 @@ set(proc_srcs
     proc_combine.cpp
     proc_cranking.cpp
     proc_delay.cpp
+    proc_diff.cpp
     proc_direction.cpp
     proc_excavator.cpp
     proc_expo.cpp
