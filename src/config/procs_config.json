@@ -277,11 +277,11 @@
                 "description": "Frequencies for different signal value slots. 0-199, 200-399, ...",
                 "enum": [
                     {"name": "5Hz", "id": 0,
-                        "description": "Using a slow logic for motor start"},
+                        "description": "Using a slow logic to ensure motor start"},
                     {"name": "10Hz", "id": 1,
-                        "description": "Using a slow logic for motor start"},
+                        "description": "Using a slow logic to ensure motor start"},
                     {"name": "100Hz", "id": 2,
-                        "description": "Using a slow logic for motor start"},
+                        "description": "Using a slow logic to ensure motor start"},
                     {"name": "1kHz", "id": 3,
                         "description": ""},
                     {"name": "5kHz", "id": 4,
@@ -463,6 +463,29 @@
             }
         ]
     },
+
+
+    {
+        "id": "di",
+        "name": "PROC_DIFF",
+        "filename": "proc_diff",
+        "description": "The output signal is the difference between the last input signals",
+        "types": [
+            {
+                "name" : "inType",
+                "num" : 1,
+                "description": "Input signal type."
+            },
+            {
+                "name" : "outType",
+                "num" : 1,
+                "description": "Output signal type."
+            }
+        ],
+        "values": [
+        ]
+    },
+
 
     {
         "id": "DI",
