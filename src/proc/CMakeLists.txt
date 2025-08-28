@@ -4,6 +4,7 @@
 
 set(proc_srcs
     proc_auto.cpp
+    proc_click.cpp
     proc_combine.cpp
     proc_cranking.cpp
     proc_delay.cpp

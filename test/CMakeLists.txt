@@ -43,11 +43,11 @@ if (NOT "${CMAKE_SYSTEM_NAME} " STREQUAL "Generic ")
 
     add_executable (controller_test
         bytestream_test.cpp
+        dummy_wav.obj
+        flash_sample_test.cpp
         proc_storage_test.cpp
         sample_storage_test.cpp
         wav_sample_test.cpp
-        flash_sample_test.cpp
-        dummy_wav.obj
     )
     target_include_directories (controller_test
         PRIVATE
@@ -73,6 +73,7 @@ if (NOT "${CMAKE_SYSTEM_NAME} " STREQUAL "Generic ")
         engine_reverse_test.cpp
         engine_simple_test.cpp
         engine_speed_test.cpp
+        proc_click_test.cpp
         proc_auto_test.cpp
         proc_sequence_test.cpp
         proc_switch_test.cpp
