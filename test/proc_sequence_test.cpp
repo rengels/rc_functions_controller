@@ -43,11 +43,11 @@ TEST(ProcSequenceTest, Sequence) {
     signals.reset();
     signals[SignalType::ST_AUX1] = RCSIGNAL_NEUTRAL;
     proc.step(info);
-    EXPECT_EQ(signals[SignalType::ST_AUX2], RCSIGNAL_NEUTRAL);
+    EXPECT_EQ(signals[SignalType::ST_AUX2], RCSIGNAL_INVALID);
     proc.step(info);
-    EXPECT_EQ(signals[SignalType::ST_AUX2], RCSIGNAL_NEUTRAL);
+    EXPECT_EQ(signals[SignalType::ST_AUX2], RCSIGNAL_INVALID);
     proc.step(info);
-    EXPECT_EQ(signals[SignalType::ST_AUX2], RCSIGNAL_NEUTRAL);
+    EXPECT_EQ(signals[SignalType::ST_AUX2], RCSIGNAL_INVALID);
 
     // -- test sequence
     signals.reset();

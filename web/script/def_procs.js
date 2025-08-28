@@ -392,6 +392,38 @@ export let defProcs = [
     },
 
     {
+        "id": "CL",
+        "name": "PROC_CLICK",
+        "filename": "proc_click",
+        "description": "Decodes different clicks (like double click).",
+        "types": [
+            {
+                "name" : "inType",
+                "num" : 1,
+                "description": "Input type"
+            },
+            {
+                "name" : "outTypes",
+                "num" : 5,
+                "description": "Output types for the different number of clicks."
+            }
+        ],
+        "values": [
+            {
+                "name": "clickTime",
+                "type": "TimeMs",
+                "unit": "ms",
+                "description": "The number of milli seconds for a click"
+            }
+        ],
+
+        "defaultTypes": { "inType": [ "ST_AUX1" ] },
+        "defaultValues": {
+            "clickTime": [ 800 ]
+        }
+    },
+
+    {
         "id": "CO",
         "name": "PROC_COMBINE",
         "filename": "proc_combine",
