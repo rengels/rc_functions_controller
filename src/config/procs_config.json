@@ -276,17 +276,17 @@
                 "type": "OutputEsc::FreqType",
                 "description": "Frequencies for different signal value slots. 0-199, 200-399, ...",
                 "enum": [
-                    {"name": "5Hz", "id": 0,
-                        "description": "Using a slow logic to ensure motor start"},
-                    {"name": "10Hz", "id": 1,
-                        "description": "Using a slow logic to ensure motor start"},
-                    {"name": "100Hz", "id": 2,
-                        "description": "Using a slow logic to ensure motor start"},
-                    {"name": "1kHz", "id": 3,
+                    {"name": "50Hz", "id": 0,
                         "description": ""},
-                    {"name": "5kHz", "id": 4,
+                    {"name": "100Hz", "id": 1,
                         "description": ""},
-                    {"name": "10kHz", "id": 5,
+                    {"name": "1kHz", "id": 2,
+                        "description": ""},
+                    {"name": "5kHz", "id": 3,
+                        "description": ""},
+                    {"name": "10kHz", "id": 4,
+                        "description": ""},
+                    {"name": "20kHz", "id": 5,
                         "description": ""}
                 ]
             },
@@ -379,6 +379,38 @@
         "description": "Creates many signals, using sensible rules, e.g. direction indicators from steering.",
         "types": [],
         "values": []
+    },
+
+    {
+        "id": "CL",
+        "name": "PROC_CLICK",
+        "filename": "proc_click",
+        "description": "Decodes different clicks (like double click).",
+        "types": [
+            {
+                "name" : "inType",
+                "num" : 1,
+                "description": "Input type"
+            },
+            {
+                "name" : "outTypes",
+                "num" : 5,
+                "description": "Output types for the different number of clicks."
+            }
+        ],
+        "values": [
+            {
+                "name": "clickTime",
+                "type": "TimeMs",
+                "unit": "ms",
+                "description": "The number of milli seconds for a click"
+            }
+        ],
+
+        "defaultTypes": { "inType": [ "ST_AUX1" ] },
+        "defaultValues": {
+            "clickTime": [ 800 ]
+        }
     },
 
     {

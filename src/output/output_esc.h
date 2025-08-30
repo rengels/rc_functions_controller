@@ -18,12 +18,12 @@ namespace rcOutput {
  *  forward declare it in simple_byte_stream.h
  */
 enum class FreqType : uint8_t {
-    KHZ10,
-    KHZ5,
-    KHZ1,
+    HZ50,
     HZ100,
-    HZ10,
-    HZ5
+    KHZ1,
+    KHZ5,
+    KHZ10,
+    KHZ20
 };
 
 /** Concrete implementation of the Output interface
@@ -65,16 +65,11 @@ class OutputEsc : public OutputPwm {
         /** Returns the us for a signal with a 1kHz signal */
         int16_t signalToPwm(const rcSignals::RcSignal signal) const;
 
-        /** Controls the output by manually switching the timers on an off.
-         *
-         */
-        void stepSlow(const rcProc::StepInfo& info, uint16_t stepIncrement);
-
         /** Configures the PWM for the output.
          *
          *  @param[in] period The timer period in ms.
          */
-        void stepFast(const rcProc::StepInfo& info, uint32_t period);
+        void setOutput(const rcProc::StepInfo& info, uint32_t period);
 
     public:
         OutputEsc();
