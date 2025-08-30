@@ -30,6 +30,10 @@ void ProcDelay::start() {
 
 void ProcDelay::step(const StepInfo& info) {
 
+    if (outType == SignalType::ST_NONE) {
+        return;
+    }
+
     Signals* const signals = info.signals;
 
     // write the delayed slot
