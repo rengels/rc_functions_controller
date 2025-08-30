@@ -52,14 +52,14 @@ void AudioDynamic::step(const rcProc::StepInfo& info) {
     if (volumeType == SignalType::ST_NONE) {
         dynamicVolume = RCSIGNAL_MAX;
     } else {
-        dynamicVolume = info.signals->get(volumeType, RCSIGNAL_NEUTRAL);
+        dynamicVolume = std::abs(info.signals->get(volumeType, RCSIGNAL_NEUTRAL));
     }
 
     rcSignals::RcSignal speed;
     if (speedType == SignalType::ST_NONE) {
         speed = RCSIGNAL_MAX;
     } else {
-        speed = info.signals->get(speedType, RCSIGNAL_NEUTRAL);
+        speed = std::abs(info.signals->get(speedType, RCSIGNAL_NEUTRAL));
     }
 
     float fVolume = dynamicVolume / 1000.0f;

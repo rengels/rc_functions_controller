@@ -267,7 +267,6 @@ void app_main(void) {
 
     // -- setup pipeline
     ESP_LOGI(TAG, "Setup pipeline");
-
     storage.loadFromNvm();
     storage.start();
 
@@ -330,8 +329,7 @@ void mainTask(void *pvParameters) {
         int64_t timeStart = esp_timer_get_time();
 
         // -- prepare StepInfo
-        // signals.reset();
-        signals = signalsBt;
+        signals = signalsBt;  // get the initial signals from the BT overrides
 
         rcProc::StepInfo info = {
             .deltaMs = 20U, // TODO: might not be accurate

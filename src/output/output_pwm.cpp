@@ -51,6 +51,8 @@ OutputPwm::OutputPwm():
 void OutputPwm::start() {
 
     ESP_LOGI(TAG, "start");
+
+    // create a timer
     if (handleTimer == nullptr) {
         groupId = reserveTimerGroupId();
         mcpwm_timer_config_t timer_config = {
@@ -62,12 +64,15 @@ void OutputPwm::start() {
             .intr_priority = 0,
             .flags = {
                 .update_period_on_empty = true,
-                .update_period_on_sync = false},
+                .update_period_on_sync = false,
+                .allow_pd = false
+            },
         };
         ESP_ERROR_CHECK(
             mcpwm_new_timer(&timer_config, &handleTimer));
     }
 
+    // create configure the operation
     for (uint8_t i = 0; i < PWM_NUM; i++) {
         if (types[i] == SignalType::ST_NONE) {
             continue;
