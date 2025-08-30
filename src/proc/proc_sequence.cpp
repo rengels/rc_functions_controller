@@ -44,11 +44,11 @@ void ProcSequence::step(const StepInfo& info) {
             state = !state;
         }
 
-        (*(info.signals))[outputType] =
-            (state ? RCSIGNAL_MAX : RCSIGNAL_NEUTRAL);
-
         if (sequenceTimeMs < sequenceDurationMs) {
             sequenceTimeMs += info.deltaMs;
+
+            (*(info.signals))[outputType] =
+                (state ? RCSIGNAL_MAX : RCSIGNAL_NEUTRAL);
 
         } else if (!onlyOnce || !triggered) {
             sequenceTimeMs = 0;
