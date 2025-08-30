@@ -71,7 +71,7 @@ void OutputEsc::start() {
             continue;
         }
         gpio_set_direction(pins2[i], GPIO_MODE_OUTPUT);
-        gpio_set_level(pins2[i], 1);
+        gpio_set_level(pins2[i], 0);
     }
 }
 
@@ -82,67 +82,19 @@ void OutputEsc::stop() {
         if (types[i] == SignalType::ST_NONE) {
             continue;
         }
-        gpio_set_level(pins2[i], 0);
 
-        if (handleCmpr[i] != nullptr) {
-            mcpwm_comparator_set_compare_value(
-                handleCmpr[i],
-                0);
-        }
+        // Setting both outputs to 1
+        // this will reliable stop the motor.
+        // Other solutions didn't work.
+        gpio_set_level(pins2[i], 1);
+        gpio_set_level(pins[i], 1);
     }
 
     OutputPwm::stop();
 }
 
-void OutputEsc::stepSlow(const rcProc::StepInfo& info, uint16_t stepIncrement) {
 
-    static uint32_t step = 0u;
-    step += stepIncrement;
-    if (step >= RCSIGNAL_MAX) {
-        step = 0u;
-    }
-
-    uint32_t period = 20000u; // 20ms, a cycle period of the main task
-
-    ESP_ERROR_CHECK(
-        mcpwm_timer_set_period(handleTimer, period));
-
-    for (uint8_t i = 0; i < PWM_NUM; i++) {
-        if (types[i] == SignalType::ST_NONE) {
-            continue;
-        }
-        if (handleCmpr[i] != nullptr) {
-            const RcSignal signal = (*(info.signals))[types[i]];
-
-            uint32_t value = signalToPwm(signal);
-            if (value > step + stepIncrement) {
-                value = period;  // full step
-            } else if (value > step) {
-                value = (value - step) * period / stepIncrement;  // partial step
-            } else {
-                value = 0u;  // no step
-            }
-
-            if (signal >= 0) {
-                gpio_set_level(pins2[i], 0);
-                ESP_ERROR_CHECK(
-                    mcpwm_comparator_set_compare_value(
-                        handleCmpr[i],
-                        value));
-
-            } else {
-                gpio_set_level(pins2[i], 1);
-                ESP_ERROR_CHECK(
-                    mcpwm_comparator_set_compare_value(
-                        handleCmpr[i],
-                        (period) - value));
-            }
-        }
-    }
-}
-
-
-void OutputEsc::stepFast(const rcProc::StepInfo& info, uint32_t period) {
+void OutputEsc::setOutput(const rcProc::StepInfo& info, uint32_t period) {
 
     if (handleTimer != nullptr) {
         ESP_ERROR_CHECK(
@@ -160,7 +112,7 @@ void OutputEsc::stepFast(const rcProc::StepInfo& info, uint32_t period) {
                 signalToPwm(signal) * period / RCSIGNAL_MAX,
                 period);
 
-            if (signal >= 0) {
+            if ((signal >= 0) || (signal == RCSIGNAL_INVALID)) {
                 gpio_set_level(pins2[i], 0);
                 ESP_ERROR_CHECK(
                     mcpwm_comparator_set_compare_value(
@@ -181,47 +133,51 @@ void OutputEsc::stepFast(const rcProc::StepInfo& info, uint32_t period) {
 
 void OutputEsc::step(const rcProc::StepInfo& info) {
 
-    // -- find the greatest FreqType for the output signals;
-    FreqType maxFreqType = FreqType::KHZ10;
+    // -- find the lowest FreqType for the output signals;
+    // this is necessary since motors might not start with 10KHz but 1%
+    // signal
+    FreqType minFreqType = FreqType::KHZ10;
     for (uint8_t i = 0; i < PWM_NUM; i++) {
         if (types[i] == SignalType::ST_NONE) {
             continue;
         }
-        if (handleCmpr[i] != nullptr) {
 
+        if (handleCmpr[i] != nullptr) {
             const RcSignal signal = (*(info.signals))[types[i]];
             const int16_t value = signalToPwm(signal);
-            const uint8_t slot = std::min(
-                static_cast<uint8_t>(
-                    static_cast<uint32_t>(value) * NUM_FREQ_SLOTS / RCSIGNAL_MAX),
-                static_cast<uint8_t>(freqTypes.size() - 1u));
-            const FreqType freqType = freqTypes[slot];
+            const uint8_t slot =
+                static_cast<uint32_t>(value) * NUM_FREQ_SLOTS / RCSIGNAL_MAX;
+            const FreqType freqType = freqTypes[
+                std::min(
+                    slot,
+                    static_cast<uint8_t>(freqTypes.size() - 1u)
+                )];
 
-            if ((value > 0) && (freqType > maxFreqType)) {
-                maxFreqType = freqType;
+            if ((value != 0) && (freqType < minFreqType)) {
+                minFreqType = freqType;
             }
         }
     }
 
     // -- call the actual step function
-    switch (maxFreqType) {
+    switch (minFreqType) {
+    case FreqType::KHZ20:
+        setOutput(info, 50u);
+        break;
     case FreqType::KHZ10:
-        stepFast(info, 100u);
+        setOutput(info, 100u);
         break;
     case FreqType::KHZ5:
-        stepFast(info, 500u);
+        setOutput(info, 500u);
         break;
     case FreqType::KHZ1:
-        stepFast(info, 1000u);
+        setOutput(info, 1000u);
         break;
     case FreqType::HZ100:
-        stepFast(info, 10000u);
+        setOutput(info, 10000u);
         break;
-    case FreqType::HZ10:
-        stepSlow(info, 200u);
-        break;
-    case FreqType::HZ5:
-        stepSlow(info, 100u);
+    case FreqType::HZ50:
+        setOutput(info, 20000u);
         break;
     default:
         ; // do nothing
