@@ -46,6 +46,7 @@ InputPpm::InputPpm():
         SignalType::ST_NONE,
         SignalType::ST_NONE,
         SignalType::ST_NONE,},
+    updatedCtr{0U},
     notUpdatedCtr{0U} {
 
     receiveQueue = xQueueCreate(1, sizeof(rmt_rx_done_event_data_t));
@@ -106,6 +107,10 @@ void InputPpm::start() {
                 sizeof(rawSymbols),
                 &receiveConfig));
     }
+
+    lastSignals = {RCSIGNAL_INVALID},
+    updatedCtr = {0};
+    notUpdatedCtr = {0};
 }
 
 
@@ -149,6 +154,7 @@ void InputPpm::step(const rcProc::StepInfo& info) {
                 if (signal > -1500 && signal < 1500) {
                     lastSignals[i] = signal;
                     notUpdatedCtr[i] = 0;
+                    updatedCtr[i]++;
                 }
             }
         }
@@ -166,11 +172,16 @@ void InputPpm::step(const rcProc::StepInfo& info) {
     for (uint8_t i = 0; i < NUM_CHANNELS; i++) {
         notUpdatedCtr[i]++;
         if (notUpdatedCtr[i] >= notUpdatedCutoff) {
+            updatedCtr[i] = 0;
             lastSignals[i] = RCSIGNAL_INVALID;
         }
 
         if (types[i] != SignalType::ST_NONE) {
-            info.signals->safeSet(types[i], lastSignals[i]);
+            // ignore the first received signal.
+            // might be bogus
+            if (updatedCtr[i] > 1) {
+                info.signals->safeSet(types[i], lastSignals[i]);
+            }
         }
     }
 }

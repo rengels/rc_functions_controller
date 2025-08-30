@@ -61,7 +61,17 @@ class InputPpm : public Input {
         std::array<rcSignals::RcSignal, NUM_CHANNELS> lastSignals;
         std::array<rcSignals::SignalType, NUM_CHANNELS> types;
 
-        /** Count is increased every time the signal was not received. */
+        /** Count is increased every time the signal was received.
+         *
+         *  We use this counter to ignore the first received signal.
+         *  It might be a glitch and hold a strange value.
+         */
+        std::array<uint32_t, NUM_CHANNELS> updatedCtr;
+
+        /** Count is increased every time the signal was not received.
+         *
+         *  We use this counter to invalidate the signal after a time.
+         */
         std::array<uint32_t, NUM_CHANNELS> notUpdatedCtr;
 
         /** After the signal was not received for a number of times,
