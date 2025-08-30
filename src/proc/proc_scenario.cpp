@@ -31,16 +31,12 @@ ProcScenario::ProcScenario():
     },
     outTypes3 {SignalType::ST_NONE},
     numScenarios(4u),
-    inputStateTime(0u),
-    validatedState(DebounceState::OFF),
-    inputState(DebounceState::OFF),
+    lastState(InState::OFF),
     scenario(0u)
 {}
 
 void ProcScenario::start() {
-    inputStateTime = 0u;
-    validatedState = DebounceState::OFF;
-    inputState = DebounceState::OFF;
+    lastState = InState::OFF;
     scenario = 0u;
 }
 
@@ -53,28 +49,22 @@ void ProcScenario::step(const StepInfo& info) {
     numScenarios = std::clamp(numScenarios, static_cast<uint8_t>(2u), NUM_SCENARIOS);
 
     // -- debounce and switch states
-    inputStateTime += info.deltaMs;
     if (sig != RCSIGNAL_INVALID) {
 
-        DebounceState newState = DebounceState::OFF;
+        InState newState = InState::OFF;
         if (sig > RCSIGNAL_TRUE) {
-            newState = DebounceState::NEXT;
+            newState = InState::NEXT;
         } else if (sig < -RCSIGNAL_TRUE) {
-            newState = DebounceState::PREV;
-        }
-        if (newState != inputState) {
-            inputState = newState;
-            inputStateTime = 0u;
+            newState = InState::PREV;
         }
 
         // switch state
-        if ((inputState != validatedState) &&
-            (inputStateTime > DEBOUNCE_TIME)) {
-            validatedState = inputState;
+        if (newState != lastState) {
+            lastState = newState;
 
-            if (validatedState == DebounceState::NEXT) {
+            if (lastState == InState::NEXT) {
                 scenario = (scenario + 1) % numScenarios;
-            } else if (validatedState == DebounceState::NEXT) {
+            } else if (lastState == InState::NEXT) {
                 scenario = (scenario + numScenarios - 1) % numScenarios;
             }
         }
