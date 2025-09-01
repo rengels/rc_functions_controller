@@ -54,6 +54,86 @@ for (let i = 0; i < defSample.length; i++) {
   }
 }
 
+let elDrag = undefined;  ///< the element that is currently dragged
+/** Adds event listeners and the draggable attribute to make an element draggable */
+function makeDraggable(element) {
+  element.draggable = true;
+
+  // returns true if the element is located inside the group proc
+  // in this case we don't want to drag the group inside itself
+  const isInsideGroup = function(el1, group) {
+    let elParent = el1;
+    while (elParent) {
+      elParent = elParent.parentNode;
+      if (elParent == group) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /** A function that returns where the elDrag should be dropped.
+   *
+   * @returns 0: before, 1: inside the group, 2: after
+   */
+  const insertWhere = function(evt) {
+
+    // an empty group needs a different logic. we want
+    // to be able to put elements inside
+    if (element.configUl && (element.configUl.children.length == 0)) {
+      return 1;
+    } else {
+      if (evt.offsetY < (element.offsetHeight / 2)) {
+        return 0;
+      } else {
+        return 2;
+      }
+    }
+
+  /*
+  const isBefore = function(el1, el2) {
+    const rect1 = el1.getBoundingClientRect();
+    const rect2 = el2.getBoundingClientRect();
+    return (rect1.top > rect2.top);
+    */
+  };
+
+  element.addEventListener("dragstart", (evt) => {
+    // evt.preventDefault();
+    evt.stopPropagation();
+    elDrag = element;
+    const jsonData = JSON.stringify(element.getConfig(), null, 2);
+    evt.dataTransfer.setData("text/plain", jsonData);
+    evt.dataTransfer.setData("text/json", jsonData);
+    evt.dataTransfer.effectAllowed = "move";
+    element.setAttribute("isDragSource", "on");
+  });
+
+  element.addEventListener("dragover", (evt) => {
+    evt.preventDefault();
+    evt.stopPropagation();
+    if (elDrag != element) {
+      if (!isInsideGroup(element, elDrag)) {
+        const where = insertWhere(evt);
+        if (where == 0) {
+          element.parentNode.insertBefore(elDrag, element);
+        } else if (where == 1) {
+          element.configUl.insertBefore(elDrag, null);
+        } else if (where == 2) {
+          element.parentNode.insertBefore(elDrag, element.nextSibling);
+        }
+      }
+    }
+  });
+
+  element.addEventListener("dragend", (evt) => {
+    evt.preventDefault();
+    element.removeAttribute("isDragSource");
+    elDrag = undefined;
+  });
+}
+
+
 /** A callback function for status update.
  *
  *  Will get as parameters a string with a status message
@@ -251,6 +331,8 @@ function createGroupElement(id, config) {
   };
 
   tintGroupElement(elLi);
+  makeDraggable(elLi);
+
   return elLi;
 }
 
@@ -427,6 +509,8 @@ function createConfigElement(id, config) {
   };
   elLi.configUl = null;
 
+  makeDraggable(elLi);
+
   return elLi;
 }
 
@@ -475,6 +559,8 @@ function createNewElement() {
     return null;
   };
   elLi.configUl = null;
+
+  makeDraggable(elLi);
 
   return elLi;
 }
