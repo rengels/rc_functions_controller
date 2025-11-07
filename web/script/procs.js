@@ -336,6 +336,7 @@ function createGroupElement(id, config) {
   return elLi;
 }
 
+
 /** Creates a proc menu button including context menu.
  *
  *  @param elProc The DOM element of the proc (the list item).
@@ -379,6 +380,15 @@ function createProcMenuButton(elProc) {
   });
   elDropdown.appendChild(elAD3)
 
+  let elAD4 = document.createElement('li');
+  elAD4.textContent = "Duplicate";
+  elAD4.title = "Duplicate the proc element.";
+  elAD4.addEventListener("click", (event) => {
+    const elNew = createConfigElement(0, elProc.getConfig());
+    elProc.parentElement.insertBefore(elNew, elProc);
+  });
+  elDropdown.appendChild(elAD4)
+
   elMenuButton.appendChild(elDropdown)
 
   elMenuButton.addEventListener("click", (event) => {
@@ -392,6 +402,7 @@ function createProcMenuButton(elProc) {
 
   return elMenuButton;
 }
+
 
 /** Adds special event handling for the Audio Loop element.
  *
@@ -422,6 +433,7 @@ function modifyAudioLoopElement(elValueRows) {
     });
   }
 }
+
 
 /** Returns a DOM element for the proc.
  *
@@ -886,7 +898,8 @@ function moveUp(element) {
             element,
         );
       } else {
-        element.parentElement.insertBefore(element, element.previousSibling);
+        element.parentElement.insertBefore(element,
+          element.previousSibling);
       }
 
     } else {
@@ -899,7 +912,8 @@ function moveUp(element) {
         group = group.parentElement;
       }
 
-      group.parentElement.insertBefore(element, group);
+      group.parentElement.insertBefore(element,
+        group);
     }
 }
 
@@ -918,7 +932,8 @@ function moveDown(element) {
             element.nextSibling.configUl.firstChild
         );
       } else {
-        element.parentElement.insertBefore(element, element.nextSibling.nextSibling);
+        element.parentElement.insertBefore(element,
+            element.nextSibling.nextSibling);
       }
 
     } else {
@@ -932,7 +947,7 @@ function moveDown(element) {
       }
 
       group.parentElement.insertBefore(element,
-          group.nextSibling);
+        group.nextSibling);
     }
 }
 
