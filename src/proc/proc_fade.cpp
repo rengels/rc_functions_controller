@@ -17,7 +17,7 @@ namespace rcProc {
 ProcFade::ProcFade():
     fadeIn(1000),
     fadeOut(80),
-    oldValues {RCSIGNAL_NEUTRAL},
+    oldValues {RCSIGNAL_INVALID},
     types{SignalType::ST_INDICATOR_LEFT,
         SignalType::ST_INDICATOR_RIGHT,
         SignalType::ST_BRAKE,
@@ -29,7 +29,7 @@ ProcFade::ProcFade(uint16_t fadeInVal,
                    std::array<rcSignals::SignalType, NUM_CHANNELS> typesVal) :
     fadeIn(fadeInVal),
     fadeOut(fadeOutVal),
-    oldValues {RCSIGNAL_NEUTRAL},
+    oldValues {RCSIGNAL_INVALID},
     types(typesVal)
 {}
 
@@ -47,23 +47,28 @@ void ProcFade::step(const StepInfo& info) {
     }
     for (uint8_t i = 0U; i < NUM_CHANNELS; i++) {
 
-        RcSignal newValue = (*signals)[types[i]];
+        RcSignal& oldValue = oldValues[i];
+        const RcSignal newValue = (*signals)[types[i]];
+
         if (newValue == RCSIGNAL_INVALID) {
             continue;
         }
+        if (oldValue == RCSIGNAL_INVALID) {
+            oldValue = newValue;
+        }
 
         // blend up
-        if (newValue > oldValues[i]) {
-            oldValues[i] += fadeInAmount;
-            if (newValue < oldValues[i]) {
-                oldValues[i] = newValue;
+        if (newValue > oldValue) {
+            oldValue += fadeInAmount;
+            if (newValue < oldValue) {
+                oldValue = newValue;
             }
         }
         // blend down
-        if (newValue < oldValues[i]) {
-            oldValues[i] -= fadeOutAmount;
-            if (newValue > oldValues[i]) {
-                oldValues[i] = newValue;
+        if (newValue < oldValue) {
+            oldValue -= fadeOutAmount;
+            if (newValue > oldValue) {
+                oldValue = newValue;
             }
         }
 

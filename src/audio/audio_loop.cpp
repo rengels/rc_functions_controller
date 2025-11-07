@@ -22,7 +22,7 @@ void AudioLoop::copySamples(bool triggerNew,
 
         // loop back
         if (triggerNew &&
-            ((pos >= loopEnd) || (pos >= sample.size()))) {
+            ((pos == loopEnd))) {
             pos = loopBegin;
         }
     }

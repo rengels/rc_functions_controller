@@ -62,24 +62,23 @@ void ProcPower::step(const StepInfo& info) {
     }
 
     // -- multiply throttle/speed
-    auto throttle = (*signals)[SignalType::ST_THROTTLE];
-    if (throttle != RCSIGNAL_INVALID) {
-        if (validatedState == DebounceState::LOW) {
-            throttle = static_cast<uint32_t>(throttle) * lowPercent / 100;
-        } else if (validatedState == DebounceState::EMPTY) {
-            throttle = static_cast<uint32_t>(throttle) * emptyPercent / 100;
+    if (validatedState != DebounceState::GOOD) {
+        uint8_t percentage = lowPercent;
+        if (validatedState == DebounceState::EMPTY) {
+            percentage = emptyPercent;
         }
-        (*signals)[SignalType::ST_THROTTLE] = throttle;
-    }
 
-    auto speed = (*signals)[SignalType::ST_SPEED];
-    if (speed != RCSIGNAL_INVALID) {
-        if (validatedState == DebounceState::LOW) {
-            speed = static_cast<uint32_t>(speed) * lowPercent / 100;
-        } else if (validatedState == DebounceState::EMPTY) {
-            speed = static_cast<uint32_t>(speed) * emptyPercent / 100;
+        auto throttle = (*signals)[SignalType::ST_THROTTLE];
+        if (throttle != RCSIGNAL_INVALID) {
+            throttle = static_cast<int32_t>(throttle) * percentage / 100;
+            (*signals)[SignalType::ST_THROTTLE] = throttle;
         }
-        (*signals)[SignalType::ST_SPEED] = speed;
+
+        auto speed = (*signals)[SignalType::ST_SPEED];
+        if (speed != RCSIGNAL_INVALID) {
+            speed = static_cast<int32_t>(speed) * percentage / 100;
+            (*signals)[SignalType::ST_SPEED] = speed;
+        }
     }
 
     // -- send output signals
