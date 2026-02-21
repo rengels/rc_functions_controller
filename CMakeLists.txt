@@ -47,7 +47,7 @@ if (${ESP_PLATFORM})  # idf build system
         )
         add_custom_target (merge_firmware DEPENDS
             ${CMAKE_BINARY_DIR}/merged_firmware.bin)
-        add_dependencies (app merge_firmware)
+        # add_dependencies (app merge_firmware)
     endif ()
 
 elseif (${ARDUINO}) # build with CMAKE and idf toolchain
