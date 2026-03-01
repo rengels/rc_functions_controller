@@ -32,7 +32,7 @@ CONFIG_PARTITION_TABLE_FILENAME="partitions.csv"
 # we use RTTI for serializing and deserializing
 CONFIG_COMPILER_CXX_RTTI=y
 
-CONFIG_HEAP_TASK_TRACKING=y
+# CONFIG_HEAP_TASK_TRACKING=y
 
 # or else sound would stop when adc input module is active
 CONFIG_ADC_DISABLE_DAC_OUTPUT=n

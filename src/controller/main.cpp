@@ -11,7 +11,13 @@
 
 #include <esp_log.h>
 #include <esp_sleep.h>
+
+#ifdef HEAP_TRACKING  // this causes guru mediation during init on esp-sdk 5.4
 #include <esp_heap_task_info.h> // for task info
+#endif
+
+#include <esp_timer.h>  // for exact time
+#include <rtc_wdt.h>  // for watchdog timer
 
 #include <driver/gpio.h>  // for gpio_dump_all_io_configuration
 
@@ -217,6 +223,7 @@ void updateBluetoothAudio() {
 #define MAX_TASK_NUM 20                         // Max number of per tasks info that it can store
 #define MAX_BLOCK_NUM 20                        // Max number of per block info that it can store
 
+#ifdef HEAP_TRACKING
 static size_t s_prepopulated_num = 0;
 static heap_task_totals_t s_totals_arr[MAX_TASK_NUM];
 static heap_task_block_t s_block_arr[MAX_BLOCK_NUM];
@@ -247,6 +254,7 @@ static void esp_dump_per_task_heap_info()
 
     printf("\n\n");
 }
+#endif
 
 void app_main(void) {
 
