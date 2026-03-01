@@ -19,11 +19,11 @@ if (DOXYGEN_FOUND)
                 ${CMAKE_CURRENT_SOURCE_DIR}/signals.md
             COMMAND
                 ${Python3_EXECUTABLE}
-                ${CMAKE_CURRENT_SOURCE_DIR}/create_proc_table.py
+                ${CMAKE_CURRENT_SOURCE_DIR}/create_doc_tables.py
                 --procs-table ${CMAKE_CURRENT_SOURCE_DIR}/procs.md
                 --signals-table ${CMAKE_CURRENT_SOURCE_DIR}/signals.md
             DEPENDS
-                ${CMAKE_CURRENT_SOURCE_DIR}/create_proc_table.py
+                ${CMAKE_CURRENT_SOURCE_DIR}/create_doc_tables.py
                 ${CMAKE_CURRENT_SOURCE_DIR}/../src/config/procs_config.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/../src/config/signals_config.json
         )

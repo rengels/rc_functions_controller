@@ -6,6 +6,7 @@ if (${ESP_PLATFORM})  # idf build system
     idf_component_register(SRCS
         input_adc.cpp
         input_demo.cpp
+        input_can.cpp
         input_pin.cpp
         input_ppm.cpp
         input_pwm.cpp
@@ -34,6 +35,7 @@ else ()
         PRIVATE
             rc_signals
             rc_proc
+            rc_output  # just for the CAN stuff
     )
 
     if (${ARDUINO})
@@ -42,6 +44,7 @@ else ()
         target_sources (rc_input
             PRIVATE
                 input_adc.cpp
+                input_can.cpp
                 input_pin.cpp
                 input_ppm.cpp
                 input_pwm.cpp

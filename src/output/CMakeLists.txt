@@ -6,18 +6,26 @@ if (${ESP_PLATFORM})  # idf build system
     idf_component_register(SRCS
             output.cpp
             output_audio.cpp
+            output_can.cpp
             output_dummy.cpp
             output_esc.cpp
             output_led.cpp
             output_pwm.cpp
         INCLUDE_DIRS "."
         REQUIRES
+            esp_timer
             driver
+            esp_driver_twai
 
             audio
             signals
             proc
         )
+    target_compile_definitions (${COMPONENT_LIB}
+        PRIVATE
+            HAVE_NV
+            ARDUINO
+    )
 
 else ()
 
@@ -36,10 +44,16 @@ else ()
     )
 
     if (${ARDUINO})
-        # Can only be compiled for esp32 since it contains
+        # The following only be compiled for esp32 since it contains
         # HW specific stuff
+        target_compile_definitions (rc_controller
+            PRIVATE
+                HAVE_NV
+                ARDUINO
+        )
         target_sources (rc_output
             PRIVATE
+                output_can.cpp
                 output_esc.cpp
                 output_led.cpp
                 output_pwm.cpp

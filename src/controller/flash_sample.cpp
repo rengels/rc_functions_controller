@@ -9,7 +9,6 @@
 
 #ifdef HAVE_NV
 #include <esp_log.h>
-// #include <nvs.h>
 #include <nvs_flash.h>
 #include <esp_flash.h>
 #include <spi_flash_mmap.h>

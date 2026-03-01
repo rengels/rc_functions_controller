@@ -63,7 +63,7 @@ For HW schematics and layout look at:
 
 The project uses the following tools:
 
-- esp-idf v5.4 (https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/index.html)
+- esp-idf v5.5 (https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/index.html)
 - cmake
 - libboost-program-options-dev (optional for the engine emulation)
 - compiler toolchain (optional for tests)

@@ -39,6 +39,9 @@ if (${ESP_PLATFORM})
             nvs_flash
             spi_flash
             esp_timer
+            driver
+            bluetooth
+            # esp_driver_twai  # CAN
 
             signals
             proc
@@ -47,9 +50,7 @@ if (${ESP_PLATFORM})
             output
             audio
             samples
-
-            driver
-            bluetooth)
+        )
     target_compile_definitions (${COMPONENT_LIB}
         PRIVATE
             HAVE_NV

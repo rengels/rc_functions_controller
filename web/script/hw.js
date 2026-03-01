@@ -61,6 +61,9 @@ function checkOnlyOne(configs, warnings, notes, pinFunctions) {
 }
 
 /** Checks InputAdc
+ *
+ *  This mainly marks the pins, which in turns produces warnings for double allocation.
+ *
  *  @param {Array} config A list of proc configurations of the same type.
  *  @param {Array} warnings A list of strings containing warnings about the configuration.
  *  @param {Array} notes A list of strings containing notes about the configuration.
@@ -84,7 +87,10 @@ function checkADC(configs, warnings, notes, pinFunctions) {
   }
 }
 
-/** Checks InputPin and InputPwm (currently they use the same ports. */
+/** Checks InputPin and InputPwm (currently they use the same ports.
+ *
+ *  This mainly marks the pins, which in turns produces warnings for double allocation.
+ */
 function checkPin(configs, warnings, notes, pinFunctions) {
   const pinMapping = [12, 13, 14, 27, 34, 35];
 
@@ -100,7 +106,10 @@ function checkPin(configs, warnings, notes, pinFunctions) {
 }
 
 
-/** Checks InputPPM and InputSBUS */
+/** Checks InputPPM and InputSBUS
+ *
+ *  This mainly marks the pins, which in turns produces warnings for double allocation.
+ */
 function checkPpm(configs, warnings, notes, pinFunctions) {
   for (let i = 0; i < configs.length; i++) {
     const conf = configs[i];
@@ -298,6 +307,9 @@ const procCheckers = {
   "INPUT_DEMO": (c, w, n, p) => checkOnlyOne(c, w, n, p),
   "INPUT_ADC": (c, w, n, p) => {
     checkADC(c, w, n, p);
+  },
+  "INPUT_CAN": (c, w, n, p) => {
+    checkOnlyOne(c, w, n, p);
   },
   "INPUT_PIN": (c, w, n, p) => {
     checkPin(c, w, n, p);

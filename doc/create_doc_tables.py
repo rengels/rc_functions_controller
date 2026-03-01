@@ -11,8 +11,16 @@
 
 import argparse
 import datetime
+import re
 import json
 import pathlib
+
+def markdown_escape(text):
+    """ escapes the given text characters for markdown """
+
+    escape_chars = r'_*[]()~`>#+-=|{}.!'
+    return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
+
 
 def output_procs_table(defs_proc, out_file):
     """Outputs a markdown table with an overview of all the *procs* into the out file.
@@ -27,7 +35,7 @@ def output_procs_table(defs_proc, out_file):
 
     # get all proc filenames for our includes
     proc_rows = (
-        f"| {proc["id"]} | {proc['name']} | {proc['filename']}.h | {calc_types_string(proc["types"])} | {proc['description']} | "
+        f"| {proc["id"]} | {markdown_escape(proc['name'])} | {markdown_escape(proc['filename'])}.h | {markdown_escape(calc_types_string(proc["types"]))} | {markdown_escape(proc['description'])} | "
         for proc in defs_proc
         if "name" in proc
     )
@@ -48,13 +56,14 @@ process the signals in one way or another.
 
 The following table shows all available procs:
 
-| Internal ID | Name | file | configurable signals | description |
-|-------------|------|------|----------------------|-------------|
+| ID | Name | file | configurable signals | description |
+|----|------|------|----------------------|-------------|
 {'\n'.join(proc_rows)}
 
 """,
         file=out_file,
     )
+
 
 def output_signals_table(defs_signals, out_file):
     """Outputs the signal types header containing SignalTypes enum into the out file."""
@@ -67,10 +76,12 @@ def output_signals_table(defs_signals, out_file):
         """
         ret = ""
         if "name" in signal and "number" in signal:
-            ret += "| " + str(signal["number"])
+
+            ret += "| `" + signal["id"].replace('|', '\\\1') + "`"
+            ret += " | " + str(signal["number"])
             ret += " | " + signal["name"]
             if "description" in signal:
-                ret += " | " + signal["description"]
+                ret += " | " + markdown_escape(signal["description"])
             else:
                 ret += " | "
             return ret + " |"
@@ -91,8 +102,8 @@ def output_signals_table(defs_signals, out_file):
 The follow table lists all signals used as main communication
 channel throughout the project.
 
-| Internal ID | Name | description |
-|-------------|------|-------------|
+| ID | index | name | description |
+|----|-------|------|-------------|
 {"\n".join([signal_type_line(signal) for signal in defs_signals if "name" in signal])}
 """,
         file=out_file,

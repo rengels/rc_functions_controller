@@ -128,7 +128,7 @@ public:
         }
     }
 
-    /** Sets the signal but only if it's invalic.
+    /** Sets the signal but only if it's invalid.
      *
      *  This function in procs since they should be careful
      *  overwrite each others output.

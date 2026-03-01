@@ -68,6 +68,28 @@
         }
     },
 
+
+    {
+        "id": "CA",
+        "name": "INPUT_CAN",
+        "filename": "input_can",
+        "description": "Reads CAN bus messages with signals from PIN 12/14",
+        "ifdef": "ARDUINO",
+        "types": [
+        ],
+        "values": [
+            {
+                "name": "canId",
+                "type": "uint16_t",
+                "description": "The can ID for the messages"
+            }
+        ],
+        "defaultValues": {
+            "pin": [ 861 ]
+        }
+    },
+
+
     {
         "id": "PI",
         "name": "INPUT_PIN",
@@ -216,6 +238,38 @@
         "ifdef": "ARDUINO",
         "types": [],
         "values": []
+    },
+
+
+    {
+        "id": "OC",
+        "name": "OUTPUT_CAN",
+        "filename": "output_can",
+        "description": "Outputs signals via CAN message.",
+        "ifdef": "ARDUINO",
+        "types": [
+            {
+                "name" : "types",
+                "num" : 2,
+                "description": "The types to be send in the message."
+            }
+        ],
+        "values": [
+            {
+                "name": "canId",
+                "type": "uint16_t",
+                "description": "The can ID for the message."
+            }
+        ],
+        "defaultTypes": {
+            "types": [
+                "ST_SPEED",
+                "ST_THROTTLE"
+            ]
+        },
+        "defaultValues": {
+            "pin": [ "861" ]
+        }
     },
 
     {

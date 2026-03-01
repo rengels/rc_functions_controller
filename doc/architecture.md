@@ -34,7 +34,7 @@ Supported input sources (for a full list see \ref page_procs)
 Supported output sources (for a full list see \ref page_procs)
 
 - Two channel 8 bit Sound output (DAC)
-- PWM light output signals
+- PWM light output \ref page_signals
 - PWM servo output
 - ESC output
 
@@ -123,10 +123,10 @@ It provides the following services (in addition to default BLE services):
 ### Signals Characteristics
 
 The signals characteristics will just send/receive and notify a list
-of signals.
+of \ref page_signals .
 
 Writing that characteristics will write an *override* list that will
-set signals right at the beginning.
+set \ref page_signals right at the beginning.
 
 ### Configuration Characteristics
 
@@ -301,10 +301,9 @@ The *controller* will create a periodic task with the main loop, executing the s
 
 ### rcProc::Proc
 
-See the following file for a list of the available signals:
-\ref page_procs
+See the following file for a list of the available \ref page_procs .
 
-The *rcProc::Proc* nodes do transformations (processing) on the rc signals.
+The *rcProc::Proc* nodes do transformations (processing) on the rc \ref page_signals .
 They implement all the necessary functionalities an are split up into
 
 - proc: the _normal_ processing nodes.
@@ -378,8 +377,7 @@ partition "Main loops" {
 
 ### Signals
 
-See the following file for a list of the available signals:
-\ref page_signals
+See the following file for a list of the available \ref page_signals .
 
 
 The communication between the different input, output and proc modules

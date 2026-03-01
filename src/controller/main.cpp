@@ -33,8 +33,6 @@ static const char* TAG = "RcVehicle";
 #include "sample_storage_singleton.h"
 #include "bluetooth.h"
 
-#include "esp_timer.h"  // for exact time
-#include "rtc_wdt.h"  // for watchdog timer
 
 extern "C" {
 
@@ -334,7 +332,7 @@ void mainTask(void *pvParameters) {
     lastWakeTime = xTaskGetTickCount();
     for (;;) {
         xTaskDelayUntil(&lastWakeTime, frequencyTick);
-        int64_t timeStart = esp_timer_get_time();
+        int64_t timeStart = esp_timer_get_time();  // in us
 
         // -- prepare StepInfo
         signals = signalsBt;  // get the initial signals from the BT overrides
