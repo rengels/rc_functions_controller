@@ -30,6 +30,7 @@ struct CanMessage {
     rcSignals::TimeMs recTime;
 };
 
+class OutputCan;  // forward declaration
 
 /** This class provides the backend implementation for OutputCan and InputCan.
  *
@@ -41,7 +42,7 @@ struct CanMessage {
 class CanDriverWrapper {
 
 private:
-    static constexpr uint32_t TWAI_BITRATE = 200000u;
+    static constexpr uint32_t TWAI_BITRATE = 250000u;
     static constexpr gpio_num_t TX_GPIO_NUM = GPIO_NUM_12;
     static constexpr gpio_num_t RX_GPIO_NUM = GPIO_NUM_14;
 
@@ -75,11 +76,22 @@ private:
     /** Stop the driver completely. */
     void stopDriver();
 
+    /** Reconfigures the CAN ID filter.
+     *
+     *  Uses filterIds and filterMask to
+     *  update the CAN driver filter.
+     *  For this the driver needs to be stopped and restarted.
+     */
+    void reconfigureFilter();
+
     /** Remove messages with an older timestamp than ALIVE_TIME from the input buffer. */
     void removeOldMessages();
 
     /** Reads all messages from the driver and copies them in the receivedMessages buffer. */
     void readMessages();
+
+    /** Do the actual message sending via the can driver */
+    void sendMessage(const rcOutput::OutputCan* proc, const rcProc::StepInfo& info);
 
 public:
     /** Start the can HW driver, update ref count. */

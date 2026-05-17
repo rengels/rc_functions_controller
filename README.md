@@ -12,7 +12,7 @@ but the code is completely new.
 
 Web frontend:
 ![QR code for web frontend](./doc/qrcode.png)
-[web frontend](./web/index.html)
+[web frontend](https://rengels.github.io/rc_functions_controller/web/index.html)
 
 ## License
 

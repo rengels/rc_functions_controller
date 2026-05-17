@@ -12,7 +12,7 @@ using namespace rcProc;
 
 namespace rcInput {
 
-InputCan::InputCan() : canId(0x35Du) {
+InputCan::InputCan() : canId(0x35Eu) {
 }
 
 void InputCan::start() {

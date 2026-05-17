@@ -36,7 +36,7 @@ twai_node_handle_t canDriverHandle = nullptr;
 #endif
 
 CanId CanDriverWrapper::filterIds = ID_UNSET;
-CanId CanDriverWrapper::filterMask = 0u;
+CanId CanDriverWrapper::filterMask = 0x7FFu;
 std::atomic_int8_t CanDriverWrapper::driverRefCount(0);
 std::vector<CanMessage> CanDriverWrapper::receivedMessages;
 
@@ -149,16 +149,12 @@ void CanDriverWrapper::startDriver() {
         ESP_ERROR_CHECK(
             twai_node_register_event_callbacks(canDriverHandle, &callbacks, this));
 
-        // Start the TWAI controller
-        ESP_ERROR_CHECK(
-            twai_node_enable(canDriverHandle));
-
-        // for now, filter everything
+        // for now, filter everything. This needs to be done when node is stopped
         filterIds = ID_UNSET;
-        filterMask = 0u;
+        filterMask = 0x7FFu;
         twai_mask_filter_config_t mfilter_cfg = {
-            .id = filterIds,
-            .mask = filterMask,
+            .id = (filterIds & 0x7FFu),
+            .mask = (filterMask & 0x7FFu),
             .is_ext = false,  // Accept only standard IDs, not extended IDs
             .no_classic = false,
             .no_fd = false,
@@ -166,6 +162,11 @@ void CanDriverWrapper::startDriver() {
         };
         ESP_ERROR_CHECK(
               twai_node_config_mask_filter(canDriverHandle, 0, &mfilter_cfg));
+
+        // Start the TWAI controller
+        ESP_ERROR_CHECK(
+            twai_node_enable(canDriverHandle));
+
     }
 }
 
@@ -182,7 +183,35 @@ void CanDriverWrapper::stopDriver() {
         canDriverHandle = nullptr;
 
         filterIds = ID_UNSET;
-        filterMask = 0u;
+        filterMask = 0x7FFu;
+    }
+}
+
+
+void CanDriverWrapper::reconfigureFilter() {
+    if (canDriverHandle) {
+        int res = twai_node_disable(canDriverHandle);
+        if (res != ESP_OK) {
+            ESP_LOGE(TAG, "Error when stopping CAN for reconfiguring.");
+        } else {
+            twai_mask_filter_config_t mfilter_cfg = {
+                .id = (filterIds & 0x7FFu),
+                .mask = (filterMask & 0x7FFu),
+                .is_ext = false,  // Accept only standard IDs, not extended IDs
+                .no_classic = false,
+                .no_fd = false,
+                .dual_filter = false,
+            };
+            res = twai_node_config_mask_filter(canDriverHandle, 0, &mfilter_cfg); // Configure on filter 0
+            if (res != ESP_OK) {
+                ESP_LOGE(TAG, "Error when configuring CAN filter mask.");
+            }
+
+            res = twai_node_enable(canDriverHandle);
+            if (res != ESP_OK) {
+                ESP_LOGE(TAG, "Error when restarting CAN.");
+            }
+        }
     }
 }
 
@@ -195,20 +224,10 @@ void CanDriverWrapper::start(const rcProc::Proc* proc) {
             filterIds = procIn->canId;
             filterMask = 0u;
         } else {
-            CanId differences = ~(filterIds ^ procIn->canId);
-            filterMask |= differences;
+            CanId differences = (filterIds ^ procIn->canId);
+            filterMask &= ~differences;
         }
-
-        twai_mask_filter_config_t mfilter_cfg = {
-            .id = filterIds,
-            .mask = filterMask,
-            .is_ext = false,  // Accept only standard IDs, not extended IDs
-            .no_classic = false,
-            .no_fd = false,
-            .dual_filter = false,
-        };
-        ESP_ERROR_CHECK(
-          twai_node_config_mask_filter(canDriverHandle, 0, &mfilter_cfg)); // Configure on filter 0
+        reconfigureFilter();
     }
 }
 
@@ -244,6 +263,41 @@ void CanDriverWrapper::readMessages() {
 }
 
 
+void CanDriverWrapper::sendMessage(const rcOutput::OutputCan* procOut, const rcProc::StepInfo& info) {
+
+    // put our signals in the data
+    uint8_t send_buf[OutputCan::CAN_NUM * 3] = {0};
+    uint8_t len = 0;
+    for (uint8_t i = 0; i < OutputCan::CAN_NUM && len + 3 < 8; i++) {
+        if (procOut->types[i] != rcSignals::SignalType::ST_NONE) {
+            const int16_t signal = (*(info.signals))[procOut->types[i]];
+            send_buf[len++] = rcSignals::signalTypeToId(procOut->types[i]);
+            send_buf[len++] = ((signal >> 8) & 0xFF);
+            send_buf[len++] = ((signal >> 0) & 0xFF);
+        }
+    }
+
+    twai_frame_t msg = {
+        .header = {
+            .id = procOut->canId,
+            .dlc = len,
+            .ide = false,
+            .rtr = false,  // remote
+            .fdf = false,
+            .brs = false,  // bit rate shift
+            .esi = false,  // side error indicator
+            .trigger_time = 0u,
+        },
+        .buffer = send_buf,  // Pointer to data to transmit
+        .buffer_len = len,  // Length of data to transmit
+    };
+    int res = twai_node_transmit(canDriverHandle, &msg, 0);  // Timeout = 0: returns immediately if queue is full
+    if (res != ESP_OK) {
+        ESP_LOGE(TAG, "Error when sending CAN message.");
+    }
+}
+
+
 void CanDriverWrapper::step(const rcProc::Proc* proc, const rcProc::StepInfo& info) {
 
     auto procOut = dynamic_cast<const rcOutput::OutputCan*>(proc);
@@ -251,34 +305,17 @@ void CanDriverWrapper::step(const rcProc::Proc* proc, const rcProc::StepInfo& in
 
     if (procOut != nullptr) {
 
-        // put our signals in the data
-        uint8_t send_buf[OutputCan::CAN_NUM * 3] = {0};
-        uint8_t len = 0;
-        for (uint8_t i = 0; i < OutputCan::CAN_NUM && len + 3 < 8; i++) {
-            if (procOut->types[i] != rcSignals::SignalType::ST_NONE) {
-                const int16_t signal = (*(info.signals))[procOut->types[i]];
-                send_buf[len++] = rcSignals::signalTypeToId(procOut->types[i]);
-                send_buf[len++] = ((signal & 0xFF00) >> 8);
-                send_buf[len++] = (signal & 0xFF);
-            }
+        // before trying to put on a new message, check the node state
+        twai_node_status_t canStatus;
+        twai_node_record_t canStatistics;
+        int res = twai_node_get_info(canDriverHandle, &canStatus, &canStatistics);
+
+        if ((res == ESP_OK) &&
+            (canStatus.state != TWAI_ERROR_PASSIVE && canStatus.state != TWAI_ERROR_BUS_OFF)) {
+
+            sendMessage(procOut, info);
         }
 
-        twai_frame_t msg = {
-            .header = {
-               .id = procOut->canId,
-               .dlc = len,
-               .ide = false,
-               .rtr = false,  // remote
-               .fdf = false,
-               .brs = false,  // bit rate shift
-               .esi = false,  // side error indicator
-               .trigger_time = 0u,
-            },
-            .buffer = send_buf,  // Pointer to data to transmit
-            .buffer_len = len,  // Length of data to transmit
-        };
-        ESP_ERROR_CHECK(  // TODO: only warning?
-          twai_node_transmit(canDriverHandle, &msg, 0));  // Timeout = 0: returns immediately if queue is full
 
     } else if (procIn != nullptr) {
 
@@ -288,10 +325,12 @@ void CanDriverWrapper::step(const rcProc::Proc* proc, const rcProc::StepInfo& in
         // search for matching message and copy them to info
         for (auto msg : receivedMessages) {
             if (msg.id == procIn->canId) {
-                for (int i = 0; i + 3 < msg.len; i += 3) {
+                for (int i = 0; i + 2 < msg.len; i += 3) {
                     SignalType type = signalIdToType(msg.data[i]);
-                    RcSignal value = (msg.data[i + 1] << 8) + msg.data[i + 2];
-                    (*(info.signals))[type] = value;  // possibly overwrite old CAN value
+                    if (type != rcSignals::SignalType::ST_NONE) {
+                        RcSignal value = (msg.data[i + 1] << 8) + msg.data[i + 2];
+                        (*(info.signals))[type] = value;  // possibly overwrite old CAN value
+                    }
                 }
             }
         }

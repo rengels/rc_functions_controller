@@ -48,47 +48,46 @@ Other features:
 - xenon light effect
 - incandescent light bulb effect
 
-
 The following table shows a list of the pins and their functionality.
 All pins are optional. If not configured they are not used.
 
-| pin | PWM in | ADC in | PIN in | PPM/SBUS/SRXL in | Audio out | LED out | PWM out | ESC out |
-|-----|--------|--------|--------|------------------|-----------|---------|---------|---------|
-|   1 |        |        |        |                X |           |         |       X |       X |
-|   2 |        |        |        |                X |           | ch. 1   |       X |       X |
-|   3 |        |        |        |                X |           | ch. 2   |       X |       X |
-|   4 |        |        |        |                X |           | ch. 3   |       X |       X |
-|   5 |        |        |        |                X |           | ch. 4   |       X |       X |
-|   6 |        |        |        |                X |           |         |       X |       X |
-|   7 |        |        |        |                X |           |         |       X |       X |
-|   8 |        |        |        |                X |           |         |       X |       X |
-|   9 |        |        |        |                X |           |         |       X |       X |
-|  10 |        |        |        |                X |           |         |       X |       X |
-|  11 |        |        |        |                X |           |         |       X |       X |
-|  12 | ch. 1  |        | ch. 1  |                X |           |         |       X |       X |
-|  13 | ch. 2  |        | ch. 2  |                X |           |         |       X |       X |
-|  14 | ch. 3  |        | ch. 3  |                X |           |         |       X |       X |
-|  15 |        |        |        |                X |           | ch. 5   |       X |       X |
-|  16 |        |        |        |                X |           | ch. 6   |       X |       X |
-|  17 |        |        |        |                X |           | ch. 7   |       X |       X |
-|  18 |        |        |        |                X |           | ch. 8   |       X |       X |
-|  19 |        |        |        |                X |           | ch. 9   |       X |       X |
-|  20 |        |        |        |                X |           |         |       X |       X |
-|  21 |        |        |        |                X |           | ch. 10  |       X |       X |
-|  22 |        |        |        |                X |           | ch. 11  |       X |       X |
-|  23 |        |        |        |                X |           | ch. 12  |       X |       X |
-|  24 |        |        |        |                X |           |         |       X |       X |
-|  25 |        |        |        |                X | channel 1 |         |       X |       X |
-|  26 |        |        |        |                X | channel 2 |         |       X |       X |
-|  27 | ch. 4  |        | ch. 4  |                X |           |         |       X |       X |
-|  32 |        | X      |        |                X |           | ch. 13  |       X |       X |
-|  33 |        | X      |        |                X |           |         |       X |       X |
-|  34 | ch. 5  | X      | ch. 5  |                X |           |         |         |         |
-|  35 | ch. 6  | X      | ch. 6  |                X |           |         |         |         |
-|  36 |        | X      |        |                X |           |         |       X |       X |
-|  37 |        | X      |        |                X |           |         |       X |       X |
-|  38 |        | X      |        |                X |           |         |       X |       X |
-|  39 |        | X      |        |                X |           |         |       X |       X |
+| pin | PWM in | ADC in | PIN in | PPM/SBUS/SRXL in | Audio out | LED out | PWM out | ESC out | CAN |
+|-----|--------|--------|--------|------------------|-----------|---------|---------|---------|-----|
+|   1 |        |        |        |                X |           |         |       X |       X |     |
+|   2 |        |        |        |                X |           | ch. 1   |       X |       X |     |
+|   3 |        |        |        |                X |           | ch. 2   |       X |       X |     |
+|   4 |        |        |        |                X |           | ch. 3   |       X |       X |     |
+|   5 |        |        |        |                X |           | ch. 4   |       X |       X |     |
+|   6 |        |        |        |                X |           |         |       X |       X |     |
+|   7 |        |        |        |                X |           |         |       X |       X |     |
+|   8 |        |        |        |                X |           |         |       X |       X |     |
+|   9 |        |        |        |                X |           |         |       X |       X |     |
+|  10 |        |        |        |                X |           |         |       X |       X |     |
+|  11 |        |        |        |                X |           |         |       X |       X |     |
+|  12 | ch. 1  |        | ch. 1  |                X |           |         |       X |       X |  TX |
+|  13 | ch. 2  |        | ch. 2  |                X |           |         |       X |       X |     |
+|  14 | ch. 3  |        | ch. 3  |                X |           |         |       X |       X |  RX |
+|  15 |        |        |        |                X |           | ch. 5   |       X |       X |     |
+|  16 |        |        |        |                X |           | ch. 6   |       X |       X |     |
+|  17 |        |        |        |                X |           | ch. 7   |       X |       X |     |
+|  18 |        |        |        |                X |           | ch. 8   |       X |       X |     |
+|  19 |        |        |        |                X |           | ch. 9   |       X |       X |     |
+|  20 |        |        |        |                X |           |         |       X |       X |     |
+|  21 |        |        |        |                X |           | ch. 10  |       X |       X |     |
+|  22 |        |        |        |                X |           | ch. 11  |       X |       X |     |
+|  23 |        |        |        |                X |           | ch. 12  |       X |       X |     |
+|  24 |        |        |        |                X |           |         |       X |       X |     |
+|  25 |        |        |        |                X | channel 1 |         |       X |       X |     |
+|  26 |        |        |        |                X | channel 2 |         |       X |       X |     |
+|  27 | ch. 4  |        | ch. 4  |                X |           |         |       X |       X |     |
+|  32 |        | X      |        |                X |           | ch. 13  |       X |       X |     |
+|  33 |        | X      |        |                X |           |         |       X |       X |     |
+|  34 | ch. 5  | X      | ch. 5  |                X |           |         |         |         |     |
+|  35 | ch. 6  | X      | ch. 6  |                X |           |         |         |         |     |
+|  36 |        | X      |        |                X |           |         |       X |       X |     |
+|  37 |        | X      |        |                X |           |         |       X |       X |     |
+|  38 |        | X      |        |                X |           |         |       X |       X |     |
+|  39 |        | X      |        |                X |           |         |       X |       X |     |
 
 
 
@@ -105,109 +104,6 @@ connected via a standardized data bus/signaling mechanism.
 
 Most RC inputs are cyclic in the area of 20ms. So it makes sense to
 implement a strict static scheduling of 20ms.
-
-### Bluetooth LE services
-
-The controller advertises a Bluetooth LE device with the name "RcFuncCtrl-\<random two character postfix\>" and the manufacturer "OSS".
-It provides the following services (in addition to default BLE services):
-
-| UUID | Description | flags |
-|------|-----------------|-----|
-| 31522e91-04d6-dfae-2042-3a40b42d393f | signals service |  |
-| 177d4281-2c71-50b2-264f-3fb3f9b556a8 | signals characteristic | read, write, notify |
-| 32522e91-04d6-dfae-2042-3a40b42d393f | configuration service| |
-| 187d4281-2c71-50b2-264f-3fb3f9b556a8 | configuration characteristic | read, write |
-| 197d4281-2c71-50b2-264f-3fb3f9b556a8 | audio file characterisitc | write |
-| 1a7d4281-2c71-50b2-264f-3fb3f9b556a8 | audio list characterisitc | read |
-
-### Signals Characteristics
-
-The signals characteristics will just send/receive and notify a list
-of \ref page_signals .
-
-Writing that characteristics will write an *override* list that will
-set \ref page_signals right at the beginning.
-
-### Configuration Characteristics
-
-We want a flexible configuration mechanism.
-To implement this we are using a binary format to transmit the configuration
-of the *Proc* components.
-For that we use a simple binary stream format that looks like this:
-
-| Byte No | Value | Description |
-|---------|-------|-------------|
-| 0 | 'R' | Magic number/header |
-| 1 | 'C' | Magic number/header |
-| 2 | 0x01 | Binary format version |
-| 3 | 0x01  | Proc count |
-| 4 | 'P' | Proc type ID |
-| 5 | 'A' | Proc type ID |
-| 6 | 3 | Proc data size |
-| 7 | 0x10 | Input type ID 1 |
-| 8 | 0x15 | Output type ID 1 |
-| 9 | 0x21 | Output type ID 2 |
-
-::Note
-    We don't want to use protobuf because of the comperatively high
-    effort to set this up (e.g. require protoc and nanopb).
-    We also decided against Json because of the message size and
-    the size of the necessary Json library.
-
-### Audio File Characteristics
-
-The storage on the esp32 system is pretty large (2MB), but the RC_Engine_Sound project
-had even more audio data than that (16MB) in it's samples folder.
-Compressing these files would not get us into the right range.
-
-Therefore I decided to implement a list of basic "static" samples and a mechanism
-to upload new samples.
-
-This is done via the Audio Characteristics.
-It supports the following commands (for now):
-
-| ID | Description | Data
-|---------|-------|-------------|
-| 0 | Reset all samples | |
-| 1 | New Audio | Audio ID, file size|
-| 2 | Add to Audio | Audio ID, offset (4 bytes), size (4 bytes), data |
-
-An example audio command message looks like this:
-
-| Byte No | Value | Description |
-|---------|-------|-------------|
-| 0 | 'R' | Magic number/header |
-| 1 | 'A' | Magic number/header |
-| 2 | 0x01 | Binary format version |
-| 3 | 0x02  | Command type (e.g. add to audio) |
-| 4-6 | 'AAA' | Audio ID |
-| 7.. | . | Optional parameters depending on the command |
-
-::Note
-    Initially I was thinking about a neat scheme to remove, merge and overwrite
-    audio samples.
-    However, with just a simple mechanism, the code is much less complex
-    and we get a "kind of" wear leveling.
-
-
-### Audio List Characteristics
-
-The audio list characteristics allows querying the current available
-custom samples.
-
-This is an example of a query result for the audio list characteristics:
-
-| Byte No | Value | Description |
-|---------|-------|-------------|
-| 0 | 'R' | Magic number |
-| 1 | 'L' | Magic number |
-| 2 | 0x01 | Binary format version |
-| 3-4 | 0043 | 16 bit Number of used segments (4096 bytes) |
-| 5-6 | 0023 | 16 bit Number of free segments |
-| 7 | 2 | Number of custom samples |
-| 8-10 | 'AAA' | Audio ID |
-| 11-14 | 100034 | Big endian uint32 sample size |
-| 15-16 | 0x32AF | 16 bit CRC checksum |
 
 
 ## Building block view
@@ -432,6 +328,123 @@ end note
 Just deploy via Visual Studio Code or Arduino IDE.
 
 ## Crosscutting Concepts
+
+The following chapter describes external interfaces for the rc_functions_controller.
+
+### CAN interface
+
+The CAN interface (if configured) is connected to PIN 12 (TX) and 14 (RX).
+The interface is configured to 250kbit/s.
+
+A message has the following format:
+
+byte 0 | byte 1 | byte 2 | byte 3 | byte 4 | byte 5 | byte 6
+-------|--------|--------|--------|--------|--------|--------
+signal ID | MSB | LSB | sig. ID. 2 (optional) | MSB (optional) | LSB (optional)
+
+### Bluetooth LE services
+
+The controller advertises a Bluetooth LE device with the name "RcFuncCtrl-\<random two character postfix\>" and the manufacturer "OSS".
+It provides the following services (in addition to default BLE services):
+
+| UUID | Description | flags |
+|------|-----------------|-----|
+| 31522e91-04d6-dfae-2042-3a40b42d393f | signals service |  |
+| 177d4281-2c71-50b2-264f-3fb3f9b556a8 | signals characteristic | read, write, notify |
+| 32522e91-04d6-dfae-2042-3a40b42d393f | configuration service| |
+| 187d4281-2c71-50b2-264f-3fb3f9b556a8 | configuration characteristic | read, write |
+| 197d4281-2c71-50b2-264f-3fb3f9b556a8 | audio file characterisitc | write |
+| 1a7d4281-2c71-50b2-264f-3fb3f9b556a8 | audio list characterisitc | read |
+
+#### Signals Characteristics
+
+The signals characteristics will just send/receive and notify a list
+of \ref page_signals .
+
+Writing that characteristics will write an *override* list that will
+set \ref page_signals right at the beginning.
+
+#### Configuration Characteristics
+
+We want a flexible configuration mechanism.
+To implement this we are using a binary format to transmit the configuration
+of the *Proc* components.
+For that we use a simple binary stream format that looks like this:
+
+| Byte No | Value | Description |
+|---------|-------|-------------|
+| 0 | 'R' | Magic number/header |
+| 1 | 'C' | Magic number/header |
+| 2 | 0x01 | Binary format version |
+| 3 | 0x01  | Proc count |
+| 4 | 'P' | Proc type ID |
+| 5 | 'A' | Proc type ID |
+| 6 | 3 | Proc data size |
+| 7 | 0x10 | Input type ID 1 |
+| 8 | 0x15 | Output type ID 1 |
+| 9 | 0x21 | Output type ID 2 |
+
+::Note
+    We don't want to use protobuf because of the comperatively high
+    effort to set this up (e.g. require protoc and nanopb).
+    We also decided against Json because of the message size and
+    the size of the necessary Json library.
+
+#### Audio File Characteristics
+
+The storage on the esp32 system is pretty large (2MB), but the RC_Engine_Sound project
+had even more audio data than that (16MB) in it's samples folder.
+Compressing these files would not get us into the right range.
+
+Therefore I decided to implement a list of basic "static" samples and a mechanism
+to upload new samples.
+
+This is done via the Audio Characteristics.
+It supports the following commands (for now):
+
+| ID | Description | Data
+|---------|-------|-------------|
+| 0 | Reset all samples | |
+| 1 | New Audio | Audio ID, file size|
+| 2 | Add to Audio | Audio ID, offset (4 bytes), size (4 bytes), data |
+
+An example audio command message looks like this:
+
+| Byte No | Value | Description |
+|---------|-------|-------------|
+| 0 | 'R' | Magic number/header |
+| 1 | 'A' | Magic number/header |
+| 2 | 0x01 | Binary format version |
+| 3 | 0x02  | Command type (e.g. add to audio) |
+| 4-6 | 'AAA' | Audio ID |
+| 7.. | . | Optional parameters depending on the command |
+
+::Note
+    Initially I was thinking about a neat scheme to remove, merge and overwrite
+    audio samples.
+    However, with just a simple mechanism, the code is much less complex
+    and we get a "kind of" wear leveling.
+
+
+#### Audio List Characteristics
+
+The audio list characteristics allows querying the current available
+custom samples.
+
+This is an example of a query result for the audio list characteristics:
+
+| Byte No | Value | Description |
+|---------|-------|-------------|
+| 0 | 'R' | Magic number |
+| 1 | 'L' | Magic number |
+| 2 | 0x01 | Binary format version |
+| 3-4 | 0043 | 16 bit Number of used segments (4096 bytes) |
+| 5-6 | 0023 | 16 bit Number of free segments |
+| 7 | 2 | Number of custom samples |
+| 8-10 | 'AAA' | Audio ID |
+| 11-14 | 100034 | Big endian uint32 sample size |
+| 15-16 | 0x32AF | 16 bit CRC checksum |
+
 
 ## Architectural Decisions
 

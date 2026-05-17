@@ -38,7 +38,7 @@ typedef uint32_t TimeMs;
 */
 typedef int16_t RcSignal;
 
-static const RcSignal RCSIGNAL_NEUTRAL = static_cast<RcSignal>(0);
+static constexpr RcSignal RCSIGNAL_NEUTRAL = static_cast<RcSignal>(0);
 
 /** Invalid signal.
  *
@@ -46,31 +46,31 @@ static const RcSignal RCSIGNAL_NEUTRAL = static_cast<RcSignal>(0);
  *  for some time).
  *  It also represents any signal with an indetermined value.
  */
-static const RcSignal RCSIGNAL_INVALID = std::numeric_limits<int16_t>::min();
+static constexpr RcSignal RCSIGNAL_INVALID = std::numeric_limits<int16_t>::min();
 
 /** Maximum nominal signal.
  *
  *  This represents the maximums signal, but all transmitters are
  *  exceeding this in various amounts. 1100 is not uncommon.
  */
-static const RcSignal RCSIGNAL_MAX = static_cast<RcSignal>(1000);
+static constexpr RcSignal RCSIGNAL_MAX = static_cast<RcSignal>(1000);
 
 /** Minimum nominal signal.
  */
-static const RcSignal RCSIGNAL_MIN = static_cast<RcSignal>(-1000);
+static constexpr RcSignal RCSIGNAL_MIN = static_cast<RcSignal>(-1000);
 
 /** Limit between a _true_ and a _false_ signal.
  *
  *  This is used many logic conditions, e.g. ST_IGNITION.
  */
-static const RcSignal RCSIGNAL_TRUE = static_cast<RcSignal>(300);
+static constexpr RcSignal RCSIGNAL_TRUE = static_cast<RcSignal>(300);
 
 /** Limit between a nominal neutral signal.
  *
  *  This is used when determining if a signal is considered "neutral".
  *  e.g. in the engine logic to determine if throttle is "off".
  */
-static const RcSignal RCSIGNAL_EPSILON = static_cast<RcSignal>(20);
+static constexpr RcSignal RCSIGNAL_EPSILON = static_cast<RcSignal>(20);
 
 /** This struct represents the preprocessed *RawSignals*.
  *
