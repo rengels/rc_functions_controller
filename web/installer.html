@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- This page is part of the rc functions controller project.
+      It will install the firmware via esp-webtools
+
+      @see https://esphome.github.io/esp-web-tools/
+      @see https://github.com/esphome/esp-web-tools
+    -->
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Content-Language" content="en-GB">
+    <title>RC functions controller flashing</title>
+    <meta name="description" content="Allows flashing of the RC functoin controller firmware on an esp32 dev board.">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes" />
+    <link rel="stylesheet" href="style_print.css" type="text/css" title="Normal" media="print">
+    <link rel="stylesheet" href="style.css" type="text/css" title="Normal" media="screen, projection">
+
+  </head>
+
+<script type="module" src="./esp-web-tools/install-button.js?module"></script>
+
+<body id="body" style="display: flex; flex-direction: column;">
+  <div class="header">
+    <div class="logo">RcFuncCntrl</div>
+  </div>
+
+  <div style="margin-bottom: auto; display: flex; flex-direction: row;">
+    <div style="margin-top:auto; margin-bottom: auto; margin-left: 1em; flex-grow:0;">
+      flashing:
+    </div>
+    <div style="width:2em; flex-grow:0;"></div>
+    <div style="flex-grow:0;">
+      <esp-web-install-button
+          style="animation-duration: 0.6s; animation-name: highlight; animation-iteration-count: 3;"
+          manifest="./firmware/manifest_rc_functions_controller.json">
+      </esp-web-install-button>
+    </div>
+  </div>
+
+
+  <div>
+    Powered by <a href="https://esphome.github.io/esp-web-tools/" target="_blank">ESP Web Tools</a><br/>
+    <small>rc function controller by Ralf Engels </small>
+  </div>
+
+</body>
+
+</html>

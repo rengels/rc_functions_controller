@@ -54,6 +54,7 @@ for (let i = 0; i < defSample.length; i++) {
   }
 }
 
+
 let elDrag = undefined;  ///< the element that is currently dragged
 /** Adds event listeners and the draggable attribute to make an element draggable */
 function makeDraggable(element) {
@@ -95,11 +96,25 @@ function makeDraggable(element) {
     const rect1 = el1.getBoundingClientRect();
     const rect2 = el2.getBoundingClientRect();
     return (rect1.top > rect2.top);
-    */
+    }
+  */
   };
 
   element.addEventListener("dragstart", (evt) => {
     // evt.preventDefault();
+    // check where the drag started from
+    var elStart = document.elementFromPoint(evt.clientX, evt.clientY);
+    if (elStart &&
+      (elStart.className == "options_menu" ||
+      elStart.className == "button" ||
+      elStart.className == "sliderBubble" ||
+      elStart.nodeName == "INPUT" ||
+      elStart.nodeName == "SELECT")) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        return;
+    }
+
     evt.stopPropagation();
     elDrag = element;
     const jsonData = JSON.stringify(element.getConfig(), null, 2);

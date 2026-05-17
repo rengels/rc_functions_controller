@@ -87,7 +87,7 @@ function checkADC(configs, warnings, notes, pinFunctions) {
   }
 }
 
-/** Checks InputPin and InputPwm (currently they use the same ports.
+/** Checks InputPin and InputPwm (currently they use the same ports).
  *
  *  This mainly marks the pins, which in turns produces warnings for double allocation.
  */
@@ -101,6 +101,23 @@ function checkPin(configs, warnings, notes, pinFunctions) {
       if (types[j] != "ST_NONE") {
         pinFunctions[pinMapping[j]].push(niceName(conf["name"]) + " / " + niceName(types[j]));
       }
+    }
+  }
+}
+
+
+/** Checks OutputCan and InputCan
+ *
+ *  This mainly marks the pins, which in turns produces warnings for double allocation.
+ */
+function checkCan(configs, warnings, notes, pinFunctions) {
+  const hasCan = (e) => {return e.includes("CAN");};
+  if (configs.length > 0) {
+    if (pinFunctions[12].find(hasCan) == undefined) {
+      pinFunctions[12].push("CAN / TX");
+    }
+    if (pinFunctions[14].find(hasCan) == undefined) {
+      pinFunctions[14].push("CAN / RX");
     }
   }
 }
@@ -309,7 +326,7 @@ const procCheckers = {
     checkADC(c, w, n, p);
   },
   "INPUT_CAN": (c, w, n, p) => {
-    checkOnlyOne(c, w, n, p);
+    checkCan(c, w, n, p);
   },
   "INPUT_PIN": (c, w, n, p) => {
     checkPin(c, w, n, p);
@@ -348,6 +365,9 @@ const procCheckers = {
     checkOnlyOne(c, w, n, p);
     p[25].push(niceName(c[0]["name"]) + " / Channel 1");
     p[26].push(niceName(c[0]["name"]) + " / Channel 2");
+  },
+  "OUTPUT_CAN": (c, w, n, p) => {
+    checkCan(c, w, n, p);
   },
   "OUTPUT_PWM": (c, w, n, p) => {
     checkPwm(c, w, n, p);
