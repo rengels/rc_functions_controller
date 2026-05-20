@@ -399,6 +399,24 @@ input[type=number] {
   text-align:right;
 }
 
+dl {
+  display: grid;
+  grid-gap: 0px .1em;
+  grid-template-columns: max-content auto;
+}
+dt {
+  grid-column-start: 1;
+  text-align:right;
+  font-weight: bold;
+}
+dt::after {
+  content: ":";
+}
+dd {
+  margin: 0;
+  grid-column-start: 2;
+}
+
 /* styles for cpu pinout */
 .cpuBorderTop {
     border-top: 2px solid var(--color_lv_3);

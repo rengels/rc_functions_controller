@@ -137,23 +137,16 @@ function checkPpm(configs, warnings, notes, pinFunctions) {
   }
 }
 
-
-function checkEngine(configs, warnings, notes, pinFunctions) {
+/** Check the simple engine.
+ *
+ *  This only checks rpmMax and rpmIdle right now
+ */
+function checkEngineSimple(configs, warnings, notes, pinFunctions) {
   for (let i = 0; i < configs.length; i++) {
     const conf = configs[i];
     const engineType = Number(conf["values"]["engineType"][0]);
     const idleManager = conf["values"]["idleManager"][0];
-    const rpmIdle = Number(idleManager["rpmIdleRunning"][0]);
-    const speedFactor = Number(conf["values"]["speedFactor"][0]);
-
-    const gears = conf["values"]?.["fullGears"]?.[0];
-    if (gears == null) {
-      gears = conf["values"]?.["gears"]?.[0];
-    }
-    if (gears == null) {
-      gears = [];
-    }
-
+    const rpmIdle = Number(idleManager["rpmIdleRunning"]);
     const rpmMax = Number(conf["values"]["rpmMax"][0]);
 
     if (rpmIdle < 0.0) {
@@ -172,6 +165,103 @@ function checkEngine(configs, warnings, notes, pinFunctions) {
       (engineType != 0 && engineType != 4)) {
       warnings.push("Zero idle RPM only works for electric or steam engines for proc " +
         niceName(configs[0]["name"]) + ".");
+    }
+  }
+}
+
+
+/** Calculates speed for a given gear.
+ *
+ *  @param rpm RPM in rotation per minute
+ *  @param gearRatio The gear ratio
+ *  @param speedFactor The factor distance per drive shaft rotation.
+ *  @returns resulting speed in km/h
+ */
+function calcSpeedForRpm(rpm, gearRatio, speedFactor) {
+    return rpm / 60.0 * speedFactor / gearRatio / 1000 * 3600;
+}
+
+/** Calculates some values for engineGear
+ */
+function checkEngineGear(configs, warnings, notes, pinFunctions) {
+  for (let i = 0; i < configs.length; i++) {
+    const conf = configs[i];
+    const engineType = Number(conf["values"]["engineType"][0]);
+    const idleManager = conf["values"]["idleManager"][0];
+    const rpmIdle = Number(idleManager["rpmIdleRunning"]);
+    const rpmMax = Number(conf["values"]["rpmMax"][0]);
+    const rpmShift = Number(conf["values"]["rpmShift"][0]);
+    const speedFactor = Number(conf["values"]["speedFactor"][0]);
+
+    // the sorted gears
+    var gears = conf["values"]?.["fullGears"]?.[0];
+    if (gears == null) {
+      gears = conf["values"]?.["gears"]?.[0];
+    }
+    if (gears == null) {
+      gears = [];
+    }
+    // sort inverted factor (a gear with gear factor 6 is lower than factor 2)
+    gears.sort((a,b) => {return (1 / a) - (1 / b);});
+
+    // --- gear names
+    // for a nicer output, we need some names for the gears like "R" or "-1" or "1"
+    // for the first forward gear
+    var gearNames = new Array(gears.length);
+    var firstForwardGear = 0;
+    for (var g = 0; g < gears.length; g++) {
+      if (gears[g] >= 0) {
+        firstForwardGear = g;
+        break;
+      }
+    }
+
+    // rear gears
+    if (firstForwardGear == 1) {
+      gearNames[0] = "R";
+    } else {
+      for (var g = 0; g < firstForwardGear; g++) {
+        gearNames[g] = "" + (g - firstForwardGear);
+      }
+    }
+
+    // forward gears
+    for (var g = firstForwardGear; g < gears.length; g++) {
+      gearNames[g] = "" + (g - firstForwardGear + 1);
+    }
+
+
+
+    // Calculate the different speeds per gear
+    if (gears.length == 0) {
+      notes.push("Speed range: " +
+        calcSpeedForRpm(rpmIdle, 1, speedFactor) + " <small>km/h</small> to " +
+        calcSpeedForRpm(rpmMax, 1, speedFactor) + " <small>km/h</small>.");
+    } else {
+      var strNote = "Speed range for gears:<br/>";
+      strNote += "<dl>";
+      for (var g = 0; g < gears.length; g++) {
+        strNote += "<dt>Gear " + gearNames[g] + "</dt>";
+        strNote += "<di>" + 
+          calcSpeedForRpm(rpmIdle, gears[g], speedFactor) + " <small>km/h</small> to " +
+          calcSpeedForRpm(rpmMax, gears[g], speedFactor) + " <small>km/h</small>." +
+          "</di>";
+      }
+      strNote += "</dl>";
+      notes.push(strNote);
+    }
+
+    // Calculate if the shifting RPM is outside of the speed range of the next higher gear
+    if (gears.length > 1) {
+      for (var g = 1; g < gears.length; g++) {
+        if (gears[g - 1] > 0 && gears[g] > 0) {
+          if (calcSpeedForRpm(rpmMax, gears[g - 1], speedFactor) <
+              calcSpeedForRpm(rpmShift, gears[g], speedFactor)) {
+            warnings.push(`The rpmShift is too high to switch from gear ${gearNames[g - 1]} to ${gearNames[g]}.`);
+          }
+          // TODO for negative gears
+        }
+      }
     }
   }
 }
@@ -292,16 +382,16 @@ function checkPins(configs, warnings, notes, pinFunctions) {
 
   const pinMapping = {
     0: "outputs PWM signal at boot, must be LOW to enter flashing mode.",
-    1: "debug output at boot",
-    2: "connected to on-board LED, must be left floating or LOW to enter flashing mode.",
-    3: "pin	HIGH at boot.",
+    1: "is debug output at boot",
+    2: "is connected to on-board LED, must be left floating or LOW to enter flashing mode.",
+    3: "pin	is HIGH at boot.",
     5: "outputs PWM signal at boot, strapping pin.",
-    6: "connected to the integrated SPI flash.",
-    7: "connected to the integrated SPI flash.",
-    8: "connected to the integrated SPI flash.",
-    9: "connected to the integrated SPI flash.",
-    10: "connected to the integrated SPI flash.",
-    11: "connected to the integrated SPI flash.",
+    6: "is connected to the integrated SPI flash.",
+    7: "is connected to the integrated SPI flash.",
+    8: "is connected to the integrated SPI flash.",
+    9: "is connected to the integrated SPI flash.",
+    10: "is connected to the integrated SPI flash.",
+    11: "is connected to the integrated SPI flash.",
     12: "boot fails if pulled high, strapping pin.",
     14: "outputs PWM signal at boot.",
     15: "outputs PWM signal at boot, strapping pin.",
@@ -346,19 +436,22 @@ const procCheckers = {
 
   "ENGINE_REVERSE": (c, w, n, p) => {
     checkOnlyOne(c, w, n, p);
-    checkEngine(c, w, n, p);
+    checkEngineSimple(c, w, n, p);
+    checkEngineGear(c, w, n, p);
   },
   "ENGINE_BRAKE": (c, w, n, p) => {
     checkOnlyOne(c, w, n, p);
-    checkEngine(c, w, n, p);
+    checkEngineSimple(c, w, n, p);
+    checkEngineGear(c, w, n, p);
   },
   "ENGINE_GEAR": (c, w, n, p) => {
     checkOnlyOne(c, w, n, p);
-    checkEngine(c, w, n, p);
+    checkEngineSimple(c, w, n, p);
+    checkEngineGear(c, w, n, p);
   },
   "ENGINE_SIMPLE": (c, w, n, p) => {
     checkOnlyOne(c, w, n, p);
-    checkEngine(c, w, n, p);
+    checkEngineSimple(c, w, n, p);
   },
 
   "OUTPUT_AUDIO": (c, w, n, p) => {
@@ -725,28 +818,28 @@ function fillTable() {
   const elWarnings = document.getElementById("hwWarnings");
   elWarnings.innerHTML = "";
   if (warnings.length == 0) {
-    let elText = document.createElement("div");
-    elText.textContent = "none";
-    elWarnings.appendChild(elText);
+    let elDiv = document.createElement("div");
+    elDiv.textContent = "none";
+    elWarnings.appendChild(elDiv);
   } else {
     for (let i = 0; i < warnings.length; i++ ) {
-      let elText = document.createElement("div");
-      elText.textContent = warnings[i];
-      elWarnings.appendChild(elText);
+      let elDiv = document.createElement("div");
+      elDiv.textContent = warnings[i];
+      elWarnings.appendChild(elDiv);
     }
   }
 
   const elNotes = document.getElementById("hwNotes");
   elNotes.innerHTML = "";
   if (notes.length == 0) {
-    let elText = document.createElement("div");
-    elText.textContent = "none";
-    elNotes.appendChild(elText);
+    let elDiv = document.createElement("div");
+    elDiv.textContent = "none";
+    elNotes.appendChild(elDiv);
   } else {
     for (let i = 0; i < notes.length; i++ ) {
-      let elText = document.createElement("div");
-      elText.textContent = notes[i];
-      elNotes.appendChild(elText);
+      let elDiv = document.createElement("div");
+      elDiv.innerHTML = notes[i];
+      elNotes.appendChild(elDiv);
     }
   }
 
