@@ -180,8 +180,8 @@ public:
             if (config.count("massV")) {
                 engineGear->massVehicle = config["massV"].as<float>();
             }
-            if (config.count("wheel")) {
-                engineGear->speedFactor = config["wheel"].as<float>();
+            if (config.count("factor")) {
+                engineGear->speedFactor = config["factor"].as<float>();
             }
             if (config.count("rpmShift")) {
                 engineGear->rpmShift = config["rpmShift"].as<float>();
@@ -455,7 +455,7 @@ po::options_description createOptions() {
             "Idle RPM in rev per minute.")
         ("rpmShift,s",
             po::value<float>(),
-            "RPM to keep when switching gears")
+            "minimum RPM to keep when upshifting")
         ("couplingFactor",
             po::value<int>(),
             "Percentage for coupling clutch energy transfer")
@@ -465,9 +465,9 @@ po::options_description createOptions() {
         ("doubleDeclutch",
             po::value<bool>(),
             "Double declutch (Zwischengas)")
-        ("wheel,w",
+        ("factor",
             po::value<float>(),
-            "Wheel diameter in Meters")
+            "Speed factor, meter per gear shaft rotation")
         ("gears,g",
             po::value< vector<float> >(),
             "List of gear ratios.")
