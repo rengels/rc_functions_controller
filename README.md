@@ -118,6 +118,11 @@ To build the unit tests:
     cmake --preset default
     cmake --build --preset default
 
+To execute the unit tests:
+
+    cd build/default/test/
+    ctest
+
 To build the web front-end:
 
     cmake --preset default

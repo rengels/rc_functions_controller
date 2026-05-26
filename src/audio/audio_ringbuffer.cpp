@@ -18,8 +18,8 @@ rcProc::SamplesInterval AudioRingbuffer::getEmptyBlocks() {
         &(buffer[indexEmpty * BLOCK_SIZE]),
     };
 
-    while ((blockStatus[indexEmpty] == BlockStatus::EMPTY) &&
-        (indexEmpty < NUM_BLOCKS)) {
+    while ((indexEmpty < NUM_BLOCKS) &&
+            (blockStatus[indexEmpty] == BlockStatus::EMPTY)) {
         result.last += BLOCK_SIZE;
         blockStatus[indexEmpty] = BlockStatus::WRITING;
         indexEmpty++;
